@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paeds Dosing Master + Volume Calc</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --text: #334155;
+        --border: #e2e8f0;
+        --primary: #2563eb;
+
+        /* Traffic Light Colors */
+        --status-green-bg: #dcfce7;
+        --status-green-text: #166534;
+        --status-red-bg: #fee2e2;
+        --status-red-text: #991b1b;
+        --status-amber-bg: #fff7ed;
+        --status-amber-text: #9a3412;
+        --status-grey-bg: #f1f5f9;
+        --status-grey-text: #64748b;
+        --status-blue-bg: #dbeafe;
+        --status-blue-text: #1e40af;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        padding-top: 0;
+      }
+
+      /* Sticky Header Controls */
+      .header-controls {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+        padding: 15px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border);
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+
+      .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-width: 100px;
+        flex: 1;
+      }
+      .input-wrapper label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 4px;
+      }
+      .input-wrapper input {
+        padding: 10px;
+        border: 2px solid var(--border);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+      .input-wrapper input:focus {
+        border-color: var(--primary);
+        outline: none;
+      }
+
+      .search-wrapper {
+        flex: 2.5;
+        min-width: 250px;
+      }
+
+      /* Table Styles */
+      .table-container {
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow-x: auto;
+        min-height: 500px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      th {
+        background-color: #f1f5f9;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        position: sticky;
+        top: 0;
+      }
+
+      /* Indicators */
+      .status-cell {
+        width: 50px;
+        text-align: center;
+        vertical-align: middle;
+      }
+      .indicator {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background-color: #cbd5e1;
+        border: 2px solid white;
+        box-shadow: 0 0 0 1px #cbd5e1;
+      }
+
+      /* Row Coloring Logic */
+      tr.status-green {
+        background-color: #f0fdf4;
+      }
+      tr.status-green .indicator {
+        background-color: #22c55e;
+        box-shadow: 0 0 0 1px #22c55e;
+      }
+
+      tr.status-red {
+        background-color: #fef2f2;
+        border-left: 5px solid #ef4444;
+      }
+      tr.status-red .indicator {
+        background-color: #ef4444;
+        box-shadow: 0 0 0 1px #ef4444;
+      }
+
+      tr.status-amber {
+        background-color: #fffbeb;
+      }
+      tr.status-amber .indicator {
+        background-color: #f59e0b;
+        box-shadow: 0 0 0 1px #f59e0b;
+      }
+
+      /* Text & Badges */
+      .drug-name {
+        font-weight: 800;
+        color: #0f172a;
+        font-size: 1rem;
+      }
+      .category {
+        font-size: 0.7rem;
+        color: #64748b;
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 5px;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin-top: 4px;
+        margin-right: 5px;
+      }
+      .badge-red {
+        color: #991b1b;
+        background: #fee2e2;
+      }
+      .badge-green {
+        color: #166534;
+        background: #dcfce7;
+      }
+      .badge-amber {
+        color: #9a3412;
+        background: #fff7ed;
+      }
+      .badge-blue {
+        color: #1e40af;
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+      }
+
+      .dose-text {
+        white-space: pre-wrap;
+        line-height: 1.4;
+        font-size: 0.95rem;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-controls">
+      <div class="input-wrapper search-wrapper">
+        <label>🔍 Search Drug / Indication</label>
+        <input
+          type="text"
+          id="searchBox"
+          placeholder="Type name (e.g. Paracetamol)..."
+          autofocus
+        />
+      </div>
+
+      <div class="input-wrapper">
+        <label>🎂 Age (Years)</label>
+        <input type="number" id="inAge" placeholder="y.o." step="0.5" />
+      </div>
+
+      <div class="input-wrapper">
+        <label>⚖️ Weight (kg)</label>
+        <input type="number" id="inWeight" placeholder="kg" step="0.1" />
+      </div>
+
+      <div class="input-wrapper">
+        <label>💊 Dose Given (mg)</label>
+        <input type="number" id="inDose" placeholder="mg" step="0.1" />
+      </div>
+    </div>
+
+    <div id="resultsArea" class="table-container"></div>
+
+    <textarea id="csvData" class="hidden">
+Category|Drug|Route|Paediatric Dose|Adult Dose|Remarks
+ANTIBIOTICS|Amoxicillin|Oral|15-30 mg/kg TDS\nAcute OM/Pneumonia: 90mg/kg/DAY|1g|Susp: 125mg/5mL, Tab: 250/500mg
+ANTIBIOTICS|Augmentin (Amox/Clav)|Oral|Mild: 15-25mg/kg BD\nSevere: 22.5mg/kg TDS|Tab: 625mg|Dose based on Amox/Clav.\nMax clavulanic 10mg/kg/day.\nSusp: 228mg/5ml
+ANTIBIOTICS|Augmentin (Amox/Clav)|IV|30mg/kg 8H|1.2g|
+ANTIBIOTICS|Ampicillin|IV|Mild: 25mg/kg 6H\nSepsis: 50mg/kg 6H\nMeningitis: 75-100mg/kg 6H|500mg - 2g|Neonates: See neonatal section
+ANTIBIOTICS|Unasyn (Ampi-Sulbactam)|Oral|<30kg: 12.5-25mg/kg BD\n≥30kg: 375-750mg BD|750mg|Tab: 375mg
+ANTIBIOTICS|Unasyn (Ampi-Sulbactam)|IV|Mild: 75mg/kg 6H\nSevere: 150mg/kg 6H|3g|1 vial: 1g ampi / 0.5g sulbactam
+ANTIBIOTICS|Amikacin|IV|15mg/kg 24H|1g|Conc ≤ 5mg/mL. Trough <2.3. Watch renal function.
+ANTIBIOTICS|Azithromycin|Oral/IV|10mg/kg 24H for 3 days|500mg|Susp: 200mg/5mL
+ANTIBIOTICS|Cefaclor|Oral|10-15mg/kg TDS|500mg|Potential serum sickness
+ANTIBIOTICS|Cefepime|IV|50mg/kg 12H\nSevere/Neutropenic: 50mg/kg 8H|1-2g|
+ANTIBIOTICS|Cephalexin|Oral|10-15mg/kg QDS\nSevere: 15-25mg/kg QDS|500mg|Susp: 125mg/5mL
+ANTIBIOTICS|Ceftazidime|IV|30mg/kg 8H\nSevere/Neutropenic: 50mg/kg 8H|1-2g|
+ANTIBIOTICS|Ceftriaxone|IV|Sepsis: 50mg/kg 24H\nMeningitis: 50mg/kg 12H|2g|Do not use with calcium-containing solutions (Hartmanns)
+ANTIBIOTICS|Cefotaxime|IV|50mg/kg 8H\nMeningitis: 75-100mg/kg 8H|2g|
+ANTIBIOTICS|Cefuroxime|Oral|Susp: 10-15mg/kg BD\nTabs (>12yo): 250-500mg BD|500mg|Susp and Tabs NOT interchangeable dosing
+ANTIBIOTICS|Cefazolin|IV|20mg/kg 8H\nSevere/Septic Arthritis: 50mg/kg 8H|2g|
+ANTIBIOTICS|Clarithromycin|Oral|7.5mg/kg BD|500mg|Susp: 125mg/5ml
+ANTIBIOTICS|Clindamycin|Oral/IV|Mild: 5-7mg/kg 8H\nSevere: 7-13mg/kg 8H|IV: 900mg\nPO: 450mg|Risk of pseudomembranous colitis
+ANTIBIOTICS|Cloxacillin|Oral|6.25 – 12.5mg/kg QDS|500mg|Susp: 125mg/5mL
+ANTIBIOTICS|Cloxacillin|IV|15mg/kg 6H\nSevere: 25-50mg/kg 6H|1-2g|
+ANTIBIOTICS|Doxycycline|Oral|2.2mg/kg 12H|100mg|Avoid in <8YO (Teeth staining)
+ANTIBIOTICS|Gentamicin|IV|6mg/kg 24H|360mg|Trough <1. Obese: use adj weight.
+ANTIBIOTICS|Metronidazole|Oral/IV|10mg/kg 8H|500mg|Tab: 200mg
+ANTIBIOTICS|Meropenem|IV|Mild: 10mg/kg 8H\nSevere: 20mg/kg 8H\nMeningitis: 40mg/kg 8H|1g - 2g|
+ANTIBIOTICS|Penicillin G|IV|0.05 MU/kg 6H\nMeningitis: 0.1 MU/kg 6H|2-4 MU|1 MU = 600mg
+ANTIBIOTICS|Penicillin V|Oral|7.5-15mg/kg QDS|500mg|
+ANTIBIOTICS|Piperacillin/Tazobactam|IV|60-90mg/kg 6H|4.5g|Infuse over 30min
+ANTIBIOTICS|Bactrim (TMP/SMX)|Oral/IV|Treatment: 4-6mg TMP/kg 12H\nPCP Tx: 5mg TMP/kg 6-8H|160mg TMP|Dosed on TMP component
+ANTIBIOTICS|Vancomycin|IV|<16yo: 15mg/kg 6H\n>16yo: 15mg/kg 12H|1g|Check trough pre-3rd/4th dose.
+ANTIBIOTICS|Vancomycin|Oral|C.Diff: 10mg/kg 6H|125mg|Systemic absorption is negligible
+NEONATAL|Ampicillin|IV|GBS Meningitis (0-7d): 100mg/kg 8H\n(>8d): 75mg/kg 6H|-|Refer to Neofax for others
+NEONATAL|Amoxicillin|Oral|15mg/kg 12H|-|-|
+NEONATAL|Gentamicin|IV|4mg/kg 24H|-|Trough pre-3rd dose
+NEONATAL|Metronidazole|IV/Oral|Load: 15mg/kg\nMaint: 7.5mg/kg (Freq depends on PMA)|-|
+ANTIVIRAL|Acyclovir|IV|HSV Enceph: 20mg/kg 8H (<12y)\nVZV: 10mg/kg 8H|-|-|Ensure hydration
+ANTIVIRAL|Acyclovir|Oral|VZV: 20mg/kg QDS x 5d\nHSV Gingivo: 20mg/kg QDS|800mg|
+ANTIVIRAL|Valacyclovir|Oral|20mg/kg TDS (VZV) or BD (HSV)|1g|Min age 3 months
+ANTIVIRAL|Oseltamivir (Tamiflu)|Oral|<15kg: 30mg BD\n15-23kg: 45mg BD\n23-40kg: 60mg BD\n>40kg: 75mg BD|75mg|Renal adjust req
+ANTIFUNGAL|Fluconazole|Oral/IV|Load: 6-12mg/kg\nMaint: 3-12mg/kg OD|800mg|
+ANTIFUNGAL|Micafungin|IV|Tx: 2-4mg/kg OD\nProph: 1mg/kg OD|Tx: 200mg|
+ANTIFUNGAL|Anidulafungin|IV|Load: 3mg/kg\nMaint: 1.5mg/kg OD|200mg / 100mg|
+ANALGESIA|Paracetamol|Oral/IV|10-15mg/kg 6H|1g|Max 75mg/kg/day. Hepatic caution.\nSusp: 120mg/5mL
+ANALGESIA|Ibuprofen|Oral|5-10mg/kg 6-8H|400mg|Max 40mg/kg/day. Avoid in < 6mo. Give with food.\nSusp: 100mg/5mL
+ANALGESIA|Diclofenac|Oral/PR|0.5-1mg/kg 8-12H|50mg|Age >1yo
+ANALGESIA|Naproxen|Oral|5-7mg/kg 8-12H|550mg|Age >2yo. Max 1100mg/day
+ANALGESIA|Ketorolac|IV|0.2-0.5mg/kg 6-8H|30mg|Max duration 5 days
+ANALGESIA|Tramadol|Oral/IV|1-2mg/kg 6H PRN|100mg|Avoid in <12yo. Nausea common.
+ANALGESIA|Mist Morphine|Oral|0.2-0.5mg/kg 6-8H PRN|-|Start low. Monitor resp.
+CONSTIPATION|Glycerin Enema|PR|<6mo: 0.5 supp\n6mo-2y: 1 supp\n>2y: 1.5 supp|-|
+CONSTIPATION|Lactulose|Oral|0.5mL/kg 12-24H|-|
+CONSTIPATION|Sennosides|Oral|2-6yo: 0.5-1 tab ON\n6-12yo: 1-2 tab ON|15mg|Tab: 7.5mg
+CONSTIPATION|Bisacodyl|Oral/PR|3-12yo: 5-10mg OD\n>12yo: 10mg OD|10mg|Do not crush tabs
+CONSTIPATION|PEG 4000 (Forlax)|Oral|Maint: 0.4-0.8g/kg/day\nDisimpaction: 1-1.5g/kg/day|2 sachets|Dissolve in water
+CONSTIPATION|Fleet Enema|PR|2-12yo: 1 Paeds bottle\n>12yo: 1 Adult bottle|-|Not for <2yo. High Phosphate.
+ANTI-DIARRHOEAL|Smecta|Oral|>2yo: 1 sachet BD-TDS|-|Not for <2yo (lead content)
+ANTI-DIARRHOEAL|Lacteol Fort|Oral|<2yo: 0.5 sachet BD\n>2yo: 1 sachet BD|-|Lactobacillus acidophilus
+ANTI-DIARRHOEAL|LactoGG|Oral|<1yo: 0.5 capsule OD\n≥1yo: 1 capsule OD|-|Lactobacillus rhamnosus
+ANTI-DIARRHOEAL|Racecadotril (Hidrasec)|Oral|9-13kg: 20mg TDS\n13-27kg: 30mg TDS\n>27kg: 60mg TDS|-|Not <3mo. Stop if >5 days.
+ABDOMINAL|Gaviscon / MMT|Oral|6-12yo: 5-10ml TDS\n>12yo: 10-20ml TDS|-|Avoid in Na restricted diet
+ABDOMINAL|Famotidine|Oral/IV|0.5-1mg/kg BD|40mg|
+ABDOMINAL|Omeprazole|Oral|0.5-1mg/kg OD-BD|40mg|
+ABDOMINAL|Esomeprazole|Oral/IV|<20kg: 10mg OD\n>20kg: 20mg OD|40mg|
+ABDOMINAL|Ridwind (Simethicone)|Oral|<2yo: 0.2ml QDS\n>2yo: 0.4ml QDS|-|
+ABDOMINAL|Trimebutine|Oral|<1yo: 25mg BD\n1-5yo: 25mg TDS\n>12yo: 100-200mg TDS|200mg|
+ANTI-EMETIC|Cinnarizine|Oral|0.3-0.6mg/kg TDS|25mg|Not for <5yo
+ANTI-EMETIC|Promethazine|Oral/IM|0.25-0.5mg/kg 6-8H|25mg|Contraindicated <2yo
+ANTI-EMETIC|Domperidone|Oral|0.2-0.5mg/kg 8H|10mg|Watch QT prolongation.\nSusp: 1mg/ml
+ANTI-EMETIC|Ondansetron|Oral/IV|0.1-0.2mg/kg 8H|8mg|Age >6mo
+MUCOLYTIC/COUGH|Bromhexine|Oral|2-6yo: 2mg TDS\n6-12yo: 4mg TDS\n>12yo: 8mg TDS|16mg|Soln: 4mg/5ml
+MUCOLYTIC/COUGH|Fluimucil (Acetylcysteine)|Oral|2-6yo: 100mg BD\n>6yo: 200mg BD or 600mg OD|600mg|
+MUCOLYTIC/COUGH|Promethazine|Oral|2-5yo: 2.5-5mg BD\n>12yo: 10-15mg BD|25mg|Contraindicated <2yo\nSoln: 5mg/5ml
+MUCOLYTIC/COUGH|Dextromethorphan|Oral|2-5yo: 2.5ml TDS\n6-12yo: 5ml TDS|10ml|Soln: 15mg/5ml
+NASAL|Oxymetazoline (Iliadin)|Nasal|1mo-1y: 0.01% 1 drop TDS\n1-6y: 0.025% 1 drop TDS\n>6y: 0.05% 1 drop TDS|-|Max 5 days
+ANTIHISTAMINE|Chlorpheniramine|Oral|2-5yo: 1mg TDS\n6-11yo: 2mg TDS\n12-17yo: 4mg TDS|4mg|Soln: 4mg/5ml
+ANTIHISTAMINE|Hydroxyzine|Oral|0.5mg/kg TDS|25mg|Age >6mo.\nSoln: 10mg/5ml
+ANTIHISTAMINE|Cetirizine (Zyrtec)|Oral|6mo-2yo: 2.5mg OD\n2-5yo: 2.5-5mg OD\n>5yo: 5-10mg OD|10mg|Soln: 1mg/ml
+ANTIHISTAMINE|Fexofenadine (Telfast)|Oral|6mo-2yo: 15mg BD\n2-11yo: 30mg BD\n>12yo: 180mg OD|180mg|Susp: 30mg/5ml
+ASTHMA|Salbutamol|MDI|2-6 puffs 4-6H|8 puffs|Via spacer
+ASTHMA|Salbutamol|Neb|<5yo: 0.5ml (2.5mg)\n>5yo: 1ml (5mg)|-|Use with 2-3ml NS
+ASTHMA|Ipratropium|Neb|250mcg (1ml) 6-8H|500mcg|
+ASTHMA|Prednisolone|Oral|1-2mg/kg OD x 3-5 days|40mg|
+ASTHMA|Hydrocortisone|IV|Asthma: 4mg/kg 6H|100mg|
+CROUP|Dexamethasone|Oral/IV|0.15 - 0.6mg/kg STAT|10mg|Max 12mg usually
+CROUP|Adrenaline|Neb|0.5ml/kg of 1:1000 (Max 5ml)|5ml|Monitor ECG/Rebound
+ANAPHYLAXIS|Adrenaline|IM|0.01ml/kg of 1:1000|0.5ml|IM ONLY. Repeat 5-10min if needed.
+SEIZURE|Lorazepam|IV|0.05-0.1mg/kg|4mg|Max 2 doses
+SEIZURE|Diazepam|IV|0.1-0.4mg/kg|10-20mg|Respiratory depression risk
+SEIZURE|Midazolam|Buccal/IM|0.2 - 0.5mg/kg|10mg|
+SEIZURE|Phenytoin|IV|Load: 15-20mg/kg\nMaint: 2.5-3mg/kg 12H|-|Filter required. Cardiac monitor.
+SEIZURE|Phenobarbitone|IV|Load: 20mg/kg\nMaint: 2.5-3mg/kg 12H|-|
+SEIZURE|Levetiracetam (Keppra)|IV/Oral|Load: 20-40mg/kg\nMaint: 10mg/kg 12H|3g|
+ANTI-HYPERTENSIVE|Amlodipine|Oral|0.1-0.6mg/kg 24H|10mg|
+ANTI-HYPERTENSIVE|Nifedipine|Oral|0.04-0.25mg/kg 4-6H|10mg|Acute only
+ANTI-HYPERTENSIVE|Frusemide|Oral/IV|0.5-1mg/kg 6-24H|80mg|Monitor K
+CEREBRAL EDEMA|3% NaCl|IV|5ml/kg over 20mins|-|-|
+CEREBRAL EDEMA|Mannitol 20%|IV|5ml/kg (1g/kg)|500ml|
+CORTICOSTEROID|Hydrocortisone|IV|Stress Dose: 25mg/m2 6H\nShock: 1mg/kg 6H|100mg|
+HYPOGLYCEMIA|Dextrose 10%|IV|2ml/kg STAT|-|-|
+COAGULOPATHY|Vitamin K|Oral/IV|0.3mg/kg|10mg|Slow bolus max 1mg/min
+INTUBATION|Midazolam|IV|0.2-0.3mg/kg|5mg|Caution in shock
+INTUBATION|Ketamine|IV|1-2mg/kg|100mg|
+INTUBATION|Etomidate|IV|0.2-0.4mg/kg|20mg|Avoid in septic shock
+INTUBATION|Fentanyl|IV|1-2mcg/kg|100mcg|
+INTUBATION|Suxamethonium|IV|2mg/kg|-|-|CI: Hyperkalemia, Burns
+INTUBATION|Rocuronium|IV|0.6-1.2mg/kg|50mg|
+SEDATION|Chloral Hydrate|Oral|30-50mg/kg|1g|Max 2g total
+SEDATION|Ketamine|IV|1-2mg/kg|200mg|
+REVERSAL|Naloxone|IV|0.01mg/kg (See protocol)|2mg|Opioid antidote
+REVERSAL|Flumazenil|IV|5mcg/kg|2mg|Benzo antidote. Risk of seizure.
+BLOOD|Packed Cells|IV|10-15ml/kg over 3-4H|-|-|4ml/kg raises Hb by 1
+BLOOD|Platelets|IV|10ml/kg|-|
+BLOOD|FFP|IV|10-20ml/kg|-|
+PRE-MED|Diphenhydramine|IV|0.5-1mg/kg|50mg|
+PRE-MED|Hydrocortisone|IV|1-2mg/kg|100mg|
+FLUIDS|Maintenance Fluid|IV|3-10kg: 100ml/kg\n10-20kg: 1000ml + 50ml/kg over 10\n>20kg: 1500ml + 20ml/kg over 20|Max 2500ml|Holliday-Segar Formula
+ELECTROLYTES|Sodium Deficit|Calc|0.6 x Wt x (135 - Current Na)|-|Use 0.9% or 3% NaCl depending on severity
+ELECTROLYTES|Potassium Deficit|Calc|0.6 x Wt x (4.0 - Current K)|-|Max IV rate 0.4mmol/kg/hr
+ELECTROLYTES|Potassium Chloride|Oral|Mist KCl: 1.3mmol/ml\nSpan K: 8mmol/tab|-|Give with feed
+ELECTROLYTES|Bicarbonate (Acidosis)|IV|0.3 x Base Deficit x Wt|-|Use 4.2% in peripheral/neonates
+ELECTROLYTES|Calcium Gluconate 10%|IV|0.5ml/kg (Max 20ml)|-|Slow IV
+ELECTROLYTES|Magnesium Sulphate 50%|IV|0.4mmol/kg (0.2ml/kg)|-|Max 50% conc
+</textarea
+    >
+
+    <script>
+      const csvInput = document.getElementById("csvData");
+      const searchBox = document.getElementById("searchBox");
+      const resultsArea = document.getElementById("resultsArea");
+      const inAge = document.getElementById("inAge");
+      const inWeight = document.getElementById("inWeight");
+      const inDose = document.getElementById("inDose");
+
+      // --- HELPERS ---
+
+      function parseMg(str) {
+        if (!str) return null;
+        const s = str.toLowerCase().replace(/\s/g, "");
+        if (s.includes("mg")) return parseFloat(s.replace("mg", ""));
+        if (s.includes("g") && !s.includes("mg"))
+          return parseFloat(s.replace("g", "")) * 1000;
+        return null;
+      }
+
+      function checkAgeIssues(inputAge, text) {
+        if (!inputAge || !text) return null;
+        const t = text.toLowerCase();
+        const ageMatch = t.match(
+          /(?:<|>|age\s*>|age\s*<)\s*(\d+(?:\.\d+)?)\s*(yo|yr|year|mo|mth)/
+        );
+
+        if (ageMatch) {
+          let limit = parseFloat(ageMatch[1]);
+          const unit = ageMatch[2];
+          if (unit.startsWith("m")) limit = limit / 12;
+
+          if (
+            t.includes("avoid") ||
+            t.includes("contraindicated") ||
+            t.includes("not recommended") ||
+            t.includes("not for") ||
+            t.includes("not to be used")
+          ) {
+            if (t.includes("<") && inputAge < limit)
+              return `⚠️ Too Young (Avoid < ${limit}y)`;
+          }
+          if (t.includes(">") && !t.includes("<")) {
+            if (inputAge < limit) return `⚠️ Too Young (Min ${limit}y)`;
+          }
+        }
+        return null;
+      }
+
+      function getRefRange(text) {
+        if (!text) return null;
+        const rangeRegex =
+          /(\d+(?:\.\d+)?)\s*(?:-|–|to)\s*(\d+(?:\.\d+)?)\s*mg\/kg/i;
+        const rangeMatch = text.match(rangeRegex);
+        if (rangeMatch)
+          return {
+            min: parseFloat(rangeMatch[1]),
+            max: parseFloat(rangeMatch[2]),
+          };
+
+        const singleRegex = /(\d+(?:\.\d+)?)\s*mg\/kg/i;
+        const singleMatch = text.match(singleRegex);
+        if (singleMatch) {
+          const val = parseFloat(singleMatch[1]);
+          return { min: val * 0.9, max: val * 1.1 };
+        }
+        return null;
+      }
+
+      // --- VOLUME CALCULATOR LOGIC ---
+      function getVolumeCalc(doseMg, remarksText) {
+        if (!doseMg || !remarksText) return null;
+        const t = remarksText.toLowerCase();
+
+        // Regex to look for "X mg / Y ml" or "X mg/ml"
+        // Capture group 1: mg, Capture group 2: ml
+        const concRegex = /(\d+(?:\.\d+)?)\s*mg\s*\/\s*(\d+(?:\.\d+)?)\s*ml/;
+        const match = t.match(concRegex);
+
+        if (match) {
+          const strengthMg = parseFloat(match[1]);
+          const strengthMl = parseFloat(match[2]);
+          const vol = (doseMg / strengthMg) * strengthMl;
+          return {
+            vol: vol.toFixed(1),
+            desc: `${strengthMg}mg/${strengthMl}ml`,
+          };
+        }
+
+        // Handle "1 mg/ml" format (implied 1ml)
+        const simpleRegex = /(\d+(?:\.\d+)?)\s*mg\s*\/\s*ml/;
+        const matchSimple = t.match(simpleRegex);
+        if (matchSimple) {
+          const strengthMg = parseFloat(matchSimple[1]);
+          const vol = doseMg / strengthMg;
+          return {
+            vol: vol.toFixed(1),
+            desc: `${strengthMg}mg/ml`,
+          };
+        }
+
+        return null;
+      }
+
+      // --- PARSER ---
+      function parseCSV(text) {
+        const lines = text.trim().split("\n");
+        const headers = lines[0].split("|").map((h) => h.trim());
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+          const currentLine = lines[i].split("|");
+          if (currentLine.length >= 2) {
+            const obj = {};
+            headers.forEach(
+              (header, index) =>
+                (obj[header] = currentLine[index]
+                  ? currentLine[index].trim()
+                  : "")
+            );
+            data.push(obj);
+          }
+        }
+        return data;
+      }
+
+      // --- RENDERER ---
+      function renderTable(data) {
+        if (data.length === 0) {
+          resultsArea.innerHTML =
+            '<div style="padding:40px; text-align:center; color:#94a3b8;">No matches.</div>';
+          return;
+        }
+
+        const age = parseFloat(inAge.value);
+        const weight = parseFloat(inWeight.value);
+        const dose = parseFloat(inDose.value);
+
+        const hasDose = !isNaN(dose) && dose > 0;
+        const hasWeight = !isNaN(weight) && weight > 0;
+        const hasAge = !isNaN(age);
+
+        let html =
+          "<table><thead><tr><th class='status-cell'></th><th>Drug</th><th>Paediatric Dose</th><th>Adult/Max</th><th>Remarks</th></tr></thead><tbody>";
+
+        data.forEach((row) => {
+          let status = "status-grey";
+          let message = "";
+          let badgeClass = "";
+          let volBadge = "";
+
+          // PRIORITY 1: AGE CHECK
+          if (hasAge) {
+            const warning = checkAgeIssues(
+              age,
+              row["Remarks"] + " " + row["Paediatric Dose"]
+            );
+            if (warning) {
+              status = "status-red";
+              message = warning;
+              badgeClass = "badge-red";
+            }
+          }
+
+          // PRIORITY 2: ABSOLUTE MAX DOSE
+          if (hasDose && status !== "status-red") {
+            const maxAbs = parseMg(row["Adult Dose"]);
+            if (maxAbs && dose > maxAbs) {
+              status = "status-red";
+              message = `⚠️ Exceeds Max (${maxAbs}mg)`;
+              badgeClass = "badge-red";
+            }
+          }
+
+          // PRIORITY 3: WEIGHT BASED CALC
+          if (hasDose && hasWeight && status !== "status-red") {
+            const mgKg = dose / weight;
+            const range = getRefRange(row["Paediatric Dose"]);
+
+            if (range) {
+              if (mgKg >= range.min && mgKg <= range.max) {
+                status = "status-green";
+                message = `✅ ${mgKg.toFixed(1)} mg/kg`;
+                badgeClass = "badge-green";
+              } else {
+                status = "status-red";
+                message = `⚠️ ${mgKg.toFixed(1)} mg/kg (Range: ${range.min}-${
+                  range.max
+                })`;
+                badgeClass = "badge-red";
+              }
+            } else {
+              status = "status-amber";
+              message = `❓ ${mgKg.toFixed(1)} mg/kg (Verify)`;
+              badgeClass = "badge-amber";
+            }
+          }
+
+          // PRIORITY 4: VOLUME CALCULATION (If dose exists)
+          if (hasDose) {
+            const volData = getVolumeCalc(dose, row["Remarks"]);
+            if (volData) {
+              volBadge = `<br><span class="badge badge-blue">💧 ${volData.vol} mL (using ${volData.desc})</span>`;
+            }
+          }
+
+          const doseTxt = row["Paediatric Dose"].replace(/\\n/g, "<br>");
+
+          html += `<tr class="${status}">
+            <td class="status-cell"><span class="indicator"></span></td>
+            <td>
+                <div class="drug-name">${row["Drug"]}</div>
+                <span class="category">${row["Category"] || "General"}</span>
+                ${
+                  message
+                    ? `<br><span class="badge ${badgeClass}">${message}</span>`
+                    : ""
+                }
+                ${volBadge}
+            </td>
+            <td class="dose-text">${doseTxt}</td>
+            <td>${row["Adult Dose"]}</td>
+            <td class="dose-text">${row["Remarks"]}</td>
+          </tr>`;
+        });
+
+        html += "</tbody></table>";
+        resultsArea.innerHTML = html;
+      }
+
+      function update() {
+        const rawData = csvInput.value;
+        const searchTerm = searchBox.value.toLowerCase();
+        const allData = parseCSV(rawData);
+        const filtered = allData.filter((item) =>
+          Object.values(item).some((val) =>
+            val.toLowerCase().includes(searchTerm)
+          )
+        );
+        renderTable(filtered);
+      }
+
+      [searchBox, inAge, inWeight, inDose].forEach((el) =>
+        el.addEventListener("input", update)
+      );
+      update();
+    </script>
+  </body>
+</html>

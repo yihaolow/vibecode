@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warfarin Dose Calendar</title>
+    <style>
+      :root {
+        /* Screen Colors (Will print as light gray) */
+        --bg-brown: #f3e5dc;
+        --bg-blue: #e6f0ff;
+        --bg-pink: #ffe6f0;
+
+        --border: #000;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.3;
+        padding: 20px;
+        max-width: 100%;
+        margin: auto;
+        color: #000; /* Force black text */
+      }
+
+      /* PRINT SETTINGS */
+      @media print {
+        @page {
+          size: landscape;
+          margin: 0.5cm;
+        }
+        .no-print {
+          display: none !important;
+        }
+        body {
+          padding: 0;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        /* Hide inputs, show text spans */
+        input.count {
+          display: none;
+        }
+        .print-view {
+          display: block !important;
+          font-weight: bold;
+          font-size: 1.4em;
+        }
+
+        .meta-input {
+          border: none !important;
+          background: transparent !important;
+          font-weight: bold;
+          padding: 0 !important;
+          width: auto !important;
+        }
+
+        /* Ensure text is absolute black for contrast */
+        th,
+        td {
+          border-color: #000 !important;
+          color: #000 !important;
+        }
+      }
+
+      /* INPUT PANEL (Screen Only) */
+      .no-print {
+        background: #f0f0f0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: 2px solid #ccc;
+      }
+
+      /* HEADER */
+      .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+      }
+
+      .brand-area {
+        width: 180px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-title {
+        text-align: center;
+        flex-grow: 1;
+      }
+      .main-title h1 {
+        margin: 0;
+        font-size: 2em;
+        text-transform: uppercase;
+        font-weight: 900;
+      }
+
+      .meta-info {
+        text-align: right;
+        min-width: 200px;
+      }
+      .meta-row {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      .meta-input {
+        font-family: inherit;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        padding: 2px 5px;
+      }
+
+      /* INSTRUCTIONS */
+      .instruction-section {
+        margin-bottom: 15px;
+        font-size: 0.95em;
+        border: 2px solid #000;
+        padding: 10px;
+        background: #fff;
+      }
+
+      .safety-highlight {
+        font-weight: 900;
+        text-decoration: underline;
+        font-size: 1.1em;
+        text-transform: uppercase;
+      }
+
+      .lang-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 20px;
+      }
+
+      /* TABLE */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border: 2px solid #000;
+        padding: 5px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      th {
+        background-color: #eee;
+        height: 45px;
+        font-size: 0.95em;
+      }
+
+      /* FIRST COLUMN STYLES (Strength) */
+      .strength-cell {
+        text-align: left;
+        padding-left: 15px;
+        width: 130px;
+      }
+      .strength-val {
+        font-size: 1.4em;
+        font-weight: 900;
+        display: block;
+      }
+      .strength-color {
+        font-size: 1em;
+        font-style: italic;
+        display: block;
+      }
+      /* Visual color dot for screen reference */
+      .color-dot {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 1px solid #000;
+        margin-right: 5px;
+      }
+
+      /* Row Colors */
+      .row-brown td:not(:first-child) {
+        background-color: var(--bg-brown);
+      }
+      .row-blue td:not(:first-child) {
+        background-color: var(--bg-blue);
+      }
+      .row-pink td:not(:first-child) {
+        background-color: var(--bg-pink);
+      }
+
+      /* Inputs inside table */
+      input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 1.2em;
+        text-align: center;
+        border: 1px dashed #999;
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .print-view {
+        display: none;
+      }
+
+      .total-row td {
+        background: #222;
+        color: #fff !important;
+        font-weight: bold;
+        border: 2px solid #000;
+        -webkit-print-color-adjust: exact;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="no-print">
+      <h3>💊 Control Panel</h3>
+      <p>
+        Type doses (e.g. 0.5, 1, 1.5). They convert to fractions (½, 1, 1½) for
+        printing.
+      </p>
+      <div style="display: flex; gap: 20px; align-items: center">
+        <button
+          onclick="window.print()"
+          style="
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1em;
+            font-weight: bold;
+          "
+        >
+          🖨️ Print Calendar
+        </button>
+        <div>
+          <strong>Live Weekly Total:</strong>
+          <span
+            id="liveWeeklyTotal"
+            style="color: blue; font-weight: bold; font-size: 1.2em"
+            >0</span
+          >
+          mg
+        </div>
+      </div>
+    </div>
+
+    <div id="calendar-content">
+      <div class="top-header">
+        <div class="brand-area">
+          <img
+            src="logo.png"
+            alt="Paste Marevan Sticker Here"
+            style="max-width: 100%; max-height: 100%"
+            onerror="this.style.display='none'; document.getElementById('sticker-text').style.display='block'"
+          />
+          <span
+            id="sticker-text"
+            style="
+              display: none;
+              color: #999;
+              border: 1px dashed #ccc;
+              padding: 5px;
+              font-size: 0.8em;
+            "
+            >(Paste Brand Sticker Here)</span
+          >
+        </div>
+
+        <div class="main-title">
+          <h1>Warfarin Calendar</h1>
+          <div style="font-size: 1em; font-weight: bold">(MAREVAN ®)</div>
+        </div>
+
+        <div class="meta-info">
+          <div class="meta-row">
+            Date: <input type="date" id="dateField" class="meta-input" />
+          </div>
+          <div class="meta-row">
+            Pharmacist:
+            <input
+              type="text"
+              class="meta-input"
+              style="width: 120px; border-bottom: 1px solid #000 !important"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction-section">
+        <div class="lang-grid">
+          <div>
+            1) Take dose <span class="safety-highlight">ONCE A DAY</span> at the
+            same time.
+          </div>
+          <div>
+            每天必须定时吃葯，<span class="safety-highlight">一天服用一次</span
+            >。
+          </div>
+          <div>
+            Makan ubat
+            <span class="safety-highlight">satu kali sehari</span> pada waktu
+            yang sama.
+          </div>
+          <div>
+            <span class="safety-highlight">ஒரு நாளுக்கு ஒரு முறை</span> குறித்த
+            நேரத்தில் எடுக்கவும்.
+          </div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Strength / Colour</th>
+            <th>Monday<br />Isnin</th>
+            <th>Tuesday<br />Selasa</th>
+            <th>Wednesday<br />Rabu</th>
+            <th>Thursday<br />Khamis</th>
+            <th>Friday<br />Jumaat</th>
+            <th>Saturday<br />Sabtu</th>
+            <th>Sunday<br />Ahad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-brown">
+            <td class="strength-cell">
+              <span class="strength-val">1 mg</span>
+              <span class="strength-color">
+                <span class="color-dot" style="background: #8b4513"></span>Brown
+              </span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_1"></span>
+            </td>
+          </tr>
+
+          <tr class="row-blue">
+            <td class="strength-cell">
+              <span class="strength-val">3 mg</span>
+              <span class="strength-color">
+                <span class="color-dot" style="background: #0000ff"></span>Blue
+              </span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_3"></span>
+            </td>
+          </tr>
+
+          <tr class="row-pink">
+            <td class="strength-cell">
+              <span class="strength-val">5 mg</span>
+              <span class="strength-color">
+                <span class="color-dot" style="background: #ff69b4"></span>Pink
+              </span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_5"></span>
+            </td>
+          </tr>
+
+          <tr class="total-row">
+            <td
+              style="text-align: right; padding-right: 15px; font-size: 0.9em"
+            >
+              Total Daily<br />Dose (mg)
+            </td>
+            <td id="total1">0</td>
+            <td id="total2">0</td>
+            <td id="total3">0</td>
+            <td id="total4">0</td>
+            <td id="total5">0</td>
+            <td id="total6">0</td>
+            <td id="total7">0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div
+        style="
+          margin-top: 10px;
+          border-top: 1px solid #000;
+          padding-top: 5px;
+          font-size: 0.85em;
+          display: flex;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <strong>2) Know your warfarin dose.</strong> 服用正确的葯量。 Makan
+          sukatan yang betul. மாத்திரைகளின் அளவை அறியவும்
+        </div>
+        <div>
+          <i>*Check against prescription.</i>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 1. Set Date to Today
+      window.onload = function () {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        document.getElementById("dateField").value = `${yyyy}-${mm}-${dd}`;
+      };
+
+      // 2. Calculation Logic
+      function calculate() {
+        let weeklyTotal = 0;
+
+        for (let i = 1; i <= 7; i++) {
+          let dayTotal = 0;
+          const inputs = document.querySelectorAll(".d" + i);
+
+          inputs.forEach((input) => {
+            const val = parseFloat(input.value) || 0;
+            const strength = parseFloat(input.getAttribute("data-val"));
+
+            dayTotal += val * strength;
+
+            // Update Text for Print
+            const span = input.nextElementSibling;
+            if (span) {
+              span.innerText = toFraction(val);
+            }
+          });
+
+          document.getElementById("total" + i).innerText = dayTotal;
+          weeklyTotal += dayTotal;
+        }
+        document.getElementById("liveWeeklyTotal").innerText = weeklyTotal;
+      }
+
+      // 3. Fraction Converter
+      function toFraction(num) {
+        if (num === 0) return "";
+        const integerPart = Math.floor(num);
+        const decimalPart = num - integerPart;
+
+        let fraction = "";
+        if (decimalPart === 0.5) fraction = "½";
+        else if (decimalPart > 0) fraction = decimalPart.toFixed(1);
+
+        if (integerPart > 0 && fraction !== "")
+          return integerPart + " " + fraction;
+        if (integerPart > 0) return integerPart;
+        return fraction;
+      }
+    </script>
+  </body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warfarin Dose Calendar</title>
+    <style>
+      :root {
+        /* Pill Colors */
+        --p-brown: #8b4513;
+        --p-blue: #0000ff;
+        --p-pink: #ff69b4;
+
+        /* Row Backgrounds */
+        --bg-brown: #f3e5dc;
+        --bg-blue: #e6f0ff;
+        --bg-pink: #ffe6f0;
+
+        --border: #000;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.3;
+        padding: 20px;
+        max-width: 100%;
+        margin: auto;
+        color: #333;
+      }
+
+      /* PRINT SETTINGS */
+      @media print {
+        @page {
+          size: landscape;
+          margin: 0.5cm;
+        }
+        .no-print {
+          display: none !important;
+        }
+        body {
+          padding: 0;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        /* Hide inputs, show text spans */
+        input.count {
+          display: none;
+        }
+        .print-view {
+          display: block !important;
+          font-weight: bold;
+          font-size: 1.3em;
+        }
+
+        /* Clean up inputs for Name/Date to look like text */
+        .meta-input {
+          border: none !important;
+          background: transparent !important;
+          font-weight: bold;
+          padding: 0 !important;
+          width: auto !important;
+          text-align: left;
+        }
+      }
+
+      /* Screen-only Input Section */
+      .no-print {
+        background: #f0f0f0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: 2px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      /* HEADER LAYOUT */
+      .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+      }
+
+      .brand-logo {
+        width: 150px; /* Adjust size of logo here */
+        height: auto;
+      }
+
+      .main-title {
+        text-align: center;
+        flex-grow: 1;
+      }
+      .main-title h1 {
+        margin: 0;
+        font-size: 1.8em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .meta-info {
+        text-align: right;
+        font-size: 0.9em;
+        min-width: 200px;
+      }
+      .meta-row {
+        margin-bottom: 5px;
+      }
+      .meta-input {
+        font-family: inherit;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        padding: 2px 5px;
+        border-radius: 3px;
+      }
+
+      /* INSTRUCTIONS */
+      .instruction-section {
+        margin-bottom: 15px;
+        font-size: 0.95em;
+        border: 1px solid #999;
+        padding: 10px;
+        background: #fff;
+      }
+
+      .safety-highlight {
+        color: #d90000; /* Red */
+        font-weight: 900;
+        text-decoration: underline;
+        font-size: 1.1em;
+      }
+
+      .lang-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 20px;
+      }
+
+      /* TABLE STYLES */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border: 2px solid var(--border);
+        padding: 5px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      th {
+        background-color: #eee;
+        height: 50px;
+        font-size: 0.9em;
+      }
+
+      /* Pill Visuals */
+      .pill-cell {
+        width: 110px;
+        text-align: center;
+      }
+      .pill-shape {
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        vertical-align: middle;
+        margin-right: 8px;
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .pill-brown {
+        background-color: var(--p-brown);
+      }
+      .pill-blue {
+        background-color: var(--p-blue);
+      }
+      .pill-pink {
+        background-color: var(--p-pink);
+      }
+
+      .pill-text {
+        font-weight: bold;
+        font-size: 1.1em;
+        vertical-align: middle;
+      }
+
+      /* Row Colors */
+      .row-brown td:not(:first-child) {
+        background-color: var(--bg-brown);
+      }
+      .row-blue td:not(:first-child) {
+        background-color: var(--bg-blue);
+      }
+      .row-pink td:not(:first-child) {
+        background-color: var(--bg-pink);
+      }
+
+      /* Inputs inside table */
+      input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 1.2em;
+        text-align: center;
+        border: 1px dashed #999;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .print-view {
+        display: none;
+      }
+
+      .total-row td {
+        background: #333;
+        color: #fff;
+        font-weight: bold;
+        border: 2px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="no-print">
+      <h3>Control Panel</h3>
+      <p>
+        Enter doses below (e.g. 0.5, 1, 1.5). They convert to fractions (½, 1½)
+        automatically on print.
+      </p>
+
+      <div style="display: flex; gap: 20px; align-items: center">
+        <button
+          onclick="window.print()"
+          style="
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1em;
+          "
+        >
+          🖨️ Print Calendar
+        </button>
+
+        <div>
+          <strong>Live Weekly Total:</strong>
+          <span
+            id="liveWeeklyTotal"
+            style="color: blue; font-weight: bold; font-size: 1.2em"
+            >0</span
+          >
+          mg
+        </div>
+      </div>
+    </div>
+
+    <div id="calendar-content">
+      <div class="top-header">
+        <div>
+          <div
+            style="
+              display: none;
+              border: 1px solid red;
+              padding: 5px;
+              font-size: 0.8em;
+              color: red;
+            "
+          >
+            Image Missing<br />(Add logo.png)
+          </div>
+        </div>
+
+        <div class="main-title">
+          <h1>Warfarin Calendar</h1>
+          <div style="font-size: 0.9em; font-style: italic">(Marevan ®)</div>
+        </div>
+
+        <div class="meta-info">
+          <div class="meta-row">
+            Date: <input type="date" id="dateField" class="meta-input" />
+          </div>
+          <div class="meta-row">
+            Pharmacist:
+            <input
+              type="text"
+              placeholder="Type Name"
+              class="meta-input"
+              style="width: 120px"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction-section">
+        <div class="lang-grid">
+          <div>
+            1) Take your warfarin dose
+            <span class="safety-highlight">ONCE A DAY</span> at the same time.
+          </div>
+          <div>
+            每天必须定时吃葯，<span class="safety-highlight">一天服用一次</span
+            >。
+          </div>
+          <div>
+            Makan ubat warfarin anda
+            <span class="safety-highlight">satu kali sehari</span> pada waktu
+            yang sama.
+          </div>
+          <div>
+            ஒவ்வொரு நாளும் குறித்த நேரத்தில்,
+            <span class="safety-highlight">ஒரு நாளுக்கு ஒரு முறை</span> உங்கள்
+            வார்ஃபரின் மாத்திரையை எடுக்கவும்.
+          </div>
+        </div>
+        <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee" />
+        <div class="lang-grid">
+          <div>2) Know your warfarin dose.</div>
+          <div>服用正确的葯量。</div>
+          <div>Makan sukatan yang betul.</div>
+          <div>உங்களின் உட்கொள்ளும் மாத்திரைகளின் அளவை அறியவும்</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th width="15%">Strength</th>
+            <th>Monday<br />星期一 / Isnin</th>
+            <th>Tuesday<br />星期二 / Selasa</th>
+            <th>Wednesday<br />星期三 / Rabu</th>
+            <th>Thursday<br />星期四 / Khamis</th>
+            <th>Friday<br />星期五 / Jumaat</th>
+            <th>Saturday<br />星期六 / Sabtu</th>
+            <th>Sunday<br />星期天 / Ahad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-brown">
+            <td class="pill-cell">
+              <div class="pill-shape pill-brown"></div>
+              <span class="pill-text" style="color: var(--p-brown)">1 mg</span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_1"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="1"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_1"></span>
+            </td>
+          </tr>
+
+          <tr class="row-blue">
+            <td class="pill-cell">
+              <div class="pill-shape pill-blue"></div>
+              <span class="pill-text" style="color: var(--p-blue)">3 mg</span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_3"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="3"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_3"></span>
+            </td>
+          </tr>
+
+          <tr class="row-pink">
+            <td class="pill-cell">
+              <div class="pill-shape pill-pink"></div>
+              <span class="pill-text" style="color: var(--p-pink)">5 mg</span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d1 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d1_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d2 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d2_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d3 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d3_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d4 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d4_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d5 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d5_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d6 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d6_5"></span>
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.5"
+                class="d7 count"
+                data-val="5"
+                oninput="calculate()"
+              /><span class="print-view" id="pv_d7_5"></span>
+            </td>
+          </tr>
+
+          <tr class="total-row">
+            <td style="text-align: right; padding-right: 10px">
+              Total Dose (mg)
+            </td>
+            <td id="total1">0</td>
+            <td id="total2">0</td>
+            <td id="total3">0</td>
+            <td id="total4">0</td>
+            <td id="total5">0</td>
+            <td id="total6">0</td>
+            <td id="total7">0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-size: 0.8em; font-style: italic; margin-top: 10px">
+        * Please check against current prescription.<br />
+        This calendar is for: change of dose, change of colour, or new patients
+        with different daily doses.
+      </p>
+    </div>
+
+    <script>
+      // 1. Set Date to Today Automatically
+      window.onload = function () {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        document.getElementById("dateField").value = `${yyyy}-${mm}-${dd}`;
+      };
+
+      // 2. Calculation Logic
+      function calculate() {
+        let weeklyTotal = 0;
+
+        // Iterate columns 1-7
+        for (let i = 1; i <= 7; i++) {
+          let dayTotal = 0;
+          const inputs = document.querySelectorAll(".d" + i);
+
+          inputs.forEach((input) => {
+            const val = parseFloat(input.value) || 0;
+            const strength = parseFloat(input.getAttribute("data-val"));
+
+            dayTotal += val * strength;
+
+            // Text Update for Print View
+            const span = input.nextElementSibling;
+            if (span) {
+              span.innerText = toFraction(val);
+            }
+          });
+
+          document.getElementById("total" + i).innerText = dayTotal;
+          weeklyTotal += dayTotal;
+        }
+        document.getElementById("liveWeeklyTotal").innerText = weeklyTotal;
+      }
+
+      // 3. Fraction Converter
+      function toFraction(num) {
+        if (num === 0) return "";
+        const integerPart = Math.floor(num);
+        const decimalPart = num - integerPart;
+
+        let fraction = "";
+        if (decimalPart === 0.5) fraction = "½";
+        else if (decimalPart > 0) fraction = decimalPart.toFixed(1);
+
+        if (integerPart > 0 && fraction !== "")
+          return integerPart + " " + fraction;
+        if (integerPart > 0) return integerPart;
+        return fraction;
+      }
+    </script>
+  </body>
+</html>
+-->

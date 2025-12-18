@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pick'n'Place - Ultimate</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --yellow: #fabd1b;
+        --orange: #ff8411;
+        --blue: #5294ff;
+        --bg-color: #f8f9fa;
+        --text-color: #333;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding: 2rem 1rem;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      main {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-bottom: 120px; /* Space for fixed footer */
+      }
+
+      /* --- SETTINGS BAR --- */
+      .settings-bar {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        font-size: 0.9rem;
+      }
+
+      .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+      }
+      .group-counter {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .group-counter input {
+        width: 50px;
+        padding: 0.3rem;
+        text-align: center;
+      }
+
+      /* --- EDITOR FORM --- */
+      .editor-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 2px solid transparent;
+        transition: 0.2s;
+        display: none; /* Hidden by default if not admin */
+      }
+
+      /* Show editor only when body has 'admin-mode' class */
+      body.admin-mode .editor-card {
+        display: block;
+      }
+
+      .editor-card.editing-mode {
+        border-color: var(--orange);
+      }
+
+      .form-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .form-row:last-child {
+        margin-bottom: 0;
+      }
+
+      input,
+      select {
+        padding: 0.6rem;
+        border: 2px solid #eee;
+        border-radius: 0.5rem;
+        font-family: inherit;
+        width: 100%;
+      }
+      input:focus,
+      select:focus {
+        border-color: var(--blue);
+        outline: none;
+      }
+
+      button {
+        cursor: pointer;
+        font-family: inherit;
+        border: none;
+        font-weight: 500;
+      }
+
+      .btn-action {
+        background-color: #222;
+        color: #fff;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.5rem;
+      }
+      .btn-action.is-update {
+        background-color: var(--orange);
+      }
+      .btn-cancel-edit {
+        background: #eee;
+        color: #333;
+        margin-left: 0.5rem;
+        display: none;
+      }
+
+      /* --- GROUPS LAYOUT --- */
+      .groups-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.5rem 0.5rem 0.5rem;
+      }
+      .group-badge {
+        background: #e0e0e0;
+        color: #333;
+        padding: 0.2em 0.6em;
+        border-radius: 99px;
+        font-size: 0.8em;
+        font-weight: 600;
+      }
+
+      .pnp-list {
+        list-style: none;
+        background-color: rgba(0, 0, 0, 0.03);
+        min-height: 80px;
+        border-radius: 1rem;
+        padding: 0.5rem;
+        border: 2px dashed rgba(0, 0, 0, 0.1);
+        transition: 0.2s;
+      }
+
+      .pnp-list.active-target {
+        border-color: var(--blue);
+        background-color: rgba(82, 148, 255, 0.1);
+      }
+
+      /* --- ITEMS --- */
+      .element {
+        background-color: #fff;
+        border-left: 5px solid var(--color, var(--yellow));
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .element.is-placeholder {
+        opacity: 0.3;
+        background: #ddd;
+        border: 2px dashed #bbb;
+        border-left: none;
+        box-shadow: none;
+        color: transparent;
+      }
+      .element.is-placeholder * {
+        visibility: hidden;
+      }
+
+      .info {
+        flex-grow: 1;
+        margin-right: 1rem;
+      }
+      .name {
+        font-weight: 600;
+        color: #111;
+        display: block;
+      }
+      .topic {
+        font-size: 0.8rem;
+        color: #888;
+        display: block;
+      }
+
+      /* Action Buttons (Edit/Delete/Pick) */
+      .actions {
+        display: none;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      /* Only show actions in Admin Mode */
+      body.admin-mode .actions {
+        display: flex;
+      }
+
+      .btn-icon {
+        background: none;
+        font-size: 1rem;
+        opacity: 0.5;
+        padding: 4px;
+      }
+      .btn-icon:hover {
+        opacity: 1;
+        background: #eee;
+        border-radius: 4px;
+      }
+
+      .pnp-pick {
+        color: var(--blue);
+        font-weight: 600;
+        background: #edf2ff;
+        padding: 0.3rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+      }
+      .pnp-pick:hover {
+        background: var(--blue);
+        color: #fff;
+      }
+
+      /* --- GHOST --- */
+      .pnp-ghost {
+        position: fixed;
+        z-index: 1000;
+        opacity: 0.95;
+        pointer-events: none; /* Crucial for "Click to Place" */
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        transform: rotate(-2deg) scale(1.02);
+        width: var(--width);
+        list-style: none;
+      }
+      .pnp-ghost .actions {
+        display: none !important;
+      }
+
+      /* --- FOOTER CONTROLS --- */
+      .pnp-controls {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(150%);
+        display: flex;
+        gap: 1rem;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 2000;
+      }
+      .pnp-controls.is-active {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .ctrl-btn {
+        padding: 0.8rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn-cancel {
+        background: #fff;
+        color: #333;
+      }
+      .btn-place {
+        background: #111;
+        color: #fff;
+      }
+
+      small.hint {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        bottom: -25px;
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+
+      /* Color classes */
+      .c1 {
+        --color: var(--yellow);
+      }
+      .c2 {
+        --color: var(--orange);
+      }
+      .c3 {
+        --color: #ff6b6b;
+      }
+      .c4 {
+        --color: var(--blue);
+      }
+    </style>
+  </head>
+  <body class="admin-mode">
+    <main>
+      <div class="settings-bar">
+        <div class="toggle-wrapper">
+          <input type="checkbox" id="modeToggle" checked />
+          <label for="modeToggle">Edit Mode</label>
+        </div>
+        <div class="group-counter">
+          <label>Groups:</label>
+          <input type="number" id="groupCount" value="3" min="2" max="10" />
+          <button
+            id="btnSetGroups"
+            style="padding: 0.2rem 0.5rem; background: #eee; border-radius: 4px"
+          >
+            Set
+          </button>
+        </div>
+      </div>
+
+      <section class="editor-card" id="editorCard">
+        <h3 id="formTitle">Add Member</h3>
+        <div class="form-row">
+          <input type="text" id="inpName" placeholder="Name" />
+          <input type="text" id="inpTopic" placeholder="Topic" />
+        </div>
+        <div class="form-row">
+          <select id="inpGroupSelect"></select>
+          <button class="btn-action" id="btnSubmit">Add</button>
+          <button class="btn-action btn-cancel-edit" id="btnCancelEdit">
+            Cancel
+          </button>
+        </div>
+      </section>
+
+      <div class="groups-wrapper" id="groupsContainer"></div>
+
+      <div class="pnp-controls">
+        <button class="ctrl-btn btn-cancel" id="btnPlaceCancel">
+          Cancel (Esc)
+        </button>
+        <button class="ctrl-btn btn-place" id="btnPlaceConfirm">
+          Place (Enter)
+        </button>
+        <small class="hint">Or click anywhere on a list to place</small>
+      </div>
+    </main>
+
+    <script>
+      /* --- 1. STATE & INIT --- */
+      const state = {
+        mode: "idle",
+        editingId: null,
+        dragItem: null,
+        ghost: null,
+        originalParent: null,
+        originalSibling: null,
+        currentGroupCount: 3,
+      };
+
+      const generateId = () => Math.random().toString(36).substr(2, 9);
+      const escapeHtml = (txt) =>
+        txt
+          ? txt.replace(
+              /[&<>"']/g,
+              (m) =>
+                ({
+                  "&": "&amp;",
+                  "<": "&lt;",
+                  ">": "&gt;",
+                  '"': "&quot;",
+                  "'": "&#039;",
+                }[m])
+            )
+          : "";
+
+      // Initial Data
+      const initialData = [
+        { id: "1", name: "Alice", topic: "Design", group: 1 },
+        { id: "2", name: "Bob", topic: "Backend", group: 2 },
+        { id: "3", name: "Charlie", topic: "Testing", group: 1 },
+      ];
+
+      /* --- 2. DYNAMIC GROUP RENDERING --- */
+      function renderGroups(count) {
+        const container = document.getElementById("groupsContainer");
+        const select = document.getElementById("inpGroupSelect");
+
+        // 1. Snapshot current items to preserve them
+        const existingItems = [];
+        document.querySelectorAll(".pnp-item").forEach((el) => {
+          existingItems.push({
+            id: el.dataset.id,
+            name: el.querySelector(".name").innerText,
+            topic: el.querySelector(".topic").innerText,
+            groupId: parseInt(el.parentNode.id.replace("group-", "")),
+          });
+        });
+
+        // If this is first load, merge initial data if empty
+        if (existingItems.length === 0 && initialData.length > 0) {
+          existingItems.push(...initialData);
+          initialData.length = 0; // Clear init
+        }
+
+        // 2. Clear DOM
+        container.innerHTML = "";
+        select.innerHTML = "";
+        state.currentGroupCount = count;
+
+        // 3. Build Groups
+        for (let i = 1; i <= count; i++) {
+          // DOM for Group
+          const groupHtml = `
+                    <div class="group-header"><h2>Group ${i}</h2><span class="group-badge">${i}</span></div>
+                    <ol id="group-${i}" class="pnp-list"></ol>
+                `;
+          const div = document.createElement("div");
+          div.className = "group-container";
+          div.innerHTML = groupHtml;
+          container.appendChild(div);
+
+          // Option for Select Dropdown
+          const opt = document.createElement("option");
+          opt.value = `group-${i}`;
+          opt.innerText = `Group ${i}`;
+          select.appendChild(opt);
+        }
+
+        // 4. Restore Items
+        existingItems.forEach((item) => {
+          // If the group doesn't exist anymore (e.g. reduced count from 4 to 3), move to last group
+          let targetGroup = item.groupId;
+          if (targetGroup > count) targetGroup = count;
+
+          createItemDOM(item.id, item.name, item.topic, `group-${targetGroup}`);
+        });
+      }
+
+      function createItemDOM(id, name, topic, groupElementId) {
+        const li = document.createElement("li");
+        li.className = `pnp-item element c${(id.charCodeAt(0) % 4) + 1}`; // Random-ish color
+        li.dataset.id = id;
+        li.innerHTML = `
+                <div class="info">
+                    <span class="name">${escapeHtml(name)}</span>
+                    <span class="topic">${escapeHtml(topic)}</span>
+                </div>
+                <div class="actions">
+                    <button class="btn-icon btn-edit" title="Edit">✎</button>
+                    <button class="btn-icon btn-del" title="Delete">✕</button>
+                    <button class="pnp-pick">Pick</button>
+                </div>
+            `;
+        document.getElementById(groupElementId).appendChild(li);
+      }
+
+      // --- 3. SETTINGS EVENTS ---
+      document.getElementById("modeToggle").addEventListener("change", (e) => {
+        if (e.target.checked) document.body.classList.add("admin-mode");
+        else document.body.classList.remove("admin-mode");
+      });
+
+      document.getElementById("btnSetGroups").addEventListener("click", () => {
+        const val = parseInt(document.getElementById("groupCount").value);
+        if (val >= 2 && val <= 10) renderGroups(val);
+        else alert("Please chose between 2 and 10 groups");
+      });
+
+      // --- 4. PICK & PLACE LOGIC ---
+
+      // GLOBAL CLICK HANDLER (Delegation)
+      document.addEventListener("click", (e) => {
+        // Pick
+        if (e.target.classList.contains("pnp-pick")) startPick(e);
+        // Delete
+        if (e.target.classList.contains("btn-del")) deleteItem(e);
+        // Edit
+        if (e.target.classList.contains("btn-edit")) startEdit(e);
+
+        // CLICK TO PLACE (New Feature)
+        if (state.mode === "picking") {
+          // Check if we clicked on a list or inside a list
+          const list = e.target.closest(".pnp-list");
+          // Ensure we didn't click the "Pick" button itself (start event)
+          const isPickBtn = e.target.classList.contains("pnp-pick");
+
+          if (list && !isPickBtn) {
+            confirmPlace();
+          }
+        }
+      });
+
+      // KEYBOARD EVENTS (New Feature)
+      document.addEventListener("keydown", (e) => {
+        // Don't trigger if typing in an input
+        if (document.activeElement.tagName === "INPUT") return;
+
+        if (state.mode === "picking") {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            confirmPlace();
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            cancelPlace();
+          }
+        }
+      });
+
+      function startPick(e) {
+        if (state.mode !== "idle") return;
+        const item = e.target.closest(".pnp-item");
+
+        // Ghost Creation
+        const rect = item.getBoundingClientRect();
+        const ghost = item.cloneNode(true);
+        ghost.classList.add("pnp-ghost");
+        ghost.style.setProperty("--width", rect.width + "px");
+        ghost.style.top = rect.top + "px";
+        ghost.style.left = rect.left + "px";
+        document.body.appendChild(ghost);
+
+        state.mode = "picking";
+        state.dragItem = item;
+        state.ghost = ghost;
+        state.originalParent = item.parentNode;
+        state.originalSibling = item.nextElementSibling;
+
+        item.classList.add("is-placeholder");
+        document.querySelector(".pnp-controls").classList.add("is-active");
+        document.body.style.cursor = "move";
+      }
+
+      function updateDrag(clientY) {
+        if (state.mode !== "picking") return;
+
+        // Move ghost
+        if (clientY) {
+          const h = state.ghost.getBoundingClientRect().height;
+          state.ghost.style.top = clientY - h / 2 + "px";
+        } else {
+          // Scroll update - use ghost's current screen position
+          const r = state.ghost.getBoundingClientRect();
+          clientY = r.top + r.height / 2;
+        }
+
+        // Detect List
+        const lists = document.querySelectorAll(".pnp-list");
+        let targetList = null;
+
+        lists.forEach((list) => {
+          const r = list.getBoundingClientRect();
+          list.classList.remove("active-target");
+          if (clientY >= r.top && clientY <= r.bottom + 50) targetList = list;
+        });
+
+        if (targetList) {
+          targetList.classList.add("active-target");
+          const children = [...targetList.children].filter(
+            (c) => c !== state.dragItem && !c.classList.contains("pnp-ghost")
+          );
+          let inserted = false;
+
+          for (let child of children) {
+            const r = child.getBoundingClientRect();
+            if (clientY < r.top + r.height / 2) {
+              targetList.insertBefore(state.dragItem, child);
+              inserted = true;
+              break;
+            }
+          }
+          if (!inserted) targetList.appendChild(state.dragItem);
+        }
+      }
+
+      window.addEventListener("mousemove", (e) => updateDrag(e.clientY), {
+        passive: true,
+      });
+      window.addEventListener("scroll", () => updateDrag(null), {
+        passive: true,
+      });
+
+      // Place / Cancel Functions
+      document
+        .getElementById("btnPlaceConfirm")
+        .addEventListener("click", confirmPlace);
+      document
+        .getElementById("btnPlaceCancel")
+        .addEventListener("click", cancelPlace);
+
+      function confirmPlace() {
+        if (state.mode !== "picking") return;
+        cleanupPick();
+      }
+
+      function cancelPlace() {
+        if (state.mode !== "picking") return;
+        // Revert
+        state.originalParent.insertBefore(
+          state.dragItem,
+          state.originalSibling
+        );
+        cleanupPick();
+      }
+
+      function cleanupPick() {
+        state.ghost.remove();
+        state.dragItem.classList.remove("is-placeholder");
+        document.querySelector(".pnp-controls").classList.remove("is-active");
+        document
+          .querySelectorAll(".pnp-list")
+          .forEach((l) => l.classList.remove("active-target"));
+        document.body.style.cursor = "";
+        state.mode = "idle";
+        state.dragItem = null;
+        state.ghost = null;
+      }
+
+      /* --- 5. EDIT FORM LOGIC --- */
+      const btnSubmit = document.getElementById("btnSubmit");
+      const btnCancelEdit = document.getElementById("btnCancelEdit");
+
+      btnSubmit.addEventListener("click", () => {
+        const name = document.getElementById("inpName").value.trim();
+        const topic = document.getElementById("inpTopic").value.trim();
+        const grp = document.getElementById("inpGroupSelect").value;
+
+        if (!name) return alert("Name required");
+
+        if (state.editingId) {
+          // Update
+          const item = document.querySelector(
+            `.pnp-item[data-id="${state.editingId}"]`
+          );
+          if (item) {
+            item.querySelector(".name").innerText = name;
+            item.querySelector(".topic").innerText = topic;
+            if (item.parentNode.id !== grp)
+              document.getElementById(grp).appendChild(item);
+          }
+          resetForm();
+        } else {
+          // Create
+          createItemDOM(generateId(), name, topic, grp);
+          document.getElementById("inpName").value = "";
+          document.getElementById("inpTopic").value = "";
+        }
+      });
+
+      function startEdit(e) {
+        const item = e.target.closest(".pnp-item");
+        state.editingId = item.dataset.id;
+
+        document.getElementById("inpName").value =
+          item.querySelector(".name").innerText;
+        document.getElementById("inpTopic").value =
+          item.querySelector(".topic").innerText;
+        document.getElementById("inpGroupSelect").value = item.parentNode.id;
+
+        document.getElementById("formTitle").innerText = "Edit Member";
+        btnSubmit.innerText = "Update";
+        btnSubmit.classList.add("is-update");
+        btnCancelEdit.style.display = "inline-block";
+        document.getElementById("editorCard").classList.add("editing-mode");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function resetForm() {
+        state.editingId = null;
+        document.getElementById("inpName").value = "";
+        document.getElementById("inpTopic").value = "";
+        document.getElementById("formTitle").innerText = "Add Member";
+        btnSubmit.innerText = "Add";
+        btnSubmit.classList.remove("is-update");
+        btnCancelEdit.style.display = "none";
+        document.getElementById("editorCard").classList.remove("editing-mode");
+      }
+
+      btnCancelEdit.addEventListener("click", resetForm);
+
+      function deleteItem(e) {
+        if (confirm("Delete member?")) e.target.closest(".pnp-item").remove();
+      }
+
+      // Init
+      renderGroups(3);
+    </script>
+  </body>
+</html>
