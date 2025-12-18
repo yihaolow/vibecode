@@ -1,275 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Drug Inventory Search</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects</title>
     <style>
-      :root {
-        --primary-color: #2563eb;
-        --bg-color: #f8fafc;
-        --highlight-bg: #dcfce7;
-        --highlight-text: #166534;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
-        background-color: var(--bg-color);
-        color: #333;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h1 {
-        color: #1e293b;
-        text-align: center;
-      }
-
-      /* Input Sections */
-      .controls {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 8px;
-        color: #475569;
-      }
-
-      textarea {
-        width: 100%;
-        height: 100px;
-        padding: 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-family: monospace;
-        font-size: 12px;
-        resize: vertical;
-        margin-bottom: 15px;
-        box-sizing: border-box;
-      }
-
-      input[type="text"] {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        border: 2px solid #cbd5e1;
-        border-radius: 6px;
-        box-sizing: border-box;
-        transition: border-color 0.2s;
-      }
-
-      input[type="text"]:focus {
-        border-color: var(--primary-color);
-        outline: none;
-      }
-
-      /* Results Table */
-      .table-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #e2e8f0;
-      }
-
-      th {
-        background-color: #f1f5f9;
-        font-weight: 600;
-        color: #475569;
-      }
-
-      tr:last-child td {
-        border-bottom: none;
-      }
-
-      tr:hover {
-        background-color: #f8fafc;
-      }
-
-      /* Highlighting the Quantity */
-      .quantity-cell {
-        font-weight: 800;
-        font-size: 1.1em;
-        color: var(--primary-color);
-        text-align: right;
-      }
-
-      /* Specific style for low stock (0) */
-      .quantity-zero {
-        color: #ef4444; /* Red */
-        background-color: #fee2e2;
-      }
-
-      /* Specific style for positive stock */
-      .quantity-positive {
-        color: var(--highlight-text); /* Green text */
-        background-color: var(--highlight-bg); /* Green background */
-        border-radius: 4px;
-        padding: 4px 8px;
-        display: inline-block;
-      }
-
-      .no-results {
-        padding: 20px;
-        text-align: center;
-        color: #64748b;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>🏥 Drug Inventory Lookup</h1>
-
-    <div class="controls">
-      <details>
-        <summary
-          style="
-            cursor: pointer;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
             margin-bottom: 10px;
-            color: var(--primary-color);
-          "
-        >
-          📂 Click to Edit/Paste Raw CSV Data
-        </summary>
-        <label for="csvData">Paste CSV Data Here:</label>
-        <textarea id="csvData" placeholder="Paste your CSV here...">
-Item Code,Material Description,Unit of Measure (UOM),Current Inventory Stock Balance
-N-C022327NONF,Asciminib 40mg Tab (SCLEMBIX),Tablet,180
-N-C022447NONF,Selpercatinib 40mg Cap (TANSTRIVE),Capsule,56
-N-C022448NONF,Selpercatinib 0mg Cap (TANSTRIVE),Capsule,0
-N-C022508NONF,FRUQUINtinib 5mg Cap (FRUZAQLA),Capsule,42
-N-C022508NONF,FRUQUINtinib 1mg Cap (FRUZAQLA),Capsule,21</textarea
-        >
-      </details>
+        }
+        a {
+            display: block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
 
-      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0" />
-
-      <label for="searchBox">🔍 Search by Drug Name:</label>
-      <input
-        type="text"
-        id="searchBox"
-        placeholder="Type to search (e.g., 'Asciminib' or 'Cap')..."
-        autocomplete="off"
-      />
+    <div class="container">
+        <h1>Project Index</h1>
+        <ul>
+            <li><a href="pickanddrag.html">Pick and Drag</a></li>
+            <li><a href="StockBalance.html">Stock Balance</a></li>
+            <li><a href="alvinsite.html">Alvin Site</a></li>
+            <li><a href="warfarinCalendar.html">Warfarin Calendar</a></li>
+            <li><a href="Kiddose.html">Kid Dose</a></li>
+        </ul>
+        <div class="footer">Hosted on GitHub Pages</div>
     </div>
 
-    <div id="resultsArea" class="table-container"></div>
-
-    <script>
-      const csvInput = document.getElementById("csvData");
-      const searchBox = document.getElementById("searchBox");
-      const resultsArea = document.getElementById("resultsArea");
-
-      // Function to parse CSV text into an array of objects
-      function parseCSV(text) {
-        const lines = text.trim().split("\n");
-        const headers = lines[0].split(",").map((h) => h.trim());
-        const data = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          // Handle basic comma separation (assuming no commas inside quotes for this simple version)
-          const currentLine = lines[i].split(",");
-          if (currentLine.length === headers.length) {
-            const obj = {};
-            headers.forEach((header, index) => {
-              obj[header] = currentLine[index].trim();
-            });
-            data.push(obj);
-          }
-        }
-        return data;
-      }
-
-      // Function to render the table based on data
-      function renderTable(data) {
-        if (data.length === 0) {
-          resultsArea.innerHTML =
-            '<div class="no-results">No matching drugs found.</div>';
-          return;
-        }
-
-        let html = "<table><thead><tr>";
-
-        // Define headers we want to show
-        const displayHeaders = [
-          "Item Code",
-          "Material Description",
-          "UOM",
-          "Stock Balance",
-        ];
-        const dataKeys = [
-          "Item Code",
-          "Material Description",
-          "Unit of Measure (UOM)",
-          "Current Inventory Stock Balance",
-        ];
-
-        displayHeaders.forEach((header) => {
-          html += `<th>${header}</th>`;
-        });
-        html += "</tr></thead><tbody>";
-
-        data.forEach((row) => {
-          const stock = parseInt(row["Current Inventory Stock Balance"], 10);
-
-          // Determine style based on quantity
-          let quantityClass = "quantity-positive";
-          if (stock === 0) quantityClass = "quantity-zero";
-
-          html += `<tr>
-                    <td>${row["Item Code"]}</td>
-                    <td>${row["Material Description"]}</td>
-                    <td>${row["Unit of Measure (UOM)"]}</td>
-                    <td class="quantity-cell"><span class="${quantityClass}">${stock}</span></td>
-                </tr>`;
-        });
-
-        html += "</tbody></table>";
-        resultsArea.innerHTML = html;
-      }
-
-      // Main Search Logic
-      function handleSearch() {
-        const rawData = csvInput.value;
-        const searchTerm = searchBox.value.toLowerCase();
-
-        const allData = parseCSV(rawData);
-
-        // Filter data based on "Material Description"
-        const filteredData = allData.filter((item) => {
-          const desc = item["Material Description"]
-            ? item["Material Description"].toLowerCase()
-            : "";
-          return desc.includes(searchTerm);
-        });
-
-        renderTable(filteredData);
-      }
-
-      // Event Listeners
-      searchBox.addEventListener("input", handleSearch);
-      csvInput.addEventListener("input", handleSearch); // Re-render if CSV data changes
-
-      // Initial Render
-      handleSearch();
-    </script>
-  </body>
+</body>
 </html>
