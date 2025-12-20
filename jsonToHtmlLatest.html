@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xiangqi Ranking Generator</title>
+    <style>
+      :root {
+        --primary: #b91c1c;
+        --bg: #f3f4f6;
+        --border: #d1d5db;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background-color: var(--bg);
+        color: #1f2937;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        gap: 20px;
+      }
+      .panel {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid var(--border);
+      }
+      h2 {
+        margin-top: 0;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #f3f4f6;
+        padding-bottom: 10px;
+      }
+      .input-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        border-bottom: 1px dashed #eee;
+        padding-bottom: 15px;
+      }
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity: 0.9;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      th {
+        background: #f9fafb;
+        padding: 10px;
+        text-align: center;
+        border-bottom: 2px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+      }
+      td {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      input.manual-input {
+        width: 40px;
+        text-align: center;
+        border: 1px solid #d1d5db;
+      }
+      .modified {
+        background-color: #fef08a;
+        font-weight: bold;
+      }
+      .tie-highlight {
+        background-color: #fff7ed;
+      }
+      .col-group-1 {
+        background-color: #fdf2f2;
+      }
+      #jsonFileInput {
+        display: none;
+      }
+
+      /* Debug Section */
+      .debug-panel {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        font-size: 0.85rem;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <h2>1. Import Data</h2>
+
+        <div class="input-group">
+          <div style="flex: 1">
+            <h3>Option A: Upload JSON</h3>
+            <p style="color: #666; font-size: 0.85rem">
+              Use file from previous steps.
+            </p>
+          </div>
+          <input
+            type="file"
+            id="jsonFileInput"
+            accept=".json,.txt"
+            onchange="handleFileUpload(this)"
+          />
+          <button onclick="document.getElementById('jsonFileInput').click()">
+            📂 Upload File
+          </button>
+        </div>
+
+        <div class="input-group" style="border: none">
+          <div style="flex: 1">
+            <h3>Option B: Paste Match Text</h3>
+            <p style="color: #666; font-size: 0.85rem">
+              Supports "Name 2:0 Name" (Spaces, Tabs, or Commas).
+            </p>
+          </div>
+          <button style="background: #4b5563" onclick="toggleTextArea()">
+            📝 Paste Text
+          </button>
+        </div>
+
+        <div id="textAreaContainer" style="display: none; margin-top: 10px">
+          <textarea
+            id="matchInput"
+            style="
+              width: 100%;
+              height: 150px;
+              padding: 10px;
+              border: 1px solid #ccc;
+            "
+            placeholder="Round 1&#10;Chen 2:0 Lee&#10;Tan 1:1 Wong"
+          ></textarea>
+          <button
+            onclick="processMatchText()"
+            style="margin-top: 5px; width: 100%"
+          >
+            Process Text
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="display: flex; justify-content: space-between">
+          <h2>2. Live Ranking</h2>
+          <button style="background: #059669" onclick="copyTableHtml()">
+            📋 Copy HTML Output
+          </button>
+        </div>
+
+        <div style="margin-bottom: 10px">
+          <input
+            type="text"
+            id="debugName"
+            placeholder="Type name to check points..."
+            style="padding: 5px"
+          />
+          <button
+            style="padding: 5px 10px; font-size: 0.8rem; background: #666"
+            onclick="debugPlayer()"
+          >
+            Check Details
+          </button>
+        </div>
+        <div id="debugOutput" class="debug-panel"></div>
+
+        <div id="tableContainer" class="table-wrapper">
+          <div style="padding: 40px; text-align: center; color: #999">
+            Waiting for data...
+          </div>
+        </div>
+      </div>
+
+      <textarea id="finalOutput" style="display: none"></textarea>
+    </div>
+
+    <script>
+      let players = {};
+      let matchHtmlCache = "";
+      let rawMatchesDebug = []; // Store for debugging
+
+      function toggleTextArea() {
+        const el = document.getElementById("textAreaContainer");
+        el.style.display = el.style.display === "none" ? "block" : "none";
+      }
+
+      // --- 1. FILE UPLOAD ---
+      function handleFileUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const jsonContent = JSON.parse(e.target.result);
+            processJsonData(jsonContent);
+            input.value = "";
+          } catch (err) {
+            alert("Error parsing JSON: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // --- 2. TEXT PARSER (IMPROVED) ---
+      function processMatchText() {
+        const text = document.getElementById("matchInput").value;
+        const lines = text.split("\n");
+        players = {};
+        rawMatchesDebug = [];
+        let roundNum = 0;
+        let matches = [];
+        let roundMatches = [];
+
+        // Regex: Matches "Name", "Score", "Name" separated by spaces, tabs, or commas
+        // Score must be like 2:0, 1:1, 0:2, 2:-, -:2
+        const scoreRegex = /(\d+|-)\s*:\s*(\d+|-)/;
+
+        lines.forEach((line) => {
+          let clean = line.trim();
+          if (!clean) return;
+
+          // Header Detection
+          if (clean.match(/Round\s*\d+|第\s*\d+\s*轮/i)) {
+            if (roundMatches.length > 0) {
+              matches.push({ r: roundNum, m: roundMatches });
+              roundMatches = [];
+            }
+            const numMatch = clean.match(/\d+/);
+            roundNum = numMatch ? parseInt(numMatch[0]) : roundNum + 1;
+            return;
+          }
+
+          // Match Detection
+          if (scoreRegex.test(clean)) {
+            // Replace tabs/commas with spaces to standardise
+            // Be careful not to break names with spaces.
+            // Strategy: Find the score. Take everything before as Red, everything after as Black.
+            const match = clean.match(scoreRegex);
+            if (match) {
+              const res = match[0];
+              const idx = clean.indexOf(res);
+
+              let redPart = clean.substring(0, idx).trim();
+              let blackPart = clean.substring(idx + res.length).trim();
+
+              // Clean trailing commas/IDs
+              // Remove leading "1 " or "1," from Red (Table numbers)
+              // Simple heuristic: If Red starts with digits then space/comma, remove it
+              redPart = redPart.replace(/^[\d,]+\s*/, "").replace(/,$/, "");
+
+              // Black might have trailing table info? Unlikely in standard paste.
+              blackPart = blackPart.replace(/^,/, "").trim();
+
+              if (redPart && blackPart) {
+                initPlayer(redPart);
+                initPlayer(blackPart);
+                updateStats(redPart, blackPart, res, roundNum);
+
+                roundMatches.push({
+                  table: roundMatches.length + 1,
+                  red: redPart,
+                  black: blackPart,
+                  result: res,
+                });
+
+                rawMatchesDebug.push({
+                  r: roundNum,
+                  red: redPart,
+                  black: blackPart,
+                  res: res,
+                });
+              }
+            }
+          }
+        });
+
+        if (roundMatches.length > 0)
+          matches.push({ r: roundNum, m: roundMatches });
+        generateMatchHtml(matches);
+        recalcAndRender();
+      }
+
+      function processJsonData(data) {
+        players = {};
+        rawMatchesDebug = [];
+
+        Object.keys(data.players).forEach((id) => {
+          initPlayer(id, data.players[id]);
+        });
+
+        let simpleMatches = [];
+        data.rounds.forEach((r) => {
+          let roundM = [];
+          r.matches.forEach((m) => {
+            initPlayer(m.red, data.players[m.red]);
+            initPlayer(m.black, data.players[m.black]);
+            updateStats(m.red, m.black, m.result, r.roundNumber);
+
+            roundM.push({
+              table: m.table,
+              red: data.players[m.red] || m.red || "BYE",
+              black: data.players[m.black] || m.black || "BYE",
+              result: m.result,
+            });
+
+            rawMatchesDebug.push({
+              r: r.roundNumber,
+              red: data.players[m.red] || m.red,
+              black: data.players[m.black] || m.black,
+              res: m.result,
+            });
+          });
+          simpleMatches.push({ r: r.roundNumber, m: roundM });
+        });
+
+        generateMatchHtml(simpleMatches);
+        recalcAndRender();
+      }
+
+      // --- 3. STATS ---
+      function initPlayer(id, name = null) {
+        if (!id) return;
+        if (!players[id]) {
+          players[id] = {
+            id: id,
+            name: name || id,
+            points: 0,
+            wins: 0,
+            blackWins: 0,
+            blackGames: 0,
+            opponentIds: [],
+            oppScoresRaw: [],
+            opponentScore: 0,
+            highOpp: 0,
+            iterativeVal: 0,
+            direct: "",
+            fouls: "",
+            matchLog: [], // For debug
+          };
+        }
+      }
+
+      function updateStats(red, black, result, round) {
+        if (!red) return;
+        const parts = result.split(":");
+        let rS = parts[0] === "-" || parts[0] === "" ? 0 : parseInt(parts[0]);
+        let bS = parts[1] === "-" || parts[1] === "" ? 0 : parseInt(parts[1]);
+        if (isNaN(rS)) rS = 0;
+        if (isNaN(bS)) bS = 0;
+
+        if (players[red]) {
+          players[red].points += rS;
+          if (rS > bS) players[red].wins++;
+          players[red].matchLog.push(
+            `R${round}: ${result} vs ${black} (+${rS})`
+          );
+        }
+
+        if (black && players[black]) {
+          players[black].points += bS;
+          if (bS > rS) {
+            players[black].wins++;
+            players[black].blackWins++;
+          }
+          players[black].blackGames++;
+          players[black].matchLog.push(
+            `R${round}: ${result} vs ${red} (Black) (+${bS})`
+          );
+
+          players[red].opponentIds.push(black);
+          players[black].opponentIds.push(red);
+        }
+      }
+
+      // --- 4. DEBUG HELPER ---
+      function debugPlayer() {
+        const name = document.getElementById("debugName").value.trim();
+        const out = document.getElementById("debugOutput");
+        out.style.display = "block";
+
+        // Find player key (fuzzy match)
+        const key = Object.keys(players).find(
+          (k) =>
+            k.includes(name) ||
+            (players[k].name && players[k].name.includes(name))
+        );
+
+        if (!key) {
+          out.innerHTML = "Player not found.";
+          return;
+        }
+
+        const p = players[key];
+        let html = `<strong>${p.name} (ID: ${p.id})</strong><br>`;
+        html += `Points: ${p.points} | OppScore: ${p.opponentScore}<br>`;
+        html += `<ul style="margin:5px 0; padding-left:20px;">`;
+        p.matchLog.forEach((log) => {
+          html += `<li>${log}</li>`;
+        });
+        html += `</ul>`;
+        out.innerHTML = html;
+      }
+
+      // --- 5. SORTING & RENDER (SAME AS BEFORE) ---
+      function calculateBuchholz() {
+        Object.values(players).forEach((p) => {
+          p.opponentScore = 0;
+          p.oppScoresRaw = [];
+          p.opponentIds.forEach((oid) => {
+            if (players[oid]) {
+              const op = players[oid].points;
+              p.opponentScore += op;
+              p.oppScoresRaw.push(op);
+            }
+          });
+          p.oppScoresRaw.sort((a, b) => a - b);
+          p.highOpp = p.oppScoresRaw.length ? Math.max(...p.oppScoresRaw) : 0;
+          p.iterativeVal =
+            p.oppScoresRaw.length > 0 ? p.opponentScore - p.oppScoresRaw[0] : 0;
+        });
+      }
+
+      function sortPlayers() {
+        const arr = Object.values(players);
+        arr.sort((a, b) => {
+          if (b.points !== a.points) return b.points - a.points;
+          if (b.opponentScore !== a.opponentScore)
+            return b.opponentScore - a.opponentScore;
+
+          const dirA = parseFloat(a.direct) || 0;
+          const dirB = parseFloat(b.direct) || 0;
+          if (dirB !== dirA) return dirB - dirA;
+
+          if (b.wins !== a.wins) return b.wins - a.wins;
+          if (b.blackWins !== a.blackWins) return b.blackWins - a.blackWins;
+          if (b.blackGames !== a.blackGames) return b.blackGames - a.blackGames;
+          if (b.highOpp !== a.highOpp) return b.highOpp - a.highOpp;
+
+          const foulA = parseFloat(a.fouls) || 0;
+          const foulB = parseFloat(b.fouls) || 0;
+          if (foulA !== foulB) return foulA - foulB; // Lower fouls better
+
+          return b.iterativeVal - a.iterativeVal;
+        });
+        return arr;
+      }
+
+      function recalcAndRender() {
+        calculateBuchholz();
+        const sorted = sortPlayers();
+
+        let html = `<table><thead><tr><th>Rank</th><th>Name</th><th>Pts</th><th>Opp Sc</th><th class="col-group-1">Direct</th><th>Wins</th><th>B-Wins</th><th>B-Gms</th><th>Hi-Opp</th><th class="col-group-1">Fouls</th><th>Iterative</th></tr></thead><tbody>`;
+
+        sorted.forEach((p, idx) => {
+          let tieClass = "";
+          if (idx > 0) {
+            const prev = sorted[idx - 1];
+            if (
+              prev.points === p.points &&
+              prev.opponentScore === p.opponentScore
+            )
+              tieClass = "tie-highlight";
+          }
+          html += `<tr class="${tieClass}"><td>${
+            idx + 1
+          }</td><td style="text-align:left;">${p.name}</td><td><strong>${
+            p.points
+          }</strong></td><td>${p.opponentScore}</td>
+                <td class="col-group-1"><input type="text" class="manual-input ${
+                  p.direct ? "modified" : ""
+                }" value="${p.direct}" onkeyup="updateManual('${
+            p.id
+          }', 'direct', this.value)"></td>
+                <td>${p.wins}</td><td>${p.blackWins}</td><td>${
+            p.blackGames
+          }</td><td>${p.highOpp}</td>
+                <td class="col-group-1"><input type="text" class="manual-input ${
+                  p.fouls ? "modified" : ""
+                }" value="${p.fouls}" onkeyup="updateManual('${
+            p.id
+          }', 'fouls', this.value)"></td>
+                <td style="color:#666;">${p.iterativeVal}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+        document.getElementById("tableContainer").innerHTML = html;
+      }
+
+      function updateManual(id, field, val) {
+        if (players[id]) {
+          players[id][field] = val;
+          recalcAndRender();
+        }
+      }
+
+      function generateMatchHtml(matches) {
+        let html = `<div class="results-section"><h2>对局结果 (Match Results)</h2>`;
+        matches.forEach((r) => {
+          html += `<div class="round-container"><h3>第 ${r.r} 轮</h3><table class="match-table"><thead><tr><th>Table</th><th>Red</th><th>Result</th><th>Black</th></tr></thead><tbody>`;
+          r.m.forEach((m) => {
+            let resClass = "result-draw";
+            if (m.result.startsWith("2")) resClass = "result-win";
+            if (m.result.startsWith("0")) resClass = "result-loss";
+            html += `<tr><td>${m.table}</td><td>${m.red}</td><td class="${resClass}">${m.result}</td><td>${m.black}</td></tr>`;
+          });
+          html += `</tbody></table></div>`;
+        });
+        html += `</div>`;
+        matchHtmlCache = html;
+      }
+
+      function copyTableHtml() {
+        const sorted = sortPlayers();
+        let cleanRows = sorted
+          .map(
+            (p, i) =>
+              `<tr><td>${i + 1}</td><td>${p.id}</td><td>个人</td><td>${
+                p.name
+              }</td><td><strong>${p.points}</strong></td><td>${
+                p.opponentScore
+              }</td><td>${p.direct}</td><td>${p.wins}</td><td>${
+                p.blackWins
+              }</td><td>${p.blackGames}</td><td>${p.highOpp}</td><td>${
+                p.iterativeVal
+              }</td><td>${p.fouls}</td></tr>`
+          )
+          .join("");
+        const finalHtml = `<div class="xiangqi-results"><h2>成绩表 (Standings)</h2><div class="table-responsive"><table class="standings-table"><thead><tr><th>名次</th><th>编号</th><th>团队(单位)</th><th>姓名</th><th>积分</th><th>对手分</th><th>直胜</th><th>胜局数</th><th>后手胜局数</th><th>后手局</th><th>最高对手分</th><th>递减最低对手分</th><th>犯规</th></tr></thead><tbody>${cleanRows}</tbody></table></div>${matchHtmlCache}</div>`;
+        const output = document.getElementById("finalOutput");
+        output.value = finalHtml;
+        output.style.display = "block";
+        output.select();
+        document.execCommand("copy");
+        output.style.display = "none";
+        alert("HTML copied!");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Xiangqi Data Converter</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f2f5;
+        color: #333;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 1024px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 4px;
+        font-size: 0.9rem;
+      }
+
+      .content {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section-title {
+        color: #667eea;
+        margin: 0 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f2f5;
+        font-size: 1.1rem;
+      }
+
+      textarea {
+        width: 100%;
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        resize: none;
+        min-height: 400px;
+        transition: border-color 0.2s;
+        line-height: 1.4;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.2s;
+        font-size: 0.9rem;
+      }
+
+      button:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button.secondary {
+        background: #6c757d;
+      }
+
+      button.secondary:hover {
+        background: #5a6268;
+      }
+
+      button.upload-btn {
+        background: #fd7e14;
+      }
+
+      button.upload-btn:hover {
+        background: #e36d0d;
+      }
+
+      button.success {
+        background: #28a745;
+      }
+
+      button.success:hover {
+        background: #218838;
+      }
+
+      button.download-btn {
+        background: #20c997;
+      }
+
+      button.download-btn:hover {
+        background: #1aa179;
+      }
+
+      .copy-btn {
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .action-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .action-row button {
+        flex: 1;
+      }
+
+      .stats {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        background: #f8f9fa;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: #495057;
+      }
+
+      .stat-item span {
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .instructions {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        border-left: 4px solid #667eea;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      .instructions h4 {
+        margin: 0 0 8px 0;
+        color: #667eea;
+      }
+
+      .instructions ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+
+      .instructions li {
+        margin-bottom: 5px;
+      }
+
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        display: block;
+      }
+
+      .player-list {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+
+      .player-list pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-family: "Courier New", monospace;
+      }
+
+      .final-output {
+        position: relative;
+      }
+
+      .tabs {
+        display: flex;
+        border-bottom: 2px solid #f0f2f5;
+        margin-bottom: 15px;
+      }
+
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        font-weight: 600;
+        color: #6c757d;
+        transition: color 0.2s;
+      }
+
+      .tab:hover {
+        color: #495057;
+      }
+
+      .tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+      }
+
+      .tab-content {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .tab-content.active {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <header>
+          <h1>📥 Input All Rounds Data</h1>
+          <div class="subtitle">Upload files or paste text</div>
+        </header>
+        <div class="content">
+          <div class="section-title">Tournament Data Input</div>
+          <textarea
+            id="allRoundsInput"
+            placeholder="Paste CSV data here, or use the Upload button to automatically append rounds..."
+          ></textarea>
+
+          <div class="controls">
+            <input
+              type="file"
+              id="fileInput"
+              accept=".csv,.txt"
+              style="display: none"
+              onchange="handleFileUpload(this)"
+            />
+
+            <button
+              onclick="document.getElementById('fileInput').click()"
+              class="upload-btn"
+            >
+              📂 Upload & Auto-Add Round
+            </button>
+
+            <button onclick="processAllRounds()" class="success">
+              🚀 Process Data
+            </button>
+            <button onclick="clearAll()" class="secondary">Clear All</button>
+          </div>
+
+          <div class="stats" id="inputStats">
+            <div class="stat-item">Rounds Detected: <span>0</span></div>
+            <div class="stat-item">Total Matches: <span>0</span></div>
+            <div class="stat-item">Unique Players: <span>0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <header>
+          <h1>📤 Complete JSON Output</h1>
+          <div class="subtitle">Ready-to-use tournament data</div>
+        </header>
+        <div class="content">
+          <div class="tabs">
+            <div class="tab active" onclick="showTab('fullJson')">
+              Full JSON
+            </div>
+            <div class="tab" onclick="showTab('playersOnly')">
+              Players Object
+            </div>
+            <div class="tab" onclick="showTab('codeSnippet')">Code Snippet</div>
+          </div>
+
+          <div id="fullJson" class="tab-content active">
+            <div class="section-title">Complete Tournament Data</div>
+            <textarea id="fullJsonOutput" readonly></textarea>
+            <div class="action-row">
+              <button onclick="copyFullJson()" class="copy-btn">
+                📋 Copy Full JSON
+              </button>
+              <button onclick="downloadJson()" class="download-btn">
+                💾 Download JSON
+              </button>
+            </div>
+          </div>
+
+          <div id="playersOnly" class="tab-content">
+            <div class="section-title">Players Object Only</div>
+            <textarea id="playersOutput" readonly></textarea>
+            <button onclick="copyPlayers()" class="copy-btn">
+              📋 Copy Players Object
+            </button>
+          </div>
+
+          <div id="codeSnippet" class="tab-content">
+            <div class="section-title">Complete Code to Replace</div>
+            <textarea id="codeSnippetOutput" readonly></textarea>
+            <button onclick="copyCodeSnippet()" class="copy-btn">
+              📋 Copy Code Snippet
+            </button>
+          </div>
+
+          <div id="status" class="status"></div>
+
+          <div class="player-list">
+            <div class="section-title">Detected Players (0)</div>
+            <pre id="playersList"></pre>
+          </div>
+
+          <div class="instructions">
+            <h4>🎯 How to use:</h4>
+            <ul>
+              <li>
+                <strong>Upload & Auto-Add:</strong> Select a file (e.g., Round 1
+                CSV). It will be added as "Round 1". Uploading another file will
+                automatically add it as "Round 2".
+              </li>
+              <li>
+                <strong>Download:</strong> Click "Download JSON" to save the
+                file.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let processedData = null;
+
+      // Handle file uploads with auto-numbering
+      function handleFileUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          let fileContent = e.target.result;
+          const textarea = document.getElementById("allRoundsInput");
+          let currentText = textarea.value;
+
+          // 1. Determine the next Round Number
+          // Find all instances of "Round X" in the existing text
+          const matches = currentText.match(/Round\s*(\d+)/gi);
+          let nextRound = 1;
+
+          if (matches && matches.length > 0) {
+            // Extract numbers and find max
+            const existingRounds = matches.map((m) =>
+              parseInt(m.match(/\d+/)[0])
+            );
+            nextRound = Math.max(...existingRounds) + 1;
+          }
+
+          // 2. Check if the uploaded content already has a "Round" header
+          // If the user uploaded a file that already says "Round 5", we might not want to double add it.
+          // But if it doesn't have a header, we inject one.
+          const hasHeader = /^\s*Round\s*\d+/i.test(fileContent);
+
+          let textToAppend = "";
+          if (!hasHeader) {
+            textToAppend = `Round ${nextRound}\n\n${fileContent}`;
+          } else {
+            textToAppend = fileContent;
+          }
+
+          // 3. Append to textarea
+          if (currentText.trim() === "") {
+            textarea.value = textToAppend;
+          } else {
+            textarea.value += "\n\n" + textToAppend;
+          }
+
+          // Reset input and process
+          input.value = "";
+
+          showStatus(`✓ Added Round ${nextRound}! Processing...`, "info");
+          processAllRounds();
+        };
+
+        reader.onerror = function () {
+          showStatus("Error reading file", "error");
+        };
+
+        reader.readAsText(file);
+      }
+
+      function downloadJson() {
+        const content = document.getElementById("fullJsonOutput").value;
+        if (!content) {
+          showStatus("No data to download. Process data first.", "error");
+          return;
+        }
+
+        try {
+          // Create a blob and download link
+          const blob = new Blob([content], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "xiangqi_tournament_data.json";
+          document.body.appendChild(a);
+          a.click();
+
+          // Cleanup
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showStatus("✓ File downloaded successfully!", "success");
+        } catch (err) {
+          console.error(err);
+          showStatus("Error downloading file", "error");
+        }
+      }
+
+      function processAllRounds() {
+        const input = document.getElementById("allRoundsInput").value.trim();
+        const statusDiv = document.getElementById("status");
+
+        if (!input) {
+          document.getElementById("inputStats").innerHTML = `
+              <div class="stat-item">Rounds Detected: <span>0</span></div>
+              <div class="stat-item">Total Matches: <span>0</span></div>
+              <div class="stat-item">Unique Players: <span>0</span></div>
+          `;
+          return;
+        }
+
+        try {
+          // Split by "Round X" pattern
+          const roundSections = input.split(/(?=Round\s*\d+)/i);
+
+          const rounds = [];
+          const allPlayers = new Map();
+
+          let totalMatches = 0;
+
+          for (const section of roundSections) {
+            const trimmedSection = section.trim();
+            if (!trimmedSection || trimmedSection.length < 5) continue; // relaxed length check
+
+            // Extract round number
+            const roundMatch = trimmedSection.match(/Round\s*(\d+)/i);
+            if (!roundMatch) continue;
+
+            const roundNumber = parseInt(roundMatch[1]);
+
+            // Split into lines and find data lines
+            const lines = trimmedSection.split("\n");
+            const matches = [];
+
+            let dataStarted = false;
+            let headersSkipped = 0;
+
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+
+              if (!trimmedLine || trimmedLine.startsWith("Round")) continue;
+
+              // Skip header lines (Chinese characters)
+              if (
+                trimmedLine.includes("台号") ||
+                trimmedLine.includes("编号") ||
+                trimmedLine.includes("红方")
+              ) {
+                headersSkipped++;
+                // Usually there are 2 header lines, so after 2, data starts
+                if (headersSkipped >= 2) dataStarted = true;
+                continue;
+              }
+
+              // Fallback: if we see a number at start, it might be data even if headers weren't perfect
+              if (!dataStarted && /^\d+,/.test(trimmedLine)) {
+                dataStarted = true;
+              }
+
+              if (!dataStarted) continue;
+
+              // Parse CSV line
+              const parts = trimmedLine.split(",").map((p) => p.trim());
+
+              // Different formats for different rounds
+              let table, redId, redName, result, blackId, blackName;
+
+              if (parts.length >= 10) {
+                // Format for Rounds 1-2: with empty columns
+                table = parseInt(parts[0]) || 0;
+                redId = parts[1];
+                redName = parts[2];
+                result = parts[5];
+                blackId = parts[9];
+                blackName = parts[8];
+              } else if (parts.length >= 7) {
+                // Format for Rounds 3-7: compact format
+                table = parseInt(parts[0]) || 0;
+                redId = parts[1];
+                redName = parts[2];
+                result = parts[4];
+                blackId = parts[7];
+                blackName = parts[6];
+              } else {
+                continue;
+              }
+
+              if (isNaN(table) || table === 0) continue;
+
+              // Store player information
+              if (redId && redName && redName !== "轮空") {
+                allPlayers.set(redId, redName);
+              }
+
+              // Handle bye games
+              let blackPlayerId = blackId;
+              if (
+                blackName === "轮空" ||
+                blackId === "轮空" ||
+                !blackId ||
+                blackId === ""
+              ) {
+                blackPlayerId = null;
+              } else if (blackId && blackName && blackName !== "轮空") {
+                allPlayers.set(blackId, blackName);
+              }
+
+              // Convert result to scores
+              let scores = [0, 0];
+              if (result && result.includes(":")) {
+                const resultParts = result.split(":");
+                scores = [
+                  resultParts[0] === "-" ? 0 : parseInt(resultParts[0]) || 0,
+                  resultParts[1] === "-" ? 0 : parseInt(resultParts[1]) || 0,
+                ];
+              }
+
+              matches.push({
+                table: table,
+                red: redId,
+                black: blackPlayerId,
+                result: result || "-:-",
+                scores: scores,
+              });
+              totalMatches++;
+            }
+
+            if (matches.length > 0) {
+              rounds.push({
+                roundNumber: roundNumber,
+                matches: matches,
+              });
+            }
+          }
+
+          // Sort rounds by round number
+          rounds.sort((a, b) => a.roundNumber - b.roundNumber);
+
+          // Convert Map to object for players
+          const playersObj = {};
+          for (const [id, name] of allPlayers.entries()) {
+            playersObj[id] = name;
+          }
+
+          // Create final tournament data
+          processedData = {
+            tournamentName: "Xiangqi Tournament 2025",
+            rounds: rounds,
+            players: playersObj,
+          };
+
+          // Update stats
+          document.getElementById("inputStats").innerHTML = `
+                    <div class="stat-item">Rounds Detected: <span>${rounds.length}</span></div>
+                    <div class="stat-item">Total Matches: <span>${totalMatches}</span></div>
+                    <div class="stat-item">Unique Players: <span>${allPlayers.size}</span></div>
+                `;
+
+          // Update outputs
+          const fullJson = JSON.stringify(processedData, null, 2);
+          document.getElementById("fullJsonOutput").value = fullJson;
+
+          const playersJson = JSON.stringify(playersObj, null, 2);
+          document.getElementById("playersOutput").value = playersJson;
+
+          // Create players list display
+          const sortedPlayers = Object.entries(playersObj)
+            .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+            .map(([id, name]) => `${id.padStart(2, " ")}: ${name}`);
+
+          document.getElementById("playersList").textContent =
+            sortedPlayers.length > 0
+              ? sortedPlayers.join("\n")
+              : "No players detected yet.";
+
+          // Create code snippet
+          const codeSnippet = `const tournamentData = ${fullJson};`;
+          document.getElementById("codeSnippetOutput").value = codeSnippet;
+
+          showStatus(
+            `✓ Successfully processed ${rounds.length} rounds with ${totalMatches} matches`,
+            "success"
+          );
+        } catch (error) {
+          showStatus(`Error: ${error.message}`, "error");
+          console.error(error);
+        }
+      }
+
+      function showTab(tabName) {
+        document.querySelectorAll(".tab-content").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        document.getElementById(tabName).classList.add("active");
+        document
+          .querySelector(`.tab[onclick="showTab('${tabName}')"]`)
+          .classList.add("active");
+      }
+
+      function copyFullJson() {
+        copyToClipboard("fullJsonOutput", "Full JSON data");
+      }
+
+      function copyPlayers() {
+        copyToClipboard("playersOutput", "Players object");
+      }
+
+      function copyCodeSnippet() {
+        copyToClipboard("codeSnippetOutput", "Complete code snippet");
+      }
+
+      function copyToClipboard(elementId, description) {
+        const element = document.getElementById(elementId);
+
+        if (!element.value.trim()) {
+          showStatus(`No ${description} to copy`, "error");
+          return;
+        }
+
+        element.select();
+        element.setSelectionRange(0, 99999);
+
+        try {
+          navigator.clipboard.writeText(element.value).then(() => {
+            showStatus(`✓ ${description} copied!`, "success");
+          });
+        } catch (err) {
+          document.execCommand("copy");
+          showStatus(`✓ ${description} copied!`, "success");
+        }
+      }
+
+      function clearAll() {
+        document.getElementById("allRoundsInput").value = "";
+        document.getElementById("fullJsonOutput").value = "";
+        document.getElementById("playersOutput").value = "";
+        document.getElementById("codeSnippetOutput").value = "";
+        document.getElementById("playersList").textContent = "";
+        document.getElementById("fileInput").value = "";
+        document.getElementById("inputStats").innerHTML = `
+                <div class="stat-item">Rounds Detected: <span>0</span></div>
+                <div class="stat-item">Total Matches: <span>0</span></div>
+                <div class="stat-item">Unique Players: <span>0</span></div>
+            `;
+        document.getElementById("status").className = "status";
+      }
+
+      function showStatus(message, type) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.textContent = message;
+        statusDiv.className = `status ${type}`;
+
+        if (type === "success") {
+          setTimeout(() => {
+            statusDiv.className = "status";
+          }, 5000);
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          e.preventDefault();
+          processAllRounds();
+        }
+      });
+    </script>
+  </body>
+</html>
