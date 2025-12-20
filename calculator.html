@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Clean Tally</title>
+    <style>
+      :root {
+        --primary: #007aff;
+        --bg: #f5f5f7;
+        --card-bg: #ffffff;
+        --text: #1d1d1f;
+        --subtext: #86868b;
+        --border: #e5e5ea;
+        --danger: #ff3b30;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* --- Header & Edit Toggle --- */
+      .header-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: -10px;
+      }
+
+      .icon-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.6;
+        padding: 5px;
+      }
+      .icon-btn.active {
+        opacity: 1;
+        color: var(--primary);
+      }
+
+      /* --- Total Display --- */
+      .total-card {
+        background: var(--card-bg);
+        padding: 25px 20px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .total-label {
+        font-size: 0.8rem;
+        color: var(--subtext);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+      }
+
+      .total-amount {
+        font-size: 4rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
+        letter-spacing: -1px;
+      }
+
+      /* --- Settings Panel (Hidden by default) --- */
+      .settings-panel {
+        background: #eef0f2;
+        border-radius: 16px;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        opacity: 0;
+      }
+
+      .settings-panel.open {
+        padding: 15px;
+        max-height: 400px;
+        opacity: 1;
+      }
+
+      .setting-row {
+        margin-bottom: 12px;
+      }
+      .setting-label {
+        font-size: 0.9rem;
+        color: var(--subtext);
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      input[type="text"].full-width {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+
+      /* --- Main Input --- */
+      .input-wrapper {
+        position: relative;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        display: flex;
+        gap: 10px;
+      }
+
+      #mainInput {
+        flex: 1;
+        border: none;
+        font-size: 1.5rem;
+        padding: 10px;
+        outline: none;
+        background: transparent;
+        font-weight: 500;
+      }
+
+      .btn-add {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn-add:active {
+        transform: scale(0.96);
+      }
+
+      /* --- History List --- */
+      .history-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+      }
+
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border);
+        animation: fadeIn 0.3s ease;
+      }
+      .history-item:last-child {
+        border-bottom: none;
+      }
+
+      .item-left {
+        display: flex;
+        flex-direction: column;
+      }
+      .item-note {
+        font-size: 0.8rem;
+        color: var(--subtext);
+      }
+      .item-val {
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+
+      .btn-del {
+        background: transparent;
+        color: #ffcccc;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0 10px;
+      }
+      .btn-del:hover {
+        color: var(--danger);
+      }
+
+      /* --- Auto-Add UI --- */
+      .turbo-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-row">
+        <button class="icon-btn" id="editToggle" onclick="toggleEditMode()">
+          ⚙️
+        </button>
+      </div>
+
+      <div class="total-card">
+        <div class="total-label" id="projectTitleDisplay">Total</div>
+        <div class="total-amount" id="displayTotal">0</div>
+      </div>
+
+      <div class="settings-panel" id="settingsPanel">
+        <div class="setting-row">
+          <span class="setting-label">Project Name</span>
+          <input
+            type="text"
+            class="full-width"
+            id="projectTitleInput"
+            placeholder="e.g. Shopping List"
+            oninput="updateTitle()"
+          />
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label">Next Entry Label (Optional)</span>
+          <input
+            type="text"
+            class="full-width"
+            id="entryLabel"
+            placeholder="Label for next item..."
+          />
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label">Turbo Mode (Auto-Submit)</span>
+          <div class="turbo-controls">
+            <input
+              type="checkbox"
+              id="autoAddToggle"
+              style="transform: scale(1.5)"
+            />
+            <input
+              type="range"
+              id="delaySlider"
+              min="500"
+              max="3000"
+              step="100"
+              value="1500"
+            />
+            <span
+              id="delayVal"
+              style="
+                font-size: 0.9rem;
+                color: var(--subtext);
+                width: 40px;
+                text-align: right;
+              "
+              >1.5s</span
+            >
+          </div>
+        </div>
+
+        <div class="setting-row" style="text-align: right; margin-top: 20px">
+          <button
+            onclick="resetAll()"
+            style="
+              color: var(--danger);
+              background: white;
+              border: 1px solid var(--danger);
+              padding: 8px 15px;
+              border-radius: 8px;
+              font-weight: bold;
+            "
+          >
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <input
+          type="text"
+          id="mainInput"
+          placeholder="Type number..."
+          autocomplete="off"
+        />
+        <button class="btn-add" onclick="processInput()">Add</button>
+      </div>
+
+      <ul class="history-list" id="historyList"></ul>
+    </div>
+
+    <script>
+      let items = [];
+      let autoAddTimer;
+
+      // Elements
+      const mainInput = document.getElementById("mainInput");
+      const labelInput = document.getElementById("entryLabel");
+      const displayTotal = document.getElementById("displayTotal");
+      const historyList = document.getElementById("historyList");
+      const settingsPanel = document.getElementById("settingsPanel");
+      const editBtn = document.getElementById("editToggle");
+      const titleInput = document.getElementById("projectTitleInput");
+      const titleDisplay = document.getElementById("projectTitleDisplay");
+      const autoAddToggle = document.getElementById("autoAddToggle");
+      const delaySlider = document.getElementById("delaySlider");
+      const delayVal = document.getElementById("delayVal");
+
+      // --- Logic for "Half" Calculation ---
+      function parseValue(str) {
+        // 1. Check if it contains any alphabet letters
+        const hasLetters = /[a-zA-Z]/.test(str);
+
+        // 2. Extract the first number found in string (e.g. "16" from "s16")
+        // Match numbers, decimals.
+        const numberMatch = str.match(/(\d+(\.\d+)?)/);
+
+        // If number found, parse it. If not (e.g. input "ONE"), base is 0.
+        let val = numberMatch ? parseFloat(numberMatch[0]) : 0;
+
+        // 3. Logic: If letters exist, add 0.5 to the base value
+        if (hasLetters) {
+          val += 0.5;
+        }
+
+        return val;
+      }
+
+      // --- Core Functions ---
+
+      function processInput() {
+        const rawText = mainInput.value.trim();
+        if (!rawText) return;
+
+        const val = parseValue(rawText);
+
+        // Don't add if 0 (unless user typed 0 explicitly, but our logic handles alphabets)
+        if (val === 0 && !rawText.includes("0")) return;
+
+        // Determine Label
+        let label = labelInput.value.trim();
+        if (!label) {
+          // If user typed "16s", shows "16s" as label implicitly
+          // If they are in edit mode and typed a label, use that.
+          // Otherwise, leave blank or use input string as hint
+          label = rawText;
+        }
+
+        const item = {
+          id: Date.now(),
+          value: val,
+          label: label,
+        };
+
+        items.push(item);
+        render();
+
+        // Reset inputs
+        mainInput.value = "";
+        // Note: We do NOT clear the generic Label input in settings,
+        // assuming user might want to label a batch.
+        // If you prefer clearing it, uncomment below:
+        // labelInput.value = '';
+
+        mainInput.focus();
+
+        // Flash effect
+        mainInput.style.backgroundColor = "#e8f5e9";
+        setTimeout(
+          () => (mainInput.style.backgroundColor = "transparent"),
+          200
+        );
+      }
+
+      function removeItem(id) {
+        items = items.filter((i) => i.id !== id);
+        render();
+      }
+
+      function resetAll() {
+        if (confirm("Reset everything?")) {
+          items = [];
+          render();
+          toggleEditMode(); // Close settings after reset
+        }
+      }
+
+      function render() {
+        // Sum
+        const total = items.reduce((acc, curr) => acc + curr.value, 0);
+        displayTotal.innerText = Number.isInteger(total)
+          ? total
+          : total.toFixed(2); // Clean decimals
+
+        // List (Newest on top)
+        historyList.innerHTML = "";
+        [...items].reverse().forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "history-item";
+          li.innerHTML = `
+                <div class="item-left">
+                    <span class="item-val">${item.value}</span>
+                    <span class="item-note">${item.label}</span>
+                </div>
+                <button class="btn-del" onclick="removeItem(${item.id})">×</button>
+            `;
+          historyList.appendChild(li);
+        });
+      }
+
+      // --- UI/Settings Functions ---
+
+      function toggleEditMode() {
+        settingsPanel.classList.toggle("open");
+        editBtn.classList.toggle("active");
+      }
+
+      function updateTitle() {
+        titleDisplay.innerText = titleInput.value || "Total";
+      }
+
+      // --- Event Listeners ---
+
+      // 1. Main Input Keys
+      mainInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          clearTimeout(autoAddTimer);
+          processInput();
+        }
+      });
+
+      // 2. Auto Add Logic
+      mainInput.addEventListener("input", () => {
+        if (!autoAddToggle.checked) return;
+        if (mainInput.value.trim() === "") return;
+
+        clearTimeout(autoAddTimer);
+        const ms = parseInt(delaySlider.value);
+
+        autoAddTimer = setTimeout(() => {
+          processInput();
+        }, ms);
+      });
+
+      // 3. Slider Visual Update
+      delaySlider.addEventListener("input", (e) => {
+        delayVal.innerText = (e.target.value / 1000).toFixed(1) + "s";
+      });
+    </script>
+  </body>
+</html>
