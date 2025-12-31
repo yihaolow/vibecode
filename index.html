@@ -3,73 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects</title>
+    <title>Project Portal</title>
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg-color);
             margin: 0;
+            padding: 40px 20px;
+            color: var(--text-main);
         }
+
         .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
             text-align: center;
+            margin-bottom: 3rem;
         }
+
         h1 {
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #111;
         }
-        ul {
+
+        p.subtitle {
+            color: var(--text-light);
+            margin-top: 0;
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Grid Layout */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        li {
-            margin-bottom: 10px;
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-        a {
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+
+        .card a {
             display: block;
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
+            padding: 20px;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.2s;
+            color: inherit;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
-        a:hover {
-            background-color: #0056b3;
+
+        .card-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            opacity: 0.7;
         }
-        .footer {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #666;
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary-color);
         }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+        
+        /* Category specific accent colors */
+        .cat-xiangqi .card-icon { color: #d97706; } /* Amber */
+        .cat-pharm .card-icon { color: #ef4444; }   /* Red */
+        .cat-admin .card-icon { color: #059669; }   /* Emerald */
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Project Index</h1>
-        <ul>
-            <li><a href="pickanddrag.html">Pick and Drag</a></li>
-            <li><a href="StockBalance.html">Stock Balance</a></li>
-            <li><a href="classsite.html">ClassSite</a></li>
-            <li><a href="warfarinCalendar.html">Warfarin Calendar</a></li>
-            <li><a href="Kiddose.html">Kid Dose</a></li>
-            <li><a href="jsonToHtmlLatest.html">JsonToHtml</a></li>
-            <li><a href="csvToJsonFull.html">csvToJsonFull</a></li>
-            <li><a href="calculator.html">Calculator</a></li>
-        </ul>
-        <div class="footer">Hosted on GitHub Pages</div>
+        <header>
+            <h1>My Projects</h1>
+            <p class="subtitle">A collection of tools, trackers, and utilities</p>
+        </header>
+
+        <div class="category-section cat-xiangqi">
+            <h2 class="category-title">♟️ Xiangqi</h2>
+            <ul class="project-grid">
+                </ul>
+        </div>
+
+        <div class="category-section cat-pharm">
+            <h2 class="category-title">💊 Pharm</h2>
+            <ul class="project-grid">
+                <li class="card">
+                    <a href="warfarinCalendar.html">
+                        <span class="card-icon">📅</span>
+                        <span class="card-title">Warfarin Calendar</span>
+                    </a>
+                </li>
+                <li class="card">
+                    <a href="Kiddose.html">
+                        <span class="card-icon">👶</span>
+                        <span class="card-title">Kid Dose</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-section cat-admin">
+            <h2 class="category-title">🛠️ Admin & Tools</h2>
+            <ul class="project-grid">
+                <li class="card">
+                    <a href="StockBalance.html">
+                        <span class="card-icon">📦</span>
+                        <span class="card-title">Stock Balance</span>
+                    </a>
+                </li>
+                <li class="card">
+                    <a href="jsonToHtmlLatest.html">
+                        <span class="card-icon">📄</span>
+                        <span class="card-title">JSON to HTML</span>
+                    </a>
+                </li>
+                <li class="card">
+                    <a href="csvToJsonFull.html">
+                        <span class="card-icon">🔄</span>
+                        <span class="card-title">CSV to JSON</span>
+                    </a>
+                </li>
+                <li class="card">
+                    <a href="calculator.html">
+                        <span class="card-icon">🧮</span>
+                        <span class="card-title">Calculator</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2 class="category-title">📂 Others (To Sort)</h2>
+            <ul class="project-grid">
+                <li class="card">
+                    <a href="pickanddrag.html">
+                        <span class="card-icon">✋</span>
+                        <span class="card-title">Pick and Drag</span>
+                    </a>
+                </li>
+                <li class="card">
+                    <a href="classsite.html">
+                        <span class="card-icon">🏫</span>
+                        <span class="card-title">Class Site</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <footer>
+            Hosted on GitHub Pages
+        </footer>
     </div>
 
 </body>
