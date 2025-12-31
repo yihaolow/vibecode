@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Yi Hao's Timesheet Pro</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 30px;
+        background-color: #f4f6f8;
+        color: #333;
+      }
+      .card {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #2c3e50;
+        margin-top: 0;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* Layout */
+      .settings {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        background: #eef2f7;
+        padding: 15px;
+        border-radius: 8px;
+        align-items: center;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      select,
+      input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+
+      textarea {
+        width: 100%;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 12px;
+        font-family: "Courier New", monospace;
+        box-sizing: border-box;
+        font-size: 0.9rem;
+      }
+      #inputData {
+        height: 120px;
+      }
+      #copyArea {
+        height: 300px;
+        background: #fff;
+        border: 2px solid #28a745;
+        color: #333;
+      }
+
+      /* Email Manager Styles */
+      .email-toggle {
+        font-size: 0.9rem;
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .email-toggle:hover {
+        text-decoration: underline;
+      }
+
+      #emailManager {
+        display: none;
+        background: #f8f9fa;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .email-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+        align-items: center;
+      }
+      .email-row input {
+        flex: 1;
+        font-family: monospace;
+      }
+      .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0 5px;
+        color: #dc3545;
+        transition: color 0.2s;
+      }
+      .btn-icon:hover {
+        color: #a71d2a;
+      }
+      .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+      .btn-add:hover {
+        background: #218838;
+      }
+
+      /* Main Buttons */
+      .btn-group {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+      button.main-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s;
+      }
+      .btn-process {
+        background: #007bff;
+        color: white;
+        flex: 1;
+      }
+      .btn-process:hover {
+        background: #0056b3;
+      }
+      .btn-email {
+        background: #28a745;
+        color: white;
+        flex: 1;
+        display: none;
+      }
+      .btn-email:hover {
+        background: #218838;
+      }
+
+      .output-section {
+        margin-top: 25px;
+        display: none;
+      }
+      .hint {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>
+        Yi Hao's Timesheet
+        <a class="email-toggle" onclick="toggleEmailManager()"
+          >⚙️ Manage Recipients</a
+        >
+      </h2>
+
+      <div id="emailManager">
+        <label>Email Recipients List:</label>
+        <div id="emailListContainer"></div>
+        <button class="btn-add" onclick="addEmailField()">+ Add Email</button>
+      </div>
+
+      <div class="settings">
+        <div class="field">
+          <label>Year</label>
+          <input type="number" id="year" value="2025" style="width: 80px" />
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <select id="month">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11" selected>December</option>
+          </select>
+        </div>
+      </div>
+
+      <label>1. Paste Roster Text:</label>
+      <textarea
+        id="inputData"
+        placeholder="Date	Day	Full day dispenser..."
+      ></textarea>
+
+      <div class="btn-group">
+        <button class="main-btn btn-process" onclick="process()">
+          Process Data
+        </button>
+        <button class="main-btn btn-email" id="emailBtn" onclick="sendEmail()">
+          Open Email Draft
+        </button>
+      </div>
+
+      <div class="output-section" id="outputSec">
+        <label>2. Excel Data (Start | End | Break):</label>
+        <textarea id="copyArea" readonly></textarea>
+        <p class="hint">
+          Click inside, Ctrl+A then Ctrl+C to copy. Paste directly into Excel.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // --- CONFIGURATION ---
+      const DEFAULTS = [
+        null,
+        null,
+        { s: 8.5, e: 17.0 }, // Locum 1 FD
+        { s: 10.0, e: 18.5 }, // Locum 2 FD
+        { s: 16.0, e: 20.0 }, // Locum 3 PM
+        { s: 13.0, e: 20.0 }, // Locum 4 PM
+      ];
+
+      const MONTH_NAMES = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+
+      // Default Recipient List
+      let emailList = [
+        "Hui_Wen_HO@nuhs.edu.sg",
+        "low_yi_hao@nuhs.edu.sg",
+        "chin_menn_woon@nuhs.edu.sg",
+        "wei_liang_lau@nuhs.edu.sg",
+        "lee_foo_weng@nuhs.edu.sg",
+        "kerry_xiao_wern_LEE@nuhs.edu.sg",
+      ];
+
+      // --- EMAIL MANAGER LOGIC ---
+
+      function toggleEmailManager() {
+        const div = document.getElementById("emailManager");
+        if (div.style.display === "none" || div.style.display === "") {
+          div.style.display = "block";
+          renderEmails();
+        } else {
+          div.style.display = "none";
+        }
+      }
+
+      function renderEmails() {
+        const container = document.getElementById("emailListContainer");
+        container.innerHTML = "";
+        emailList.forEach((email, index) => {
+          const row = document.createElement("div");
+          row.className = "email-row";
+          row.innerHTML = `
+                <input type="text" value="${email}" onchange="updateEmail(${index}, this.value)">
+                <button class="btn-icon" onclick="removeEmail(${index})" title="Remove">🗑️</button>
+            `;
+          container.appendChild(row);
+        });
+      }
+
+      function updateEmail(index, val) {
+        emailList[index] = val.trim();
+      }
+
+      function removeEmail(index) {
+        emailList.splice(index, 1);
+        renderEmails();
+      }
+
+      function addEmailField() {
+        emailList.push(""); // Add empty string
+        renderEmails();
+      }
+
+      // --- TIME PARSING LOGIC ---
+
+      function timeToDecimal(str, isEnd) {
+        if (!str) return null;
+        str = str
+          .toLowerCase()
+          .replace(/[\(\)]/g, "")
+          .trim();
+        let ampm = str.match(/[ap]m/);
+        let digits = str.replace(/[^\d]/g, "");
+        let hh, mm;
+
+        if (digits.length <= 2) {
+          hh = parseInt(digits);
+          mm = 0;
+        } else {
+          mm = parseInt(digits.slice(-2));
+          hh = parseInt(digits.slice(0, -2));
+        }
+
+        if (!ampm) {
+          if (hh < 9 || isEnd) ampm = "pm";
+          else ampm = "am";
+        } else {
+          ampm = ampm[0];
+        }
+
+        if (ampm === "pm" && hh < 12) hh += 12;
+        if (ampm === "am" && hh === 12) hh = 0;
+        return hh + mm / 60;
+      }
+
+      function formatTime(dec) {
+        if (dec === 0 || dec === null) return "";
+        let h = Math.floor(dec);
+        let m = Math.round((dec - h) * 60);
+        return h.toString().padStart(2, "0") + m.toString().padStart(2, "0");
+      }
+
+      // --- PROCESS LOGIC ---
+
+      function process() {
+        const input = document.getElementById("inputData").value;
+        const year = parseInt(document.getElementById("year").value);
+        const month = parseInt(document.getElementById("month").value);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const lines = input.trim().split("\n");
+        let schedule = {};
+
+        lines.forEach((line) => {
+          const cols = line.split("\t");
+          const dNum = parseInt(cols[0]);
+          if (isNaN(dNum)) return;
+
+          let dayShifts = [];
+          for (let i = 2; i <= 5; i++) {
+            if (cols[i] && cols[i].includes("Yi Hao")) {
+              let s, e;
+              let customTime = cols[i].match(/\((.*?)-(.*?)\)/);
+              if (customTime) {
+                s = timeToDecimal(customTime[1], false);
+                e = timeToDecimal(customTime[2], true);
+              } else {
+                s = DEFAULTS[i].s;
+                e = DEFAULTS[i].e;
+              }
+              dayShifts.push({ s, e });
+            }
+          }
+
+          if (dayShifts.length > 0) {
+            let start = Math.min(...dayShifts.map((x) => x.s));
+            let end = Math.max(...dayShifts.map((x) => x.e));
+            let breakVal = end - start > 6 ? 1 : "";
+            let displayBreak = breakVal === 1 ? "1" : "";
+            schedule[dNum] = `${formatTime(start)}\t${formatTime(
+              end
+            )}\t${displayBreak}`;
+          }
+        });
+
+        let finalOutput = "";
+        for (let i = 1; i <= daysInMonth; i++) {
+          finalOutput += (schedule[i] || "\t\t") + "\n";
+        }
+
+        document.getElementById("copyArea").value = finalOutput;
+        document.getElementById("outputSec").style.display = "block";
+
+        const btn = document.getElementById("emailBtn");
+        btn.style.display = "block";
+        btn.innerText = `Draft Email (${MONTH_NAMES[month]})`;
+      }
+
+      function sendEmail() {
+        const year = document.getElementById("year").value;
+        const monthIndex = document.getElementById("month").value;
+        const monthName = MONTH_NAMES[monthIndex];
+
+        // Filter out empty emails
+        const validEmails = emailList.filter((e) => e.trim() !== "").join(",");
+
+        const subject = `${monthName} ${year} timesheet NUH`;
+        const body = `Dear Roster Team,\n\nPlease see attached.\n\nRegards,\nYi Hao`;
+
+        const mailtoLink = `mailto:${validEmails}?subject=${encodeURIComponent(
+          subject
+        )}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+      }
+    </script>
+  </body>
+</html>
