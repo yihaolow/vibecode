@@ -9,480 +9,232 @@
     <title>Xiangqi Master: Publishing Edition</title>
     <style>
       :root {
-        /* "Publishing" Color Palette */
-        --bg-color: #f0f2f5;
-        --board-bg: #fdf5e6; /* Old Lace / Paper tone */
-        --line-color: #4a3b2a; /* Dark Brown ink */
-        --red-ink: #ce1212; /* Vivid Print Red */
-        --black-ink: #111111; /* Rich Black */
-
+        /* --- CLEAN PUBLISHING THEME --- */
+        --bg-color: #f4f4f4;
+        --board-bg: #fdf5e6; 
+        --line-color: #4b3621;
+        --red-ink: #c0392b;
+        --black-ink: #2d3436;
+        
         /* UI Colors */
         --panel-bg: #ffffff;
+        --border-color: #d9d9d9;
         --text-color: #333;
         --highlight: rgba(255, 215, 0, 0.4);
-        --selected: rgba(
-          0,
-          160,
-          233,
-          0.3
-        ); /* Cyan highlight for print contrast */
-        --active-tab: #2c3e50;
-
-        /* Shadow for "Screen" feel mentioned in blog */
-        --piece-shadow: 2px 3px 5px rgba(0, 0, 0, 0.25);
+        --selected: rgba(24, 144, 255, 0.4);
+        --tab-active: #2c3e50;
+        --branch-btn: #8e44ad;
+        
+        /* Shadow for "Piece" feel */
+        --piece-shadow: 1px 2px 4px rgba(0,0,0,0.2);
       }
 
       body {
-        margin: 0;
-        background: var(--bg-color);
-        color: var(--text-color);
-        font-family: "Adobe Source Han Sans", "Noto Sans CJK", "KaiTi",
-          "STKaiti", serif;
-        height: 100dvh;
-        width: 100vw;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
-        -webkit-user-select: none;
+        margin: 0; background: var(--bg-color); color: var(--text-color);
+        font-family: "Adobe Source Han Sans", "Noto Sans CJK", "Microsoft YaHei", sans-serif;
+        height: 100dvh; width: 100vw; overflow: hidden;
+        display: flex; justify-content: center; align-items: center;
+        user-select: none; -webkit-user-select: none;
       }
 
       .container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        max-width: 900px;
-        padding: 15px;
-        box-sizing: border-box;
-        gap: 20px;
+        display: flex; flex-direction: column; width: 100%; height: 100%;
+        max-width: 600px; padding: 10px; box-sizing: border-box; gap: 10px;
+        align-items: center; justify-content: center;
       }
 
+      /* --- LANDSCAPE OPTIMIZATION --- */
       @media (orientation: landscape) {
-        .container {
-          flex-direction: row;
-          align-items: center;
-          max-width: 1200px;
+        .container { 
+          flex-direction: row; 
+          max-width: 1100px; 
+          padding: 20px; 
+          gap: 30px; 
         }
-        .board-frame {
-          height: 90vh;
-          width: auto;
-          aspect-ratio: 9/10;
-          max-height: none;
-          max-width: none;
+        
+        .board-frame { 
+          height: 92vh; 
+          width: auto; 
+          aspect-ratio: 9/10; 
+          max-height: none; 
+          max-width: none; 
           margin: 0;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .ui-panel {
-          height: 90vh;
-          width: 360px;
+        
+        .ui-panel { 
+          height: 92vh; 
+          width: 280px; 
+          flex: 0 0 280px; 
         }
       }
 
-      /* --- PUBLISHING QUALITY BOARD --- */
+      /* --- BOARD --- */
       .board-frame {
-        width: 100%;
-        aspect-ratio: 9/10;
-        max-height: 60vh;
-        max-width: 54vh;
-        position: relative;
+        width: 100%; aspect-ratio: 9/10; 
+        max-height: 60vh; max-width: 54vh;
+        position: relative; 
         background-color: var(--board-bg);
-        /* Subtle paper texture */
-        background-image: linear-gradient(
-            rgba(255, 255, 255, 0.5) 1px,
-            transparent 1px
-          ),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-        background-size: 20px 20px;
-
-        border: 2px solid #d4c5b0;
-        border-radius: 4px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        flex-shrink: 0;
-        margin: 0 auto;
+        border: 2px solid #d4c5b0; border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        flex-shrink: 0; margin: 0 auto;
       }
 
-      .board-inner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+      .board-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+      svg.grid { width: 100%; height: 100%; display: block; pointer-events: none; }
+      
+      .line { 
+        stroke: var(--line-color); stroke-width: 1.5; 
+        fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round;
       }
-
-      svg.grid {
-        width: 100%;
-        height: 100%;
-        display: block;
-        pointer-events: none;
+      .border { 
+        stroke: var(--line-color); stroke-width: 4; 
+        fill: none; vector-effect: non-scaling-stroke; 
       }
-      /* Razor sharp lines */
-      .line {
-        stroke: var(--line-color);
-        stroke-width: 1.5;
-        fill: none;
-        vector-effect: non-scaling-stroke;
-        stroke-linecap: round;
-      }
-      .border {
-        stroke: var(--line-color);
-        stroke-width: 4;
-        fill: none;
-        vector-effect: non-scaling-stroke;
+      .mark {
+        stroke: var(--line-color); stroke-width: 1.5; fill: none;
       }
       .river-text {
-        font-family: "KaiTi", serif;
-        font-size: 36px;
-        fill: var(--line-color);
-        opacity: 0.8;
-        text-anchor: middle;
-        dominant-baseline: middle;
-        font-weight: bold;
+        font-family: "KaiTi", serif; font-size: 36px; fill: var(--line-color);
+        opacity: 0.8; text-anchor: middle; dominant-baseline: middle; font-weight: bold;
         letter-spacing: 5px;
       }
 
-      .layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-      }
+      .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
       .click-mask {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 100; cursor: pointer; -webkit-tap-highlight-color: transparent;
       }
 
-      /* --- VECTOR PIECES --- */
+      /* --- PIECES (SVG CONTAINER) --- */
       .piece {
-        width: 11.1111%;
-        height: 10%;
-        position: absolute;
-        z-index: 10;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        width: 11.1111%; height: 10%; position: absolute;
+        z-index: 10; display: flex; justify-content: center; align-items: center;
         transition: left 0.1s ease-out, top 0.1s ease-out;
       }
 
-      /* Simulated Vector Piece (CSS + Text) */
       .piece-inner {
-        width: 90%;
-        height: 90%;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: "KaiTi", "STKaiti", serif;
-        font-weight: 900;
-
-        /* Clean Vector Look */
-        background: #fcfcfc;
-        border: 2px solid #888;
-
-        /* The Shadow mentioned in the blog */
+        width: 88%; height: 88%; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        
+        background: #fff;
+        border: 2px solid #a0a0a0;
         box-shadow: var(--piece-shadow);
-
-        /* Inner Bevel Simulation */
-        background-image: radial-gradient(
-          circle at 30% 30%,
-          #fff 0%,
-          #f0f0f0 100%
-        );
-
-        font-size: clamp(14px, 4.8cqw, 34px);
-        container-type: inline-size;
-        position: relative;
+        
+        /* Subtle bevel */
+        background-image: radial-gradient(circle at 30% 30%, #fff 0%, #f4f4f4 100%);
+        container-type: inline-size; position: relative;
+      }
+      
+      /* Inner Ring */
+      .piece-inner::before {
+        content: ""; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px;
+        border-radius: 50%; border: 1px solid rgba(0,0,0,0.08);
+        pointer-events: none;
       }
 
-      /* Piece Ring (The "Euro" style often has a double ring) */
-      .piece-inner::after {
-        content: "";
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        right: 3px;
-        bottom: 3px;
-        border-radius: 50%;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+      /* SVG inside piece */
+      .piece-inner svg {
+        width: 85%;
+        height: 85%;
+        display: block;
       }
 
-      .piece.red .piece-inner {
-        color: var(--red-ink);
-        border-color: var(--red-ink);
-      }
-      .piece.black .piece-inner {
-        color: var(--black-ink);
-        border-color: var(--black-ink);
-      }
+      .piece.red .piece-inner { border-color: var(--red-ink); }
+      .piece.black .piece-inner { border-color: var(--black-ink); }
 
       /* Markers */
-      .marker {
-        position: absolute;
-        width: 11.1111%;
-        height: 10%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      .marker { position: absolute; width: 11.1111%; height: 10%; display: flex; justify-content: center; align-items: center; }
+      .last::after { 
+        content: ""; width: 90%; height: 90%; 
+        border: 2px dashed #666; border-radius: 10px; opacity: 0.6;
       }
-      /* Square "Bracket" style often seen in books */
-      .last::after {
-        content: "";
-        width: 90%;
-        height: 90%;
-        border: 2px dashed var(--black-ink);
-        border-radius: 8px;
-        opacity: 0.5;
+      .select::after { 
+        content: ""; width: 90%; height: 90%; 
+        background: var(--selected); border-radius: 50%; 
       }
-      .select::after {
-        content: "";
-        width: 100%;
-        height: 100%;
-        background: var(--selected);
-        border-radius: 12px;
-      }
-      .dot::after {
-        content: "";
-        width: 18%;
-        height: 18%;
-        background: rgba(0, 150, 0, 0.6);
-        border-radius: 50%;
+      .dot::after { 
+        content: ""; width: 18%; height: 18%; 
+        background: rgba(40, 167, 69, 0.6); border-radius: 50%; 
       }
 
-      /* UI */
-      .ui-panel {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background: var(--panel-bg);
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-        min-height: 0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      /* --- UI PANEL --- */
+      .ui-panel { 
+        flex: 1; display: flex; flex-direction: column; 
+        background: var(--panel-bg); 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        overflow: hidden; 
+        min-height: 0; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       }
 
-      .tabs {
-        display: flex;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eee;
-        flex-shrink: 0;
+      .tabs { display: flex; background: #f5f5f5; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+      .tab { 
+        flex: 1; padding: 12px; text-align: center; cursor: pointer; 
+        color: #666; transition: 0.2s; font-weight: bold; font-size: 13px;
       }
-      .tab {
-        flex: 1;
-        padding: 12px;
-        text-align: center;
-        cursor: pointer;
-        color: #666;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
+      .tab.active { background: #fff; color: var(--tab-active); border-bottom: 3px solid var(--tab-active); }
+      
+      .tab-content { flex: 1; display: none; flex-direction: column; padding: 12px; overflow: hidden; min-height: 0; }
+      .tab-content.active { display: flex; }
+
+      .playback-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
+      .pb-btn { 
+        flex: 1; padding: 10px 0; background: #fff; 
+        border: 1px solid #ccc; color: #444; 
+        border-radius: 4px; cursor: pointer; font-size: 16px; 
       }
-      .tab.active {
-        color: var(--active-tab);
-        border-bottom: 2px solid var(--active-tab);
-        background: #fff;
+      .pb-btn:active { background: #e6e6e6; }
+
+      .branch-ctrl { 
+        display: flex; align-items: center; justify-content: center; gap: 10px; 
+        margin-bottom: 8px; background: #f3e5f5; padding: 6px; 
+        border-radius: 4px; font-size: 13px; display: none; flex-shrink: 0; 
+        border: 1px solid #e1bee7; 
+      }
+      .branch-ctrl.active { display: flex; }
+      .branch-btn { background: #8e44ad; border: none; color: white; border-radius: 3px; padding: 4px 10px; cursor: pointer; }
+
+      .status { 
+        text-align: center; margin-bottom: 8px; font-weight: bold; 
+        color: var(--red-ink); font-size: 15px; flex-shrink: 0; 
       }
 
-      .tab-content {
-        flex: 1;
-        display: none;
-        flex-direction: column;
-        padding: 15px;
-        overflow: hidden;
-        min-height: 0;
+      .history { 
+        flex: 1; background: #fff; border: 1px solid #eee; border-radius: 4px;
+        overflow-y: auto; padding: 8px; font-family: "Courier New", monospace; font-size: 13px; 
       }
-      .tab-content.active {
-        display: flex;
+      .row { display: flex; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; color: #555; }
+      .row:nth-child(even) { background: #fafafa; }
+      .row.current { background: #e6f7ff; color: #000; border-left: 3px solid #1890ff; }
+      .row span { flex: 1; cursor: pointer; }
+
+      .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
+      .btn { 
+        padding: 12px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); 
+        color: white; cursor: pointer; font-weight: bold; font-size: 13px; 
+      }
+      .btn-norm { background: #6c757d; }
+      .btn-red { background: #dc3545; }
+      .btn-green { background: #28a745; }
+      
+      .export-row { grid-column: span 2; display: flex; gap: 5px; }
+      select { flex: 1; padding: 8px; background: #fff; color: #333; border: 1px solid #ccc; border-radius: 4px; }
+      textarea { 
+        width: 100%; height: 80px; background: #fdfdfd; color: #333; 
+        border: 1px solid #ccc; resize: none; border-radius: 4px; 
+        margin-bottom: 10px; box-sizing: border-box; padding: 8px; font-family: monospace; 
       }
 
-      /* Control Bar */
-      .playback-bar {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 15px;
-        flex-shrink: 0;
+      #splash { 
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); 
+        font-size: 4rem; font-family: "KaiTi", serif; font-weight: 900; 
+        color: var(--red-ink); text-shadow: 2px 2px 0 #fff; 
+        pointer-events: none; z-index: 200; opacity: 0; white-space: nowrap; 
       }
-      .pb-btn {
-        flex: 1;
-        padding: 10px 0;
-        background: #fff;
-        border: 1px solid #ccc;
-        color: #333;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: all 0.1s;
-      }
-      .pb-btn:hover {
-        background: #f0f0f0;
-      }
-      .pb-btn:active {
-        background: #e0e0e0;
-        transform: translateY(1px);
-      }
-
-      .branch-ctrl {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 10px;
-        background: #f8f9fa;
-        padding: 8px;
-        border-radius: 4px;
-        font-size: 13px;
-        border: 1px solid #eee;
-        display: none;
-        flex-shrink: 0;
-      }
-      .branch-ctrl.active {
-        display: flex;
-      }
-      .branch-btn {
-        background: var(--branch-btn);
-        border: none;
-        color: white;
-        border-radius: 3px;
-        padding: 3px 10px;
-        cursor: pointer;
-      }
-
-      .status {
-        text-align: center;
-        margin-bottom: 10px;
-        font-weight: 700;
-        color: #444;
-        font-size: 16px;
-        flex-shrink: 0;
-        padding: 5px;
-        background: #fdfdfd;
-        border-radius: 4px;
-        border: 1px solid #eee;
-      }
-
-      .history {
-        flex: 1;
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 4px;
-        overflow-y: auto;
-        padding: 0;
-        font-family: "Courier New", monospace;
-        font-size: 14px;
-      }
-      .row {
-        display: flex;
-        padding: 8px 10px;
-        border-bottom: 1px solid #f0f0f0;
-        color: #555;
-      }
-      .row:nth-child(even) {
-        background: #fafafa;
-      }
-      .row.current {
-        background: #e6f7ff;
-        color: #000;
-        border-left: 3px solid #1890ff;
-      }
-      .row span {
-        flex: 1;
-        cursor: pointer;
-      }
-
-      .tool-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        flex-shrink: 0;
-      }
-      .btn {
-        padding: 12px;
-        border-radius: 4px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        color: white;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 13px;
-      }
-      .btn-norm {
-        background: #6c757d;
-        color: white;
-      }
-      .btn-red {
-        background: #dc3545;
-      }
-      .btn-green {
-        background: #28a745;
-      }
-
-      .export-row {
-        grid-column: span 2;
-        display: flex;
-        gap: 5px;
-      }
-      select {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-      }
-      textarea {
-        width: 100%;
-        height: 80px;
-        background: #fcfcfc;
-        color: #333;
-        border: 1px solid #ccc;
-        resize: none;
-        border-radius: 4px;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-        padding: 8px;
-        font-family: monospace;
-        font-size: 12px;
-      }
-
-      #splash {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        font-size: 5rem;
-        font-family: "KaiTi", serif;
-        font-weight: 900;
-        color: var(--red-ink);
-        text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff;
-        pointer-events: none;
-        z-index: 200;
-        opacity: 0;
-        white-space: nowrap;
-      }
-      .pop {
-        animation: popAnim 1.2s ease-out forwards;
-      }
-      @keyframes popAnim {
-        0% {
-          transform: translate(-50%, -50%) scale(0.5);
-          opacity: 0;
-        }
-        20% {
-          transform: translate(-50%, -50%) scale(1.2);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(-50%, -50%) scale(1);
-          opacity: 0;
-        }
-      }
+      .pop { animation: popAnim 1.2s ease-out forwards; }
+      @keyframes popAnim { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     </style>
   </head>
   <body>
@@ -491,81 +243,48 @@
         <div class="board-inner">
           <svg class="grid" viewBox="0 0 450 500" preserveAspectRatio="none">
             <rect x="0" y="0" width="450" height="500" fill="var(--board-bg)" />
-
+            
             <rect x="25" y="25" width="400" height="450" class="border" />
-            <line x1="25" y1="75" x2="425" y2="75" class="line" />
-            <line x1="25" y1="125" x2="425" y2="125" class="line" />
-            <line x1="25" y1="175" x2="425" y2="175" class="line" />
-            <line x1="25" y1="225" x2="425" y2="225" class="line" />
-            <line x1="25" y1="275" x2="425" y2="275" class="line" />
-            <line x1="25" y1="325" x2="425" y2="325" class="line" />
-            <line x1="25" y1="375" x2="425" y2="375" class="line" />
-            <line x1="25" y1="425" x2="425" y2="425" class="line" />
-            <line x1="225" y1="25" x2="225" y2="225" class="line" />
-            <line x1="225" y1="275" x2="225" y2="475" class="line" />
-            <line x1="75" y1="25" x2="75" y2="225" class="line" />
-            <line x1="75" y1="275" x2="75" y2="475" class="line" />
-            <line x1="125" y1="25" x2="125" y2="225" class="line" />
-            <line x1="125" y1="275" x2="125" y2="475" class="line" />
-            <line x1="175" y1="25" x2="175" y2="225" class="line" />
-            <line x1="175" y1="275" x2="175" y2="475" class="line" />
-            <line x1="275" y1="25" x2="275" y2="225" class="line" />
-            <line x1="275" y1="275" x2="275" y2="475" class="line" />
-            <line x1="325" y1="25" x2="325" y2="225" class="line" />
-            <line x1="325" y1="275" x2="325" y2="475" class="line" />
-            <line x1="375" y1="25" x2="375" y2="225" class="line" />
-            <line x1="375" y1="275" x2="375" y2="475" class="line" />
-            <line x1="175" y1="25" x2="275" y2="125" class="line" />
-            <line x1="275" y1="25" x2="175" y2="125" class="line" />
-            <line x1="175" y1="375" x2="275" y2="475" class="line" />
-            <line x1="275" y1="375" x2="175" y2="475" class="line" />
-            <text x="110" y="250" class="river-text">楚 河</text>
+            <line x1="25" y1="75" x2="425" y2="75" class="line" /><line x1="25" y1="125" x2="425" y2="125" class="line" /><line x1="25" y1="175" x2="425" y2="175" class="line" /><line x1="25" y1="225" x2="425" y2="225" class="line" /><line x1="25" y1="275" x2="425" y2="275" class="line" /><line x1="25" y1="325" x2="425" y2="325" class="line" /><line x1="25" y1="375" x2="425" y2="375" class="line" /><line x1="25" y1="425" x2="425" y2="425" class="line" />
+            <line x1="225" y1="25" x2="225" y2="225" class="line" /><line x1="225" y1="275" x2="225" y2="475" class="line" />
+            <line x1="75" y1="25" x2="75" y2="225" class="line" /><line x1="75" y1="275" x2="75" y2="475" class="line" />
+            <line x1="125" y1="25" x2="125" y2="225" class="line" /><line x1="125" y1="275" x2="125" y2="475" class="line" />
+            <line x1="175" y1="25" x2="175" y2="225" class="line" /><line x1="175" y1="275" x2="175" y2="475" class="line" />
+            <line x1="275" y1="25" x2="275" y2="225" class="line" /><line x1="275" y1="275" x2="275" y2="475" class="line" />
+            <line x1="325" y1="25" x2="325" y2="225" class="line" /><line x1="325" y1="275" x2="325" y2="475" class="line" />
+            <line x1="375" y1="25" x2="375" y2="225" class="line" /><line x1="375" y1="275" x2="375" y2="475" class="line" />
+            <line x1="175" y1="25" x2="275" y2="125" class="line" /><line x1="275" y1="25" x2="175" y2="125" class="line" />
+            <line x1="175" y1="375" x2="275" y2="475" class="line" /><line x1="275" y1="375" x2="175" y2="475" class="line" />
+            
+            <g class="markers">
+               <path d="M71,116 v5 h-5 M79,116 v5 h5 M71,134 v-5 h-5 M79,134 v-5 h5" class="mark"/> 
+               <path d="M371,116 v5 h-5 M379,116 v5 h5 M371,134 v-5 h-5 M379,134 v-5 h5" class="mark"/>
+               <path d="M71,366 v5 h-5 M79,366 v5 h5 M71,384 v-5 h-5 M79,384 v-5 h5" class="mark"/> 
+               <path d="M371,366 v5 h-5 M379,366 v5 h5 M371,384 v-5 h-5 M379,384 v-5 h5" class="mark"/>
+               
+               <path d="M29,166 v5 h5 M29,184 v-5 h5" class="mark"/> <path d="M121,166 v5 h-5 M129,166 v5 h5 M121,184 v-5 h-5 M129,184 v-5 h5" class="mark"/>
+               <path d="M221,166 v5 h-5 M229,166 v5 h5 M221,184 v-5 h-5 M229,184 v-5 h5" class="mark"/>
+               <path d="M321,166 v5 h-5 M329,166 v5 h5 M321,184 v-5 h-5 M329,184 v-5 h5" class="mark"/>
+               <path d="M421,166 v5 h-5 M421,184 v-5 h-5" class="mark"/> <path d="M29,316 v5 h5 M29,334 v-5 h5" class="mark"/> 
+               <path d="M121,316 v5 h-5 M129,316 v5 h5 M121,334 v-5 h-5 M129,334 v-5 h5" class="mark"/>
+               <path d="M221,316 v5 h-5 M229,316 v5 h5 M221,334 v-5 h-5 M229,334 v-5 h5" class="mark"/>
+               <path d="M321,316 v5 h-5 M329,316 v5 h5 M321,334 v-5 h-5 M329,334 v-5 h5" class="mark"/>
+               <path d="M421,316 v5 h-5 M421,334 v-5 h-5" class="mark"/> 
+            </g>
 
+            <text x="110" y="250" class="river-text">楚 河</text>
             <g transform="translate(320, 230) scale(0.045)">
-              <path
-                fill="#AF3636"
-                d="M77.1,590 C77,503.3 76.7,417.2 77.1,331 C77.2,289.2 83.4,248.3 101.8,210.1 C131.2,149.2 179.1,112.3 246.1,100.7 C258,98.7 269.9,97.7 281.9,97.7 465.2,97.8 648.5,97.6 831.8,97.9 871.2,98 908.8,106.6 942.9,127.2 987.4,154.1 1015.2,193.2 1027,243.7 1029.8,255.4 1031.1,267.3 1031.1,279.3 1031.1,435 1031.2,590.6 1030.9,746.3 1030.9,789.2 1022.1,830.1 999.2,867.2 974.8,906.7 939,928.9 894.4,938.1 882,940.6 869.4,941.2 856.7,941.2 702.8,941.1 549,941.4 395.2,940.9 354.6,940.8 317.2,928.7 286.8,900.7 251.7,868.4 231.2,827.8 224.1,780.5 222.5,769.8 222.1,759 222.1,748.1 222.2,686.5 222.2,624.8 222.1,563.2 222.1,551.8 222.9,540.5 224.1,529.3 224.5,526 225.8,525.2 228.9,525.2 259.2,525.3 289.5,525.4 319.9,525.2 324.4,525.2 324,527.5 324,530.5 324,604.1 323.9,677.8 324.1,751.5 324.2,775 330.5,796.8 346,815.2 358.5,830.1 374.5,838.9 394.1,839.1 431.9,839.5 469.7,839.4 507.6,839.4 615.9,839.4 724.2,839.4 832.5,839.4 843.5,839.4 854.5,839.7 865.5,839.4 889.9,838.7 906.7,826.6 917.2,805.3 925.9,787.5 928.7,768.2 930.2,748.7 931.8,727.2 931.1,705.7 931.1,684.2 931.2,555.2 931.2,426.2 931.1,297.3 931.1,280.9 930.1,264.5 923.1,249.4 911.1,223.2 889.3,209.5 862.3,202.8 852.7,200.5 842.9,199.6 833.1,199.6 648.2,199.7 463.4,199.8 278.6,199.5 235.1,199.4 201.1,227.1 188.1,269.1 182,289 179.1,309.4 179.1,330.1 179,472.6 179,615.1 179,757.6 179,769.1 178.9,780.6 178.9,792.1 178.6,821.2 187.2,848.1 199.6,874 211.2,898.3 227.8,918.3 250.2,933.4 251.6,934.4 253.4,935.1 253.9,937.2 252.2,938.4 250.3,937.9 248.6,937.9 215.3,938 181.9,938.1 148.6,938.1 144.3,938.1 140,937.6 135.7,937 131.6,936.5 128.2,934.6 125.3,931.6 106.6,912.6 95,889.5 87.4,864.4 80.1,840.6 76.7,816.4 76.8,791.5 77.1,724.5 77,657.5 77.1,590 z"
-              />
-              <path
-                fill="#B13B3C"
-                d="M877,396 C877,519.8 877,643.1 877,766.4 877,773.4 877,773.2 870.3,774.3 860.9,775.9 851.4,776.2 841.9,776.2 699.5,776.2 557,776.2 414.5,776.2 404.4,776.2 394.2,775.9 384.1,775.3 380.6,775 379.2,774 379,770.3 378.2,758.8 378.1,747.4 378.1,735.9 378.1,594.7 378.1,453.6 378.1,312.5 378.1,302.5 378.1,292.5 378.8,282.5 379.1,279 380.3,278.5 383.2,278.5 407.5,278.4 431.9,277.9 456.2,277.9 576.5,277.8 696.8,277.8 817.1,277.8 833.6,277.8 850.1,276.9 866.6,278.6 877.1,279.6 877.2,279.5 877.2,290 877.1,325.2 877.1,360.3 877,396 z"
-              />
-              <path
-                fill="#B03637"
-                d="M267.8,382.3 C250,374.7 238.6,362.2 234.9,343.3 230.6,321.2 240.8,291.3 271.6,281.6 296,273.8 333.2,288.6 339.1,323 342.8,344.7 331,369.1 310.6,379.7 296.7,387 282.7,387.7 267.8,382.3 z"
-              />
-              <path
-                fill="#FDFCFC"
-                d="M536,289.5 C562.7,289.7 588.8,288.6 615,289.7 619.7,289.9 621.5,290.8 621.5,296.1 621.7,364.4 621.9,432.7 621.4,501 621.3,503 622.4,505.7 620.6,506.6 618.6,507.7 616.7,505.4 614.9,504.3 607.7,499.7 601.6,493.7 595.6,487.7 538.8,430.7 482,373.7 425.1,316.7 416.8,308.4 408.3,300.1 400.2,290.1 445.9,288.4 490.7,289.8 536,289.5 z"
-              />
-              <path
-                fill="#FDFDFD"
-                d="M402.8,765 C399.7,763.3 402.3,762.2 403,761.3 408.7,755 414.3,748.6 420.3,742.6 473.1,689.8 525.9,637.1 578.7,584.4 586.8,576.3 594.8,567.9 602.9,559.8 607.4,555.4 612.4,551.5 618,548.4 620.2,547.1 621.4,547.4 621.4,550.2 621.4,551.6 621.4,552.9 621.4,554.2 621.5,608 621.5,661.8 621.6,715.7 621.6,730 621.5,744.3 621.8,758.6 622,763.5 620.8,765.1 615.6,765.1 544.8,764.9 474,765 402.8,765 z"
-              />
-              <path
-                fill="#FEFDFD"
-                d="M634,318 C634.1,309.7 634.5,301.8 634.4,294 634.3,290.6 635.7,289.8 638.8,289.8 676.6,289.7 714.4,288.8 752.3,289.2 784.3,289.5 816.3,289.4 848.3,289.6 849.8,289.6 852.1,288.7 852.8,290.3 853.7,292 851.5,293 850.4,294.2 834.3,312.4 817.2,329.7 799.7,346.6 757.2,387.3 716.5,429.8 674.3,470.8 663,481.7 652.9,493.7 640.5,503.3 639.6,504.1 638.7,504.8 637.7,505.4 636.7,506 636,507.4 634.7,506.7 633.5,506 634.1,504.6 634.1,503.5 634,485 633.9,466.5 633.9,448 633.9,404.8 634,361.7 634,318 z"
-              />
-              <path
-                fill="#FEFDFD"
-                d="M828.5,737.5 C836,744.6 842.8,752 848.7,760.1 849.6,761.4 851.6,762.5 850.6,764.3 849.9,765.7 847.9,764.9 846.5,764.9 800.3,765 754.2,765.1 708,765.2 685.7,765.2 663.4,765 641.1,765.3 636.3,765.3 634.9,764 634.7,759.2 632.7,711.6 634.5,664 633.9,616.3 633.7,594.3 633.3,572.3 634.8,550.4 634.9,549.4 635,548.5 635.1,546.8 640.9,550.9 645.7,555.2 650.3,559.7 694.1,603.5 737.9,647.4 781.7,691.2 797.1,706.6 812.7,721.9 828.5,737.5 z"
-              />
-              <path
-                fill="#FEFDFD"
-                d="M517,520.9 C476.4,520.8 436.2,521.4 396.1,520.6 392.9,520.5 391,520.5 390.9,516.2 390.6,446.2 390.6,376.3 391.1,306.3 391.1,305.6 391.1,305 391.2,304.1 393.5,303.8 394.8,305.6 396.3,306.7 401.6,310.7 406.5,315.3 411,320.2 435.7,347.1 462.6,371.7 488.2,397.8 526.8,437.1 567,474.8 605.8,514.1 606,514.3 606.3,514.5 606.5,514.8 607.6,516.3 610.5,517.3 609.8,519.2 609.1,521.3 606.3,520.2 604.4,520.3 575.5,522 546.5,520.5 517,520.9 z"
-              />
-              <path
-                fill="#FDFDFD"
-                d="M661.4,501.4 C685.6,477.3 709.6,453.4 733.5,429.5 770.5,392.5 807.5,355.5 844.4,318.4 848.4,314.4 853.2,312 858,309.3 860.3,308 861.2,308.6 861.3,311.3 861.5,317.6 862.1,323.9 862.1,330.2 862.2,386.2 862.2,442.2 862.1,498.2 862.1,504.3 861.4,510.5 861.4,516.6 861.4,519.8 860.1,520.5 857.2,520.5 850.7,520.5 844.2,520.9 837.7,520.9 783.8,521 729.8,521 675.8,521.1 666.4,521.1 656.9,521.1 646.1,521.1 650.9,512.8 656.1,507.3 661.4,501.4 z"
-              />
-              <path
-                fill="#FEFDFD"
-                d="M864.3,678 C864.3,701 864.3,723.5 864.2,746 864.2,747.3 865.1,749.3 863.3,750 862.1,750.5 861,749.1 859.9,748.4 853.8,744.5 848.2,740.1 843.1,735 784.2,676.1 725.3,617.2 666.5,558.2 660.8,552.6 655.5,546.6 650.1,540.7 649.3,539.8 647.7,538.8 648.4,537.4 649.1,536 650.8,536.7 652,536.6 677.2,535.5 702.3,536.1 727.5,536.2 755.9,536.2 784.4,535.9 812.9,536 828.4,536 843.9,536.6 859.4,536.8 863.3,536.8 864.3,538.2 864.3,542.1 864.2,587.2 864.3,632.4 864.3,678 z"
-              />
-              <path
-                fill="#FEFDFD"
-                d="M591.6,536.3 C595.9,536.4 599.7,536.4 603.6,536.6 604.3,536.6 605.4,536.7 605.8,537.2 606.6,538.2 605.4,539 604.8,539.6 599.4,545.5 594.1,551.6 588.4,557.1 539.3,604.6 492.3,654.3 443,701.6 431.3,712.8 420.2,724.5 409.5,736.7 404.3,742.5 398.5,747.7 392.3,753.1 390.8,749.4 391.1,746 391.1,742.8 391,678.5 391,614.1 391,549.8 391,536.2 391.2,536 405.1,536 462.3,536 519.5,536.1 576.6,536.1 581.5,536.1 586.3,536.2 591.6,536.3 z"
-              />
+              <path fill="#AF3636" d="M77.1,590 C77,503.3 76.7,417.2 77.1,331 C77.2,289.2 83.4,248.3 101.8,210.1 C131.2,149.2 179.1,112.3 246.1,100.7 C258,98.7 269.9,97.7 281.9,97.7 465.2,97.8 648.5,97.6 831.8,97.9 871.2,98 908.8,106.6 942.9,127.2 987.4,154.1 1015.2,193.2 1027,243.7 1029.8,255.4 1031.1,267.3 1031.1,279.3 1031.1,435 1031.2,590.6 1030.9,746.3 1030.9,789.2 1022.1,830.1 999.2,867.2 974.8,906.7 939,928.9 894.4,938.1 882,940.6 869.4,941.2 856.7,941.2 702.8,941.1 549,941.4 395.2,940.9 354.6,940.8 317.2,928.7 286.8,900.7 251.7,868.4 231.2,827.8 224.1,780.5 222.5,769.8 222.1,759 222.1,748.1 222.2,686.5 222.2,624.8 222.1,563.2 222.1,551.8 222.9,540.5 224.1,529.3 224.5,526 225.8,525.2 228.9,525.2 259.2,525.3 289.5,525.4 319.9,525.2 324.4,525.2 324,527.5 324,530.5 324,604.1 323.9,677.8 324.1,751.5 324.2,775 330.5,796.8 346,815.2 358.5,830.1 374.5,838.9 394.1,839.1 431.9,839.5 469.7,839.4 507.6,839.4 615.9,839.4 724.2,839.4 832.5,839.4 843.5,839.4 854.5,839.7 865.5,839.4 889.9,838.7 906.7,826.6 917.2,805.3 925.9,787.5 928.7,768.2 930.2,748.7 931.8,727.2 931.1,705.7 931.1,684.2 931.2,555.2 931.2,426.2 931.1,297.3 931.1,280.9 930.1,264.5 923.1,249.4 911.1,223.2 889.3,209.5 862.3,202.8 852.7,200.5 842.9,199.6 833.1,199.6 648.2,199.7 463.4,199.8 278.6,199.5 235.1,199.4 201.1,227.1 188.1,269.1 182,289 179.1,309.4 179.1,330.1 179,472.6 179,615.1 179,757.6 179,769.1 178.9,780.6 178.9,792.1 178.6,821.2 187.2,848.1 199.6,874 211.2,898.3 227.8,918.3 250.2,933.4 251.6,934.4 253.4,935.1 253.9,937.2 252.2,938.4 250.3,937.9 248.6,937.9 215.3,938 181.9,938.1 148.6,938.1 144.3,938.1 140,937.6 135.7,937 131.6,936.5 128.2,934.6 125.3,931.6 106.6,912.6 95,889.5 87.4,864.4 80.1,840.6 76.7,816.4 76.8,791.5 77.1,724.5 77,657.5 77.1,590 z" />
+              <path fill="#B13B3C" d="M877,396 C877,519.8 877,643.1 877,766.4 877,773.4 877,773.2 870.3,774.3 860.9,775.9 851.4,776.2 841.9,776.2 699.5,776.2 557,776.2 414.5,776.2 404.4,776.2 394.2,775.9 384.1,775.3 380.6,775 379.2,774 379,770.3 378.2,758.8 378.1,747.4 378.1,735.9 378.1,594.7 378.1,453.6 378.1,312.5 378.1,302.5 378.1,292.5 378.8,282.5 379.1,279 380.3,278.5 383.2,278.5 407.5,278.4 431.9,277.9 456.2,277.9 576.5,277.8 696.8,277.8 817.1,277.8 833.6,277.8 850.1,276.9 866.6,278.6 877.1,279.6 877.2,279.5 877.2,290 877.1,325.2 877.1,360.3 877,396 z" />
+              <path fill="#B03637" d="M267.8,382.3 C250,374.7 238.6,362.2 234.9,343.3 230.6,321.2 240.8,291.3 271.6,281.6 296,273.8 333.2,288.6 339.1,323 342.8,344.7 331,369.1 310.6,379.7 296.7,387 282.7,387.7 267.8,382.3 z" />
+              <path fill="#FDFCFC" d="M536,289.5 C562.7,289.7 588.8,288.6 615,289.7 619.7,289.9 621.5,290.8 621.5,296.1 621.7,364.4 621.9,432.7 621.4,501 621.3,503 622.4,505.7 620.6,506.6 618.6,507.7 616.7,505.4 614.9,504.3 607.7,499.7 601.6,493.7 595.6,487.7 538.8,430.7 482,373.7 425.1,316.7 416.8,308.4 408.3,300.1 400.2,290.1 445.9,288.4 490.7,289.8 536,289.5 z" />
+              <path fill="#FDFDFD" d="M402.8,765 C399.7,763.3 402.3,762.2 403,761.3 408.7,755 414.3,748.6 420.3,742.6 473.1,689.8 525.9,637.1 578.7,584.4 586.8,576.3 594.8,567.9 602.9,559.8 607.4,555.4 612.4,551.5 618,548.4 620.2,547.1 621.4,547.4 621.4,550.2 621.4,551.6 621.4,552.9 621.4,554.2 621.5,608 621.5,661.8 621.6,715.7 621.6,730 621.5,744.3 621.8,758.6 622,763.5 620.8,765.1 615.6,765.1 544.8,764.9 474,765 402.8,765 z" />
+              <path fill="#FEFDFD" d="M634,318 C634.1,309.7 634.5,301.8 634.4,294 634.3,290.6 635.7,289.8 638.8,289.8 676.6,289.7 714.4,288.8 752.3,289.2 784.3,289.5 816.3,289.4 848.3,289.6 849.8,289.6 852.1,288.7 852.8,290.3 853.7,292 851.5,293 850.4,294.2 834.3,312.4 817.2,329.7 799.7,346.6 757.2,387.3 716.5,429.8 674.3,470.8 663,481.7 652.9,493.7 640.5,503.3 639.6,504.1 638.7,504.8 637.7,505.4 636.7,506 636,507.4 634.7,506.7 633.5,506 634.1,504.6 634.1,503.5 634,485 633.9,466.5 633.9,448 633.9,404.8 634,361.7 634,318 z" />
+              <path fill="#FEFDFD" d="M828.5,737.5 C836,744.6 842.8,752 848.7,760.1 849.6,761.4 851.6,762.5 850.6,764.3 849.9,765.7 847.9,764.9 846.5,764.9 800.3,765 754.2,765.1 708,765.2 685.7,765.2 663.4,765 641.1,765.3 636.3,765.3 634.9,764 634.7,759.2 632.7,711.6 634.5,664 633.9,616.3 633.7,594.3 633.3,572.3 634.8,550.4 634.9,549.4 635,548.5 635.1,546.8 640.9,550.9 645.7,555.2 650.3,559.7 694.1,603.5 737.9,647.4 781.7,691.2 797.1,706.6 812.7,721.9 828.5,737.5 z" />
+              <path fill="#FEFDFD" d="M517,520.9 C476.4,520.8 436.2,521.4 396.1,520.6 392.9,520.5 391,520.5 390.9,516.2 390.6,446.2 390.6,376.3 391.1,306.3 391.1,305.6 391.1,305 391.2,304.1 393.5,303.8 394.8,305.6 396.3,306.7 401.6,310.7 406.5,315.3 411,320.2 435.7,347.1 462.6,371.7 488.2,397.8 526.8,437.1 567,474.8 605.8,514.1 606,514.3 606.3,514.5 606.5,514.8 607.6,516.3 610.5,517.3 609.8,519.2 609.1,521.3 606.3,520.2 604.4,520.3 575.5,522 546.5,520.5 517,520.9 z" />
+              <path fill="#FDFDFD" d="M661.4,501.4 C685.6,477.3 709.6,453.4 733.5,429.5 770.5,392.5 807.5,355.5 844.4,318.4 848.4,314.4 853.2,312 858,309.3 860.3,308 861.2,308.6 861.3,311.3 861.5,317.6 862.1,323.9 862.1,330.2 862.2,386.2 862.2,442.2 862.1,498.2 862.1,504.3 861.4,510.5 861.4,516.6 861.4,519.8 860.1,520.5 857.2,520.5 850.7,520.5 844.2,520.9 837.7,520.9 783.8,521 729.8,521 675.8,521.1 666.4,521.1 656.9,521.1 646.1,521.1 650.9,512.8 656.1,507.3 661.4,501.4 z" />
+              <path fill="#FEFDFD" d="M864.3,678 C864.3,701 864.3,723.5 864.2,746 864.2,747.3 865.1,749.3 863.3,750 862.1,750.5 861,749.1 859.9,748.4 853.8,744.5 848.2,740.1 843.1,735 784.2,676.1 725.3,617.2 666.5,558.2 660.8,552.6 655.5,546.6 650.1,540.7 649.3,539.8 647.7,538.8 648.4,537.4 649.1,536 650.8,536.7 652,536.6 677.2,535.5 702.3,536.1 727.5,536.2 755.9,536.2 784.4,535.9 812.9,536 828.4,536 843.9,536.6 859.4,536.8 863.3,536.8 864.3,538.2 864.3,542.1 864.2,587.2 864.3,632.4 864.3,678 z" />
+              <path fill="#FEFDFD" d="M591.6,536.3 C595.9,536.4 599.7,536.4 603.6,536.6 604.3,536.6 605.4,536.7 605.8,537.2 606.6,538.2 605.4,539 604.8,539.6 599.4,545.5 594.1,551.6 588.4,557.1 539.3,604.6 492.3,654.3 443,701.6 431.3,712.8 420.2,724.5 409.5,736.7 404.3,742.5 398.5,747.7 392.3,753.1 390.8,749.4 391.1,746 391.1,742.8 391,678.5 391,614.1 391,549.8 391,536.2 391.2,536 405.1,536 462.3,536 519.5,536.1 576.6,536.1 581.5,536.1 586.3,536.2 591.6,536.3 z" />
             </g>
           </svg>
           <div id="markerLayer" class="layer"></div>
@@ -591,17 +310,17 @@
 
         <div id="tab-game" class="tab-content active">
           <div id="status" class="status">Red to Move</div>
+          
           <div id="branchCtrl" class="branch-ctrl">
             <button class="branch-btn" onclick="game.prevVar()">&lt;</button>
             <span id="varInfo">Var: 1/1</span>
             <button class="branch-btn" onclick="game.nextVar()">&gt;</button>
           </div>
+
           <div class="playback-bar">
             <button class="pb-btn" onclick="game.goto(0)">|&lt;</button>
             <button class="pb-btn" onclick="game.step(-1)">&lt;</button>
-            <button class="pb-btn" id="playBtn" onclick="game.togglePlay()">
-              ▶
-            </button>
+            <button class="pb-btn" id="playBtn" onclick="game.togglePlay()">▶</button>
             <button class="pb-btn" onclick="game.step(1)">&gt;</button>
             <button class="pb-btn" onclick="game.goto(9999)">&gt;|</button>
           </div>
@@ -634,7 +353,7 @@
           <hr
             style="
               border: 0;
-              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              border-top: 1px solid rgba(0, 0, 0, 0.1);
               margin: 10px 0;
             "
           />
@@ -642,26 +361,11 @@
             id="fenBox"
             placeholder="Paste FEN or Movelist..."
           ></textarea>
-
           <div class="tool-grid">
-            <input
-              type="file"
-              id="fileInput"
-              accept=".xqf"
-              style="display: none"
-              onchange="game.loadXQF(event)"
-            />
-            <button
-              class="btn btn-norm"
-              onclick="document.getElementById('fileInput').click()"
-            >
-              Import XQF
-            </button>
             <button class="btn btn-norm" data-key="load" onclick="game.load()">
               Paste Load
             </button>
           </div>
-
           <div
             style="
               margin-top: 10px;
@@ -699,120 +403,62 @@
     </div>
 
     <script>
-      const CN_NUMS = [
-        "",
-        "一",
-        "二",
-        "三",
-        "四",
-        "五",
-        "六",
-        "七",
-        "八",
-        "九",
-      ];
-      const CN_DIGITS = [
-        "",
-        "１",
-        "２",
-        "３",
-        "４",
-        "５",
-        "６",
-        "７",
-        "８",
-        "９",
-      ];
+    const SVG_PIECES = {
+       'R': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">俥</text></g>`,
+       'N': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">傌</text></g>`,
+       'E': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">相</text></g>`,
+       'A': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">仕</text></g>`,
+       'K': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">帥</text></g>`,
+       'C': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">炮</text></g>`,
+       'P': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#c0392b" text-anchor="middle">兵</text></g>`,
+       
+       'r': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">車</text></g>`,
+       'n': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">馬</text></g>`,
+       'e': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">象</text></g>`,
+       'a': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">士</text></g>`,
+       'k': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">将</text></g>`,
+       'c': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">砲</text></g>`,
+       'p': `<g transform="translate(10,10) scale(0.8)"><text x="50" y="70" font-size="65" font-family="KaiTi" font-weight="bold" fill="#2d3436" text-anchor="middle">卒</text></g>`
+    };
+
+      const CN_NUMS = ["","一","二","三","四","五","六","七","八","九"];
+      const CN_DIGITS = ["","１","２","３","４","５","６","７","８","９"];
       const CN_PIECES = {
-        rK: "帥",
-        rA: "仕",
-        rE: "相",
-        rN: "傌",
-        rR: "俥",
-        rC: "炮",
-        rP: "兵",
-        bK: "将",
-        bA: "士",
-        bE: "象",
-        bN: "馬",
-        bR: "車",
-        bC: "砲",
-        bP: "卒",
-        K: "帥",
-        A: "仕",
-        E: "相",
-        N: "傌",
-        R: "俥",
-        C: "炮",
-        P: "兵",
-        k: "将",
-        a: "士",
-        e: "象",
-        n: "馬",
-        r: "車",
-        c: "砲",
-        p: "卒",
+        rK: "帥", rA: "仕", rE: "相", rN: "傌", rR: "俥", rC: "炮", rP: "兵",
+        bK: "将", bA: "士", bE: "象", bN: "馬", bR: "車", bC: "砲", bP: "卒",
+        K: "帥", A: "仕", E: "相", N: "傌", R: "俥", C: "炮", P: "兵",
+        k: "将", a: "士", e: "象", n: "馬", r: "車", c: "砲", p: "卒",
       };
       const CN_DIR = { "+": "进", "-": "退", "=": "平" };
 
       const STRINGS = {
         en: {
-          tabGame: "Game",
-          tabTools: "Tools",
-          newGame: "New Game",
-          undo: "Undo",
-          flip: "Flip View",
-          reflect: "Reflect",
-          load: "Load",
-          export: "Export",
-          redMove: "Red to Move",
-          blackMove: "Black to Move",
-          check: " - Check!",
-          win: " Wins (Checkmate)",
-          stalemate: "Stalemate",
-          confirmNew: "Start New Game?",
-          copied: "Copied!",
-          illegal: "Stopped: Illegal Move encountered at ",
-          overwrite: "You are about to change history. Create new Branch?",
+          tabGame: "Game", tabTools: "Tools", newGame: "New Game", undo: "Undo", flip: "Flip View", reflect: "Reflect",
+          load: "Load", export: "Export", redMove: "Red to Move", blackMove: "Black to Move", check: " - Check!",
+          win: " Wins (Checkmate)", stalemate: "Stalemate", confirmNew: "Start New Game?", copied: "Copied!",
+          illegal: "Stopped: Illegal Move encountered at ", overwrite: "You are about to change history. Create new Branch?",
         },
         zh: {
-          tabGame: "对弈",
-          tabTools: "工具",
-          newGame: "新对局",
-          undo: "悔棋",
-          flip: "翻转棋盘",
-          reflect: "镜像显示",
-          load: "导入",
-          export: "导出",
-          redMove: "红方走",
-          blackMove: "黑方走",
-          check: " - 将军!",
-          win: " 胜 (绝杀)",
-          stalemate: "困毙 (和棋)",
-          confirmNew: "开始新对局?",
-          copied: "已复制完整棋谱!",
-          illegal: "停止: 遇到非法着法于 ",
-          overwrite: "是否创建新变着?",
+          tabGame: "对弈", tabTools: "工具", newGame: "新对局", undo: "悔棋", flip: "翻转棋盘", reflect: "镜像显示",
+          load: "导入", export: "导出", redMove: "红方走", blackMove: "黑方走", check: " - 将军!",
+          win: " 胜 (绝杀)", stalemate: "困毙 (和棋)", confirmNew: "开始新对局?", copied: "已复制完整棋谱!",
+          illegal: "停止: 遇到非法着法于 ", overwrite: "是否创建新变着?",
         },
       };
 
       class MoveNode {
-        constructor(moveData, parent = null) {
-          this.data = moveData;
-          this.parent = parent;
-          this.children = [];
-          this.tempBranchId = null;
-        }
+          constructor(moveData, parent = null) {
+              this.data = moveData; 
+              this.parent = parent;
+              this.children = [];
+              this.tempBranchId = null; 
+          }
       }
 
       class Engine {
-        constructor() {
-          this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
-          this.board = Array(10)
-            .fill(null)
-            .map(() => Array(9).fill(null));
+          this.board = Array(10).fill(null).map(() => Array(9).fill(null));
           const start = [
             ["bR", "bN", "bE", "bA", "bK", "bA", "bE", "bN", "bR"],
             [null, null, null, null, null, null, null, null, null],
@@ -829,7 +475,7 @@
             for (let x = 0; x < 9; x++) this.board[y][x] = start[y][x];
           this.turn = "r";
           this.root = new MoveNode(null);
-          this.cursor = this.root;
+          this.cursor = this.root; 
         }
 
         getPiece(x, y) {
@@ -838,106 +484,65 @@
         }
 
         getHistory() {
-          let hist = [];
-          let curr = this.cursor;
-          while (curr.parent) {
-            hist.push(curr.data);
-            curr = curr.parent;
-          }
-          return hist.reverse();
+            let hist = [];
+            let curr = this.cursor;
+            while(curr.parent) {
+                hist.push(curr.data);
+                curr = curr.parent;
+            }
+            return hist.reverse();
         }
 
         validate(fx, fy, tx, ty, p) {
           if (fx === tx && fy === ty) return false;
           const tgt = this.getPiece(tx, ty);
           if (tgt && tgt[0] === p[0]) return false;
-          const dx = tx - fx,
-            dy = ty - fy,
-            adx = Math.abs(dx),
-            ady = Math.abs(dy);
-          const type = p[1],
-            red = p[0] === "r";
+          const dx = tx - fx, dy = ty - fy, adx = Math.abs(dx), ady = Math.abs(dy);
+          const type = p[1], red = p[0] === "r";
           switch (type) {
-            case "K":
-              return (
-                tx >= 3 &&
-                tx <= 5 &&
-                (red ? ty >= 7 : ty <= 2) &&
-                adx + ady === 1
-              );
-            case "A":
-              return (
-                tx >= 3 &&
-                tx <= 5 &&
-                (red ? ty >= 7 : ty <= 2) &&
-                adx === 1 &&
-                ady === 1
-              );
-            case "E":
-              return (
-                (red ? ty >= 5 : ty <= 4) &&
-                adx === 2 &&
-                ady === 2 &&
-                !this.getPiece(fx + dx / 2, fy + dy / 2)
-              );
+            case "K": return tx >= 3 && tx <= 5 && (red ? ty >= 7 : ty <= 2) && adx + ady === 1;
+            case "A": return tx >= 3 && tx <= 5 && (red ? ty >= 7 : ty <= 2) && adx === 1 && ady === 1;
+            case "E": return (red ? ty >= 5 : ty <= 4) && adx === 2 && ady === 2 && !this.getPiece(fx + dx / 2, fy + dy / 2);
             case "N":
-              if (adx === 1 && ady === 2)
-                return !this.getPiece(fx, fy + (dy > 0 ? 1 : -1));
-              if (adx === 2 && ady === 1)
-                return !this.getPiece(fx + (dx > 0 ? 1 : -1), fy);
+              if (adx === 1 && ady === 2) return !this.getPiece(fx, fy + (dy > 0 ? 1 : -1));
+              if (adx === 2 && ady === 1) return !this.getPiece(fx + (dx > 0 ? 1 : -1), fy);
               return false;
-            case "R":
-              return (dx === 0 || dy === 0) && this.count(fx, fy, tx, ty) === 0;
+            case "R": return (dx === 0 || dy === 0) && this.count(fx, fy, tx, ty) === 0;
             case "C":
               const c = this.count(fx, fy, tx, ty);
               return (dx === 0 || dy === 0) && (tgt ? c === 1 : c === 0);
             case "P":
-              const fwd = red ? -1 : 1,
-                cross = red ? fy <= 4 : fy >= 5;
-              return (
-                (dy === fwd && dx === 0) || (cross && dy === 0 && adx === 1)
-              );
+              const fwd = red ? -1 : 1, cross = red ? fy <= 4 : fy >= 5;
+              return (dy === fwd && dx === 0) || (cross && dy === 0 && adx === 1);
           }
           return false;
         }
         count(x1, y1, x2, y2) {
-          let c = 0,
-            dx = Math.sign(x2 - x1),
-            dy = Math.sign(y2 - y1),
-            x = x1 + dx,
-            y = y1 + dy,
-            safe = 0;
+          let c = 0, dx = Math.sign(x2 - x1), dy = Math.sign(y2 - y1), x = x1 + dx, y = y1 + dy, safe = 0;
           while ((x !== x2 || y !== y2) && safe++ < 20) {
             if (this.getPiece(x, y)) c++;
-            x += dx;
-            y += dy;
+            x += dx; y += dy;
           }
           return c;
         }
         inCheck(turn) {
-          let k = null,
-            opp = turn === "r" ? "b" : "r";
+          let k = null, opp = turn === "r" ? "b" : "r";
           for (let y = 0; y < 10; y++)
-            for (let x = 0; x < 9; x++)
-              if (this.board[y][x] === turn + "K") k = { x, y };
+            for (let x = 0; x < 9; x++) if (this.board[y][x] === turn + "K") k = { x, y };
           if (!k) return true;
           let ok = null;
           for (let y = 0; y < 10; y++)
-            for (let x = 0; x < 9; x++)
-              if (this.board[y][x] === opp + "K") ok = { x, y };
-          if (ok && k.x === ok.x && this.count(k.x, k.y, ok.x, ok.y) === 0)
-            return true;
+            for (let x = 0; x < 9; x++) if (this.board[y][x] === opp + "K") ok = { x, y };
+          if (ok && k.x === ok.x && this.count(k.x, k.y, ok.x, ok.y) === 0) return true;
           for (let y = 0; y < 10; y++)
             for (let x = 0; x < 9; x++) {
               let p = this.board[y][x];
-              if (p && p[0] === opp && this.validate(x, y, k.x, k.y, p))
-                return true;
+              if (p && p[0] === opp && this.validate(x, y, k.x, k.y, p)) return true;
             }
           return false;
         }
         getLegalMoves() {
-          let moves = [],
-            turn = this.turn;
+          let moves = [], turn = this.turn;
           for (let fy = 0; fy < 10; fy++)
             for (let fx = 0; fx < 9; fx++) {
               let p = this.board[fy][fx];
@@ -946,47 +551,37 @@
                   for (let tx = 0; tx < 9; tx++) {
                     if (this.validate(fx, fy, tx, ty, p)) {
                       let cap = this.board[ty][tx];
-                      this.board[ty][tx] = p;
-                      this.board[fy][fx] = null;
-                      if (!this.inCheck(turn))
-                        moves.push({ fx, fy, tx, ty, p, cap });
-                      this.board[fy][fx] = p;
-                      this.board[ty][tx] = cap;
+                      this.board[ty][tx] = p; this.board[fy][fx] = null;
+                      if (!this.inCheck(turn)) moves.push({ fx, fy, tx, ty, p, cap });
+                      this.board[fy][fx] = p; this.board[ty][tx] = cap;
                     }
                   }
               }
             }
           return moves;
         }
-
+        
         move(fx, fy, tx, ty) {
           const mvStr = `${fx}${fy}${tx}${ty}`;
-          let existingChild = this.cursor.children.find(
-            (c) => c.data.mv === mvStr
-          );
+          let existingChild = this.cursor.children.find(c => c.data.mv === mvStr);
           if (!existingChild && this.cursor.children.length > 0) {
-            if (!confirm(ui.getText("overwrite"))) return false;
+             if (!confirm(ui.getText("overwrite"))) return false;
           }
           let p = this.board[fy][fx];
           if (!p || p[0] !== this.turn) return false;
           let cap = this.board[ty][tx];
           if (!this.validate(fx, fy, tx, ty, p)) return false;
-          this.board[ty][tx] = p;
-          this.board[fy][fx] = null;
+          this.board[ty][tx] = p; this.board[fy][fx] = null;
           if (this.inCheck(this.turn)) {
-            this.board[fy][fx] = p;
-            this.board[ty][tx] = cap;
+            this.board[fy][fx] = p; this.board[ty][tx] = cap;
             return false;
           }
           if (existingChild) {
-            this.cursor = existingChild;
+             this.cursor = existingChild;
           } else {
-            let newNode = new MoveNode(
-              { fx, fy, tx, ty, p, cap, mv: mvStr },
-              this.cursor
-            );
-            this.cursor.children.push(newNode);
-            this.cursor = newNode;
+             let newNode = new MoveNode({ fx, fy, tx, ty, p, cap, mv: mvStr }, this.cursor);
+             this.cursor.children.push(newNode);
+             this.cursor = newNode;
           }
           this.turn = this.turn === "r" ? "b" : "r";
           return cap;
@@ -994,69 +589,40 @@
       }
 
       const ui = {
-        flip: false,
-        reflect: false,
-        sel: null,
-        lang: "en",
-        init() {
-          this.render();
-          this.updateInfo();
-          this.updateText();
-        },
+        flip: false, reflect: false, sel: null, lang: 'en',
+        init() { this.render(); this.updateInfo(); this.updateText(); },
         toggleLang() {
-          this.lang = this.lang === "en" ? "zh" : "en";
+          this.lang = this.lang === 'en' ? 'zh' : 'en';
           this.updateText();
           this.updateInfo();
         },
-        getText(key) {
-          return STRINGS[this.lang][key] || key;
-        },
+        getText(key) { return STRINGS[this.lang][key] || key; },
         updateText() {
-          document.querySelectorAll("[data-key]").forEach((el) => {
+          document.querySelectorAll('[data-key]').forEach(el => {
             el.innerText = this.getText(el.dataset.key);
           });
-          document.title = "Xiangqi Master: SixGa Edition";
+          document.title = "Xiangqi Master: SixGa Edition"; 
         },
         switchTab(t) {
-          document
-            .querySelectorAll(".tab")
-            .forEach((e) => e.classList.remove("active"));
-          document
-            .querySelectorAll(".tab-content")
-            .forEach((e) => e.classList.remove("active"));
+          document.querySelectorAll(".tab").forEach((e) => e.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach((e) => e.classList.remove("active"));
           event.target.classList.add("active");
           document.getElementById("tab-" + t).classList.add("active");
         },
-        doFlip() {
-          this.flip = !this.flip;
-          this.render();
-        },
-        doReflect() {
-          this.reflect = !this.reflect;
-          this.render();
-          this.updateInfo();
-        },
+        doFlip() { this.flip = !this.flip; this.render(); },
+        doReflect() { this.reflect = !this.reflect; this.render(); this.updateInfo(); },
         toPx(x, y) {
-          // Fix: Ensure 'ry' handles flip correctly for pieces (invert Y coords)
           let rx = this.reflect ? 8 - x : x;
           let ry = y;
-          if (this.flip) {
-            rx = 8 - rx; // Flip X
-            ry = 9 - y; // Flip Y
-          }
+          if (this.flip) { rx = 8 - rx; ry = 9 - y; } 
           return { left: rx * 11.1111, top: ry * 10 };
         },
         toLog(cx, cy) {
-          const rect = document
-            .getElementById("boardFrame")
-            .getBoundingClientRect();
+          const rect = document.getElementById("boardFrame").getBoundingClientRect();
           let x = Math.floor((cx - rect.left) / (rect.width / 9));
           let y = Math.floor((cy - rect.top) / (rect.height / 10));
           if (x < 0 || x > 8 || y < 0 || y > 9) return null;
-          if (this.flip) {
-            x = 8 - x;
-            y = 9 - y;
-          }
+          if (this.flip) { x = 8 - x; y = 9 - y; }
           if (this.reflect) x = 8 - x;
           return { x, y };
         },
@@ -1069,329 +635,203 @@
             const cap = game.eng.move(this.sel.x, this.sel.y, c.x, c.y);
             if (cap !== false) {
               const sfxType = cap ? "triangle" : "square";
-              // Sound Effect
-              const ctx = new (window.AudioContext ||
-                window.webkitAudioContext)();
-              const o = ctx.createOscillator();
-              const g = ctx.createGain();
-              o.type = cap ? "triangle" : "square";
+              const ctx = new (window.AudioContext || window.webkitAudioContext)();
+              const o = ctx.createOscillator(); const g = ctx.createGain();
+              o.type = cap ? 'triangle' : 'square';
               o.frequency.setValueAtTime(cap ? 600 : 300, ctx.currentTime);
               g.gain.setValueAtTime(0.1, ctx.currentTime);
               g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-              o.connect(g);
-              g.connect(ctx.destination);
-              o.start();
-              o.stop(ctx.currentTime + 0.1);
-
-              // Immediate Update
+              o.connect(g); g.connect(ctx.destination);
+              o.start(); o.stop(ctx.currentTime + 0.1);
               this.sel = null;
-              this.render();
-              this.updateInfo();
-              game.checkGameOver();
+              this.render(); this.updateInfo(); game.checkGameOver();
             } else if (p && p[0] === game.eng.turn) {
-              this.sel = c;
-              requestAnimationFrame(() => this.render());
+              this.sel = c; requestAnimationFrame(() => this.render());
             } else {
-              this.sel = null;
-              requestAnimationFrame(() => this.render());
+              this.sel = null; requestAnimationFrame(() => this.render());
             }
           };
           if (this.sel) handleMove();
           else if (p && p[0] === game.eng.turn) {
-            this.sel = c;
-            requestAnimationFrame(() => this.render());
+            this.sel = c; requestAnimationFrame(() => this.render());
           }
         },
         render() {
-          const pL = document.getElementById("pieceLayer"),
-            mL = document.getElementById("markerLayer");
-          pL.innerHTML = "";
-          mL.innerHTML = "";
+          const pL = document.getElementById("pieceLayer"), mL = document.getElementById("markerLayer");
+          pL.innerHTML = ""; mL.innerHTML = "";
           let hist = game.eng.getHistory();
           let tmp = new Engine();
           if (game.startFen) game.loadFenTo(game.startFen, tmp);
-          hist.forEach((m) => {
-            tmp.board[m.ty][m.tx] = tmp.board[m.fy][m.fx];
-            tmp.board[m.fy][m.fx] = null;
+          hist.forEach(m => {
+             tmp.board[m.ty][m.tx] = tmp.board[m.fy][m.fx];
+             tmp.board[m.fy][m.fx] = null;
           });
           let board = tmp.board;
           for (let y = 0; y < 10; y++)
             for (let x = 0; x < 9; x++) {
               let p = board[y][x];
               let pos = this.toPx(x, y);
-              let last = hist[hist.length - 1];
-              if (
-                last &&
-                ((last.fx === x && last.fy === y) ||
-                  (last.tx === x && last.ty === y))
-              ) {
-                let m = document.createElement("div");
-                m.className = "marker last";
-                m.style.left = pos.left + "%";
-                m.style.top = pos.top + "%";
-                mL.appendChild(m);
+              let last = hist[hist.length-1];
+              if (last && ((last.fx === x && last.fy === y) || (last.tx === x && last.ty === y))) {
+                let m = document.createElement("div"); m.className = "marker last";
+                m.style.left = pos.left + "%"; m.style.top = pos.top + "%"; mL.appendChild(m);
               }
               if (this.sel && this.sel.x === x && this.sel.y === y) {
-                let m = document.createElement("div");
-                m.className = "marker select";
-                m.style.left = pos.left + "%";
-                m.style.top = pos.top + "%";
-                mL.appendChild(m);
+                let m = document.createElement("div"); m.className = "marker select";
+                m.style.left = pos.left + "%"; m.style.top = pos.top + "%"; mL.appendChild(m);
                 tmp.turn = game.eng.turn;
-                tmp
-                  .getLegalMoves()
-                  .filter((m) => m.fx === x && m.fy === y)
-                  .forEach((m) => {
-                    let dPos = this.toPx(m.tx, m.ty),
-                      d = document.createElement("div");
-                    d.className = "marker dot";
-                    d.style.left = dPos.left + "%";
-                    d.style.top = dPos.top + "%";
-                    mL.appendChild(d);
-                  });
+                tmp.getLegalMoves().filter((m) => m.fx === x && m.fy === y).forEach((m) => {
+                  let dPos = this.toPx(m.tx, m.ty), d = document.createElement("div");
+                  d.className = "marker dot"; d.style.left = dPos.left + "%"; d.style.top = dPos.top + "%"; mL.appendChild(d);
+                });
               }
               if (p) {
                 let d = document.createElement("div");
                 d.className = `piece ${p[0] === "r" ? "red" : "black"}`;
-                let char = CN_PIECES[p];
-                if (p[0] === "b" && p[1] === "K") char = CN_PIECES["k"];
-                if (p[0] === "r" && p[1] === "K") char = CN_PIECES["K"];
-                d.innerHTML = `<div class="piece-inner">${char}</div>`;
-                d.style.left = pos.left + "%";
-                d.style.top = pos.top + "%";
-                pL.appendChild(d);
+                let key = p[1];
+                if (p[0] === 'b') key = key.toLowerCase();
+                d.innerHTML = `<div class="piece-inner"><svg viewBox="0 0 100 100">${SVG_PIECES[key]}</svg></div>`;
+                d.style.left = pos.left + "%"; d.style.top = pos.top + "%"; pL.appendChild(d);
               }
             }
         },
         updateInfo() {
-          const list = document.getElementById("history"),
-            statusEl = document.getElementById("status");
+          const list = document.getElementById("history"), statusEl = document.getElementById("status");
           const branchCtrl = document.getElementById("branchCtrl");
           const varInfo = document.getElementById("varInfo");
-          document.getElementById("playBtn").innerText = game.isPlaying
-            ? "||"
-            : "▶";
+          document.getElementById("playBtn").innerText = game.isPlaying ? "||" : "▶";
           if (game.isGameOver) {
-            statusEl.style.color = "yellow";
-            statusEl.innerText = game.gameOverStatus;
+            statusEl.style.color = "yellow"; statusEl.innerText = game.gameOverStatus;
           } else {
             statusEl.style.color = game.eng.turn === "r" ? "#ff6b6b" : "#aaa";
-            statusEl.innerText = this.getText(
-              game.eng.turn === "r" ? "redMove" : "blackMove"
-            );
-            if (game.eng.inCheck(game.eng.turn))
-              statusEl.innerText += this.getText("check");
+            statusEl.innerText = this.getText(game.eng.turn === "r" ? "redMove" : "blackMove");
+            if (game.eng.inCheck(game.eng.turn)) statusEl.innerText += this.getText("check");
           }
-          if (
-            game.eng.cursor.parent &&
-            game.eng.cursor.parent.children.length > 1
-          ) {
-            branchCtrl.classList.add("active");
-            let sibs = game.eng.cursor.parent.children;
-            let idx = sibs.indexOf(game.eng.cursor);
-            varInfo.innerText = `Var: ${idx + 1}/${sibs.length}`;
+          if (game.eng.cursor.parent && game.eng.cursor.parent.children.length > 1) {
+             branchCtrl.classList.add('active');
+             let sibs = game.eng.cursor.parent.children;
+             let idx = sibs.indexOf(game.eng.cursor);
+             varInfo.innerText = `Var: ${idx + 1}/${sibs.length}`;
           } else {
-            branchCtrl.classList.remove("active");
+             branchCtrl.classList.remove('active');
           }
           list.innerHTML = "";
           let tmp = new Engine();
           if (game.startFen) game.loadFenTo(game.startFen, tmp);
           let hist = game.eng.getHistory();
           for (let i = 0; i < hist.length; i += 2) {
-            let h1 = hist[i],
-              h2 = hist[i + 1];
+            let h1 = hist[i], h2 = hist[i + 1];
             let not1 = game.genNotation(tmp, h1, this.reflect);
-            tmp.board[h1.ty][h1.tx] = tmp.board[h1.fy][h1.fx];
-            tmp.board[h1.fy][h1.fx] = null;
+            tmp.board[h1.ty][h1.tx] = tmp.board[h1.fy][h1.fx]; tmp.board[h1.fy][h1.fx] = null;
             let not2 = h2 ? game.genNotation(tmp, h2, this.reflect) : "";
-            if (h2) {
-              tmp.board[h2.ty][h2.tx] = tmp.board[h2.fy][h2.fx];
-              tmp.board[h2.fy][h2.fx] = null;
-            }
+            if (h2) { tmp.board[h2.ty][h2.tx] = tmp.board[h2.fy][h2.fx]; tmp.board[h2.fy][h2.fx] = null; }
             let div = document.createElement("div");
-            let isCurr =
-              game.eng.cursor.data === h1 ||
-              (h2 && game.eng.cursor.data === h2);
+            let isCurr = (game.eng.cursor.data === h1) || (h2 && game.eng.cursor.data === h2);
             div.className = "row" + (isCurr ? " current" : "");
-            div.innerHTML = `<span>${
-              i / 2 + 1
-            }.</span><span onclick="game.goto(${
-              i + 1
-            })">${not1}</span><span onclick="game.goto(${
-              i + 2
-            })">${not2}</span>`;
+            div.innerHTML = `<span>${i / 2 + 1}.</span><span onclick="game.goto(${i + 1})">${not1}</span><span onclick="game.goto(${i + 2})">${not2}</span>`;
             list.appendChild(div);
             if (isCurr) div.scrollIntoView({ block: "nearest" });
           }
         },
         splash(txt) {
           let el = document.getElementById("splash");
-          el.innerText = txt;
-          el.classList.remove("pop");
-          void el.offsetWidth;
-          el.classList.add("pop");
+          el.innerText = txt; el.classList.remove("pop");
+          void el.offsetWidth; el.classList.add("pop");
           sfx.play(440, "sine", 0.5, 0.4);
         },
       };
 
       const game = {
         eng: new Engine(),
-        startFen:
-          "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
-        isGameOver: false,
-        gameOverStatus: "",
-        isPlaying: false,
-        playTimer: null,
+        startFen: "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1",
+        isGameOver: false, gameOverStatus: "", isPlaying: false, playTimer: null,
         newGame() {
           if (!confirm(ui.getText("confirmNew"))) return;
           this.eng.reset();
-          this.startFen =
-            "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
+          this.startFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
           document.getElementById("fenBox").value = "";
-          this.stopPlay();
-          ui.sel = null;
-          ui.flip = false;
-          ui.reflect = false;
-          this.isGameOver = false;
-          this.gameOverStatus = "";
-          ui.init();
-          sfx.play(400, "sawtooth");
+          this.stopPlay(); ui.sel = null; ui.flip = false; ui.reflect = false;
+          this.isGameOver = false; this.gameOverStatus = "";
+          ui.init(); sfx.play(400, "sawtooth");
         },
-        reset() {
-          this.newGame();
-        },
+        reset() { this.newGame(); },
         undo() {
           this.stopPlay();
           if (this.eng.cursor.parent) {
-            let p = this.eng.cursor.data;
-            this.eng.board[p.fy][p.fx] = p.p;
-            this.eng.board[p.ty][p.tx] = p.cap;
-            this.eng.cursor = this.eng.cursor.parent;
-            this.eng.turn = this.eng.turn === "r" ? "b" : "r";
-            this.isGameOver = false;
-            ui.sel = null;
-            ui.render();
-            ui.updateInfo();
+             let p = this.eng.cursor.data;
+             this.eng.board[p.fy][p.fx] = p.p;
+             this.eng.board[p.ty][p.tx] = p.cap;
+             this.eng.cursor = this.eng.cursor.parent;
+             this.eng.turn = this.eng.turn === "r" ? "b" : "r";
+             this.isGameOver = false;
+             ui.sel = null; ui.render(); ui.updateInfo();
           }
         },
-        goto(i) {
-          this.stopPlay();
-          let hist = this.eng.getHistory();
-          if (i > hist.length) return;
-          while (this.eng.cursor.parent) {
-            this.undo();
-          }
-          for (let k = 0; k < i; k++) {
-            let moveData = hist[k];
-            let child = this.eng.cursor.children.find(
-              (c) => c.data === moveData
-            );
-            if (child) {
-              this.eng.board[moveData.ty][moveData.tx] = moveData.p;
-              this.eng.board[moveData.fy][moveData.fx] = null;
-              this.eng.cursor = child;
-              this.eng.turn = this.eng.turn === "r" ? "b" : "r";
-            }
-          }
-          ui.sel = null;
-          ui.render();
-          ui.updateInfo();
+        goto(i) { 
+           this.stopPlay();
+           let hist = this.eng.getHistory();
+           if (i > hist.length) return;
+           while(this.eng.cursor.parent) { this.undo(); }
+           for(let k=0; k<i; k++) {
+              let moveData = hist[k];
+              let child = this.eng.cursor.children.find(c => c.data === moveData);
+              if (child) {
+                 this.eng.board[moveData.ty][moveData.tx] = moveData.p; 
+                 this.eng.board[moveData.fy][moveData.fx] = null;
+                 this.eng.cursor = child;
+                 this.eng.turn = this.eng.turn === "r" ? "b" : "r";
+              }
+           }
+           ui.sel = null; ui.render(); ui.updateInfo();
         },
         nextVar() {
-          if (this.eng.cursor.parent) {
-            let sibs = this.eng.cursor.parent.children;
-            let idx = sibs.indexOf(this.eng.cursor);
-            let next = sibs[(idx + 1) % sibs.length];
-            this.swapToSibling(next);
-          }
+           if (this.eng.cursor.parent) {
+              let sibs = this.eng.cursor.parent.children;
+              let idx = sibs.indexOf(this.eng.cursor);
+              let next = sibs[(idx + 1) % sibs.length];
+              this.swapToSibling(next);
+           }
         },
         prevVar() {
-          if (this.eng.cursor.parent) {
-            let sibs = this.eng.cursor.parent.children;
-            let idx = sibs.indexOf(this.eng.cursor);
-            let prev = sibs[(idx - 1 + sibs.length) % sibs.length];
-            this.swapToSibling(prev);
-          }
+           if (this.eng.cursor.parent) {
+              let sibs = this.eng.cursor.parent.children;
+              let idx = sibs.indexOf(this.eng.cursor);
+              let prev = sibs[(idx - 1 + sibs.length) % sibs.length];
+              this.swapToSibling(prev);
+           }
         },
         swapToSibling(node) {
-          let p = this.eng.cursor.data;
-          this.eng.board[p.fy][p.fx] = p.p;
-          this.eng.board[p.ty][p.tx] = p.cap;
-          let n = node.data;
-          this.eng.board[n.ty][n.tx] = n.p;
-          this.eng.board[n.fy][n.fx] = null;
-          this.eng.cursor = node;
-          ui.render();
-          ui.updateInfo();
+           let p = this.eng.cursor.data;
+           this.eng.board[p.fy][p.fx] = p.p;
+           this.eng.board[p.ty][p.tx] = p.cap;
+           let n = node.data;
+           this.eng.board[n.ty][n.tx] = n.p; 
+           this.eng.board[n.fy][n.fx] = null;
+           this.eng.cursor = node;
+           ui.render(); ui.updateInfo();
         },
-        step(d) {
-          if (d === -1) {
-            this.undo();
-            return;
-          }
-          if (this.eng.cursor.children.length > 0) {
-            let next = this.eng.cursor.children[0];
-            let n = next.data;
-            this.eng.board[n.ty][n.tx] = n.p;
-            this.eng.board[n.fy][n.fx] = null;
-            this.eng.cursor = next;
-            this.eng.turn = this.eng.turn === "r" ? "b" : "r";
-            ui.render();
-            ui.updateInfo();
-          }
+        step(d) { 
+           if (d === -1) { this.undo(); return; }
+           if (this.eng.cursor.children.length > 0) {
+              let next = this.eng.cursor.children[0];
+              let n = next.data;
+              this.eng.board[n.ty][n.tx] = n.p; 
+              this.eng.board[n.fy][n.fx] = null;
+              this.eng.cursor = next;
+              this.eng.turn = this.eng.turn === "r" ? "b" : "r";
+              ui.render(); ui.updateInfo();
+           }
         },
         togglePlay() {
           if (this.isPlaying) this.stopPlay();
           else {
-            this.isPlaying = true;
-            ui.updateInfo();
+            this.isPlaying = true; ui.updateInfo();
             this.playTimer = setInterval(() => {
-              if (this.eng.cursor.children.length > 0) this.step(1);
-              else this.stopPlay();
+              if (this.eng.cursor.children.length > 0) this.step(1); else this.stopPlay();
             }, 1000);
           }
         },
-        stopPlay() {
-          clearInterval(this.playTimer);
-          this.isPlaying = false;
-          ui.updateInfo();
-        },
-        loadXQF(e) {
-          let f = e.target.files[0];
-          if (!f) return;
-          let r = new FileReader();
-          r.onload = (evt) => {
-            try {
-              this.parseXQF(new Uint8Array(evt.target.result));
-            } catch (e) {
-              alert("XQF Parse Failed");
-            }
-          };
-          r.readAsArrayBuffer(f);
-        },
-        parseXQF(u8) {
-          if (u8[0] != 0x58 || u8[1] != 0x51) {
-            alert("Not XQF");
-            return;
-          }
-          let key = u8[0xa];
-          let mStr = "";
-          let i = 1024;
-          while (i < u8.length - 4) {
-            let src = u8[i] - 24 - key;
-            let dst = u8[i + 1] - 32 - key;
-            let tag = u8[i + 2];
-            if (tag > 240) break;
-            let fx = src % 9;
-            let fy = 9 - Math.floor(src / 9);
-            let tx = dst % 9;
-            let ty = 9 - Math.floor(dst / 9);
-            mStr += `${fx}${fy}${tx}${ty}`;
-            i += 4;
-          }
-          document.getElementById("fenBox").value = mStr;
-          this.load();
-        },
+        stopPlay() { clearInterval(this.playTimer); this.isPlaying = false; ui.updateInfo(); },
         load() {
           let txt = document.getElementById("fenBox").value.trim();
           if (!txt) return;
@@ -1400,26 +840,25 @@
           let mainMoveStr = "";
           let branches = [];
           if (txt.includes("[DhtmlXQ]")) {
-            let f = txt.match(/_fen](.*?)\[/);
-            if (f) fen = f[1];
-            let m = txt.match(/_movelist](.*?)\[/);
-            if (m) mainMoveStr = m[1];
-            const regex = /\[DhtmlXQ_move_(\d+)_(\d+)_(\d+)\](.*?)\[/g;
-            let match;
-            while ((match = regex.exec(txt)) !== null) {
-              branches.push({
-                pid: parseInt(match[1]),
-                idx: parseInt(match[2]),
-                id: parseInt(match[3]),
-                moves: match[4],
-              });
-            }
+             let f = txt.match(/_fen](.*?)\[/);
+             if (f) fen = f[1];
+             let m = txt.match(/_movelist](.*?)\[/);
+             if (m) mainMoveStr = m[1];
+             const regex = /\[DhtmlXQ_move_(\d+)_(\d+)_(\d+)\](.*?)\[/g;
+             let match;
+             while ((match = regex.exec(txt)) !== null) {
+                branches.push({
+                   pid: parseInt(match[1]),
+                   idx: parseInt(match[2]),
+                   id: parseInt(match[3]),
+                   moves: match[4]
+                });
+             }
           } else if (/^\d+$/.test(txt)) {
-            fen =
-              "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
-            mainMoveStr = txt;
+             fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
+             mainMoveStr = txt;
           } else if (txt.includes("/")) {
-            fen = txt;
+             fen = txt;
           }
           this.eng.reset();
           this.loadFenTo(fen, this.eng);
@@ -1427,60 +866,54 @@
           this.isGameOver = false;
           this.gameOverStatus = "";
           const processMoves = (node, moveStr, branchId) => {
-            let curr = node;
-            for (let i = 0; i < moveStr.length; i += 4) {
-              let fx = parseInt(moveStr[i]);
-              let fy = parseInt(moveStr[i + 1]);
-              let tx = parseInt(moveStr[i + 2]);
-              let ty = parseInt(moveStr[i + 3]);
-              let tmpEng = new Engine();
-              this.loadFenTo(this.startFen, tmpEng);
-              let path = [];
-              let pNode = curr;
-              while (pNode.parent) {
-                path.push(pNode.data);
-                pNode = pNode.parent;
-              }
-              path.reverse().forEach((m) => {
-                tmpEng.board[m.ty][m.tx] = m.p;
-                tmpEng.board[m.fy][m.fx] = null;
-                tmpEng.turn = tmpEng.turn === "r" ? "b" : "r";
-              });
-              let p = tmpEng.getPiece(fx, fy);
-              let cap = tmpEng.board[ty][tx];
-              let mvStr = `${fx}${fy}${tx}${ty}`;
-              let newNode = new MoveNode(
-                { fx, fy, tx, ty, p, cap, mv: mvStr },
-                curr
-              );
-              newNode.tempBranchId = branchId;
-              curr.children.push(newNode);
-              curr = newNode;
-            }
-            return curr;
+             let curr = node;
+             for(let i=0; i < moveStr.length; i+=4) {
+                let fx = parseInt(moveStr[i]);
+                let fy = parseInt(moveStr[i+1]);
+                let tx = parseInt(moveStr[i+2]);
+                let ty = parseInt(moveStr[i+3]);
+                let tmpEng = new Engine();
+                this.loadFenTo(this.startFen, tmpEng);
+                let path = [];
+                let pNode = curr;
+                while(pNode.parent) { path.push(pNode.data); pNode = pNode.parent; }
+                path.reverse().forEach(m => {
+                   tmpEng.board[m.ty][m.tx] = m.p;
+                   tmpEng.board[m.fy][m.fx] = null;
+                   tmpEng.turn = tmpEng.turn === "r" ? "b" : "r";
+                });
+                let p = tmpEng.getPiece(fx, fy);
+                let cap = tmpEng.board[ty][tx];
+                let mvStr = `${fx}${fy}${tx}${ty}`;
+                let newNode = new MoveNode({ fx, fy, tx, ty, p, cap, mv: mvStr }, curr);
+                newNode.tempBranchId = branchId;
+                curr.children.push(newNode);
+                curr = newNode;
+             }
+             return curr; 
           };
           let mainTip = processMoves(this.eng.root, mainMoveStr, 0);
           let curr = this.eng.root;
-          while (curr.children.length) {
-            curr.children[0].tempBranchId = 0;
-            curr = curr.children[0];
+          while(curr.children.length) {
+             curr.children[0].tempBranchId = 0;
+             curr = curr.children[0];
           }
-          branches.forEach((b) => {
-            let parentNode = null;
-            let q = [{ n: this.eng.root, d: 0 }];
-            while (q.length) {
-              let { n, d } = q.shift();
-              if (d === b.idx && n.tempBranchId === b.pid) {
-                parentNode = n;
-                break;
-              }
-              if (d < b.idx) {
-                n.children.forEach((c) => q.push({ n: c, d: d + 1 }));
-              }
-            }
-            if (parentNode) {
-              processMoves(parentNode, b.moves, b.id);
-            }
+          branches.forEach(b => {
+             let parentNode = null;
+             let q = [{n: this.eng.root, d: 0}];
+             while(q.length) {
+                let {n, d} = q.shift();
+                if (d === b.idx && n.tempBranchId === b.pid) {
+                   parentNode = n;
+                   break;
+                }
+                if (d < b.idx) {
+                   n.children.forEach(c => q.push({n:c, d: d+1}));
+                }
+             }
+             if (parentNode) {
+                processMoves(parentNode, b.moves, b.id);
+             }
           });
           this.eng.cursor = this.eng.root;
           let startTurn = this.startFen.split(" ")[1] || "r";
@@ -1491,20 +924,15 @@
         },
         loadFenTo(fen, engine) {
           let rows = fen.split(" ")[0].split("/");
-          engine.board = Array(10)
-            .fill(null)
-            .map(() => Array(9).fill(null));
+          engine.board = Array(10).fill(null).map(() => Array(9).fill(null));
           rows.forEach((r, y) => {
             let x = 0;
             for (let c of r) {
               if (!isNaN(c)) x += parseInt(c);
               else {
-                let color = c === c.toUpperCase() ? "r" : "b",
-                  t = c.toUpperCase();
-                if (t === "H") t = "N";
-                if (t === "B") t = "E";
-                engine.board[y][x] = color + t;
-                x++;
+                let color = c === c.toUpperCase() ? "r" : "b", t = c.toUpperCase();
+                if (t === "H") t = "N"; if (t === "B") t = "E";
+                engine.board[y][x] = color + t; x++;
               }
             }
           });
@@ -1513,17 +941,14 @@
         },
         checkGameOver() {
           const moves = this.eng.getLegalMoves();
-          const winTxt =
-            ui
-              .getText(this.eng.turn === "r" ? "blackMove" : "redMove")
-              .split(" ")[0] + ui.getText("win");
+          const winTxt = ui.getText(this.eng.turn === "r" ? "blackMove" : "redMove").split(" ")[0] + ui.getText("win");
           if (moves.length === 0) {
             this.isGameOver = true;
             if (this.eng.inCheck(this.eng.turn)) {
-              this.gameOverStatus = winTxt;
+              this.gameOverStatus = winTxt; 
               ui.splash("绝 杀");
             } else {
-              this.gameOverStatus = ui.getText("stalemate");
+              this.gameOverStatus = ui.getText("stalemate"); 
               ui.splash("闷 宫");
             }
           } else if (this.eng.inCheck(this.eng.turn)) ui.splash("將 軍");
@@ -1531,174 +956,141 @@
         },
         genNotation(tempEng, move, isReflect) {
           const { fx, fy, tx, ty, p } = move;
-          if (!p) return "";
-          const red = p[0] === "r",
-            type = p[1];
+          if(!p) return "";
+          const red = p[0] === "r", type = p[1];
           let name = CN_PIECES[p];
           let srcF, dstF;
-          if (!isReflect) {
-            srcF = red ? 9 - fx : fx + 1;
-            dstF = red ? 9 - tx : tx + 1;
-          } else {
-            srcF = red ? fx + 1 : 9 - fx;
-            dstF = red ? tx + 1 : 9 - tx;
-          }
+          if (!isReflect) { srcF = red ? 9 - fx : fx + 1; dstF = red ? 9 - tx : tx + 1; }
+          else { srcF = red ? fx + 1 : 9 - fx; dstF = red ? tx + 1 : 9 - tx; }
           let sameCol = [];
           if (!["A", "E", "K"].includes(type)) {
-            for (let y = 0; y < 10; y++)
-              if (tempEng.board[y][fx] === p) sameCol.push(y);
+            for (let y = 0; y < 10; y++) if (tempEng.board[y][fx] === p) sameCol.push(y);
           }
           let otherColHasStack = false;
           if (!["A", "E", "K"].includes(type)) {
-            for (let x = 0; x < 9; x++) {
-              if (x === fx) continue;
-              let count = 0;
-              for (let y = 0; y < 10; y++)
-                if (tempEng.board[y][x] === p) count++;
-              if (count > 1) {
-                otherColHasStack = true;
-                break;
-              }
-            }
+             for(let x=0; x<9; x++) {
+               if(x === fx) continue;
+               let count = 0;
+               for(let y=0; y<10; y++) if(tempEng.board[y][x] === p) count++;
+               if(count > 1) { otherColHasStack = true; break; }
+             }
           }
-          let prefix = "",
-            useFileInsteadOfName = false;
+          let prefix = "", useFileInsteadOfName = false;
           if (sameCol.length > 1) {
-            if (red) sameCol.sort((a, b) => a - b);
-            else sameCol.sort((a, b) => b - a);
+            if (red) sameCol.sort((a, b) => a - b); else sameCol.sort((a, b) => b - a);
             let idx = sameCol.indexOf(fy);
             if (sameCol.length === 2) prefix = idx === 0 ? "前" : "后";
-            else if (sameCol.length === 3)
-              prefix = idx === 0 ? "前" : idx === 1 ? "中" : "后";
-            else {
-              const P_MAP = ["前", "二", "三", "四", "五"];
-              prefix = idx === sameCol.length - 1 ? "后" : P_MAP[idx];
-            }
+            else if (sameCol.length === 3) prefix = idx === 0 ? "前" : idx === 1 ? "中" : "后";
+            else { const P_MAP = ["前", "二", "三", "四", "五"]; prefix = idx === sameCol.length - 1 ? "后" : P_MAP[idx]; }
             if (otherColHasStack && type === "P") useFileInsteadOfName = true;
-            name = useFileInsteadOfName
-              ? prefix + (red ? CN_NUMS[srcF] : CN_DIGITS[srcF])
-              : prefix + name;
+            name = useFileInsteadOfName ? prefix + (red ? CN_NUMS[srcF] : CN_DIGITS[srcF]) : prefix + name;
           }
           const dy = ty - fy;
           let dir = fy === ty ? "=" : (red ? dy < 0 : dy > 0) ? "+" : "-";
           let dest = "";
           if (["R", "C", "P", "K"].includes(type) && dir !== "=") {
-            let dist = Math.abs(dy);
-            dest = red ? CN_NUMS[dist] : CN_DIGITS[dist];
+            let dist = Math.abs(dy); dest = red ? CN_NUMS[dist] : CN_DIGITS[dist];
           } else dest = red ? CN_NUMS[dstF] : CN_DIGITS[dstF];
           if (sameCol.length > 1) return name + CN_DIR[dir] + dest;
           let fChar = red ? CN_NUMS[srcF] : CN_DIGITS[srcF];
           return name + fChar + CN_DIR[dir] + dest;
         },
         export() {
-          const type = document.getElementById("exportFormat").value;
+          const type = document.getElementById('exportFormat').value;
           let fen = "";
           for (let y = 0; y < 10; y++) {
             let e = 0;
             for (let x = 0; x < 9; x++) {
               let p = this.eng.board[y][x];
-              if (!p) e++;
-              else {
-                if (e) fen += e;
-                e = 0;
-                let c = p[1];
-                if (c === "N") c = "H";
-                if (c === "E") c = "B";
+              if (!p) e++; else {
+                if (e) fen += e; e = 0;
+                let c = p[1]; if (c === "N") c = "H"; if (c === "E") c = "B";
                 fen += p[0] === "r" ? c.toUpperCase() : c.toLowerCase();
               }
             }
-            if (e) fen += e;
-            if (y < 9) fen += "/";
+            if (e) fen += e; if (y < 9) fen += "/";
           }
           fen += ` ${this.eng.turn} - - 0 1`;
-          let tmp = new Engine();
-          if (this.startFen) this.loadFenTo(this.startFen, tmp);
+          let tmp = new Engine(); 
+          if(this.startFen) this.loadFenTo(this.startFen, tmp);
           let binitStr = "";
-          for (let y = 9; y >= 0; y--) {
-            // Red First Scan (Bottom Up)
-            for (let x = 0; x < 9; x++) {
-              if (tmp.board[y][x]) binitStr += `${x}${y}`;
-            }
+          for(let y=9; y>=0; y--) { 
+             for(let x=0; x<9; x++) {
+                if(tmp.board[y][x]) binitStr += `${x}${y}`;
+             }
           }
-
+          
           let mainMoveStr = "";
           let branchTags = "";
           let branchIdCounter = 1;
-          let pending = [
-            { startNode: this.eng.root, bid: 0, parentBid: 0, parentDepth: 0 },
-          ];
+          let pending = [{startNode: this.eng.root, bid: 0, parentBid: 0, parentDepth: 0}];
           let nodeMap = new Map();
-          nodeMap.set(this.eng.root, { bid: 0, depth: 0 });
-
+          nodeMap.set(this.eng.root, {bid: 0, depth: 0});
+          
           let activePathSet = new Set();
           let p = this.eng.cursor;
-          while (p) {
-            activePathSet.add(p);
-            p = p.parent;
-          }
+          while(p) { activePathSet.add(p); p = p.parent; }
 
-          while (pending.length) {
-            let task = pending.shift();
-            let str = "";
-            let ptr = task.startNode;
-            if (task.startNode !== this.eng.root) str += ptr.data.mv;
-            let d = task.startNode === this.eng.root ? 0 : task.parentDepth + 1;
-            nodeMap.set(ptr, { bid: task.bid, depth: d });
+          while(pending.length) {
+             let task = pending.shift();
+             let str = "";
+             let ptr = task.startNode;
+             if (task.startNode !== this.eng.root) str += ptr.data.mv;
+             let d = task.startNode === this.eng.root ? 0 : task.parentDepth + 1; 
+             nodeMap.set(ptr, {bid: task.bid, depth: d});
 
-            while (true) {
-              let mainChild = null;
-              if (activePathSet.has(ptr)) {
-                mainChild = ptr.children.find((c) => activePathSet.has(c));
-              }
-              if (!mainChild && ptr.children.length > 0)
-                mainChild = ptr.children[0];
-              if (!mainChild) break;
-
-              str += mainChild.data.mv;
-              d++;
-              nodeMap.set(mainChild, { bid: task.bid, depth: d });
-
-              ptr.children.forEach((c) => {
-                if (c !== mainChild) {
-                  pending.push({
-                    startNode: c,
-                    bid: branchIdCounter++,
-                    parentBid: task.bid,
-                    parentDepth: d - 1,
-                  });
+             while(true) {
+                let mainChild = null;
+                if (activePathSet.has(ptr)) {
+                   mainChild = ptr.children.find(c => activePathSet.has(c));
                 }
-              });
-              ptr = mainChild;
-            }
-            if (task.bid === 0) mainMoveStr = str;
-            else {
-              let tagIdx = task.parentDepth + 1;
-              branchTags += `[DhtmlXQ_move_${task.parentBid}_${tagIdx}_${task.bid}]${str}[/DhtmlXQ_move_${task.parentBid}_${tagIdx}_${task.bid}]\n`;
-            }
+                if (!mainChild && ptr.children.length > 0) mainChild = ptr.children[0];
+                if (!mainChild) break; 
+
+                str += mainChild.data.mv;
+                d++;
+                nodeMap.set(mainChild, {bid: task.bid, depth: d});
+
+                ptr.children.forEach(c => {
+                   if (c !== mainChild) {
+                      pending.push({
+                         startNode: c, 
+                         bid: branchIdCounter++, 
+                         parentBid: task.bid, 
+                         parentDepth: d - 1 
+                      });
+                   }
+                });
+                ptr = mainChild;
+             }
+             if (task.bid === 0) mainMoveStr = str;
+             else {
+               let tagIdx = task.parentDepth + 1; 
+               branchTags += `[DhtmlXQ_move_${task.parentBid}_${tagIdx}_${task.bid}]${str}[/DhtmlXQ_move_${task.parentBid}_${tagIdx}_${task.bid}]\n`;
+             }
           }
 
-          let tmpNot = new Engine();
+          let tmpNot = new Engine(); 
           if (this.startFen) this.loadFenTo(this.startFen, tmpNot);
           let movesTxt = "";
           let hist = this.eng.getHistory();
           hist.forEach((h, i) => {
             let not = this.genNotation(tmpNot, h, false);
             movesTxt += i % 2 === 0 ? `${i / 2 + 1}. ${not} ` : `${not}\n`;
-            tmpNot.board[h.ty][h.tx] = tmpNot.board[h.fy][h.fx];
-            tmpNot.board[h.fy][h.fx] = null;
+            tmpNot.board[h.ty][h.tx] = tmpNot.board[h.fy][h.fx]; tmpNot.board[h.fy][h.fx] = null;
           });
-
+          
           let output = "";
-          if (type === "text") {
-            output = `开始局面: ${this.startFen}\n着法:\n${movesTxt}`;
+          if (type === 'text') {
+             output = `开始局面: ${this.startFen}\n着法:\n${movesTxt}`;
           } else {
-            output = `[DhtmlXQ]\n[DhtmlXQ_fen]${this.startFen}[/DhtmlXQ_fen]\n[DhtmlXQ_binit]${binitStr}[/DhtmlXQ_binit]\n[DhtmlXQ_movelist]${mainMoveStr}[/DhtmlXQ_movelist]\n${branchTags}[/DhtmlXQ]`;
+             output = `[DhtmlXQ]\n[DhtmlXQ_fen]${this.startFen}[/DhtmlXQ_fen]\n[DhtmlXQ_binit]${binitStr}[/DhtmlXQ_binit]\n[DhtmlXQ_movelist]${mainMoveStr}[/DhtmlXQ_movelist]\n${branchTags}[/DhtmlXQ]`;
           }
-
+          
           document.getElementById("fenBox").value = output;
           navigator.clipboard.writeText(output);
           alert(ui.getText("copied"));
-        },
+        }
       };
 
       ui.init();
