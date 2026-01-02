@@ -18,7 +18,7 @@
         --panel-bg: #ffffff;
         --border-color: #d9d9d9;
         --highlight: rgba(255, 215, 0, 0.4);
-        --selected: rgba(24, 144, 255, 0.4);
+        --selected: rgba(0, 160, 233, 0.3);
         --tab-active: #2c3e50;
         --branch-btn: #8e44ad;
 
@@ -279,13 +279,17 @@
         border-radius: 10px;
         opacity: 0.6;
       }
+
       .select::after {
         content: "";
-        width: 90%;
-        height: 90%;
-        background: var(--selected);
-        border-radius: 50%;
+        width: 100%; /* Changed from 90% to fill the square */
+        height: 100%; /* Changed from 90% to fill the square */
+        background: var(
+          --selected
+        ); /* Uses the Cyan color defined at the top */
+        border-radius: 12px; /* Rounded corners instead of 50% circle */
       }
+
       .dot::after {
         content: "";
         width: 18%;
@@ -500,6 +504,19 @@
           transform: translate(-50%, -50%) scale(1);
           opacity: 0;
         }
+      }
+
+      .dot::after {
+        content: "";
+        width: 18%;
+        height: 18%;
+        background: rgba(
+          40,
+          167,
+          69,
+          0.6
+        ); /* This is the green dot for legal moves */
+        border-radius: 50%;
       }
     </style>
   </head>
