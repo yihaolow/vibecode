@@ -1,10 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CSV Attendance Report Generator</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -24,91 +23,201 @@
       }
       .container-box {
         background-color: #ffffff;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
           0 2px 4px -2px rgba(0, 0, 0, 0.1);
       }
       .csv-output {
-        white-space: pre; /* Essential for preserving CSV formatting in the textarea */
+        white-space: pre;
         overflow-x: auto;
         min-height: 200px;
+        font-family: monospace;
+      }
+      .date-checkbox:checked + div {
+        background-color: #e0e7ff;
+        border-color: #4f46e5;
+        color: #4f46e5;
+      }
+      .division-checkbox:checked + div {
+        background-color: #dcfce7;
+        border-color: #16a34a;
+        color: #16a34a;
       }
     </style>
   </head>
   <body class="p-4 sm:p-8">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
-        Chinese Chess Attendance Report Generator
-      </h1>
+    <div class="max-w-5xl mx-auto space-y-6">
+      <!-- Header -->
+      <div class="border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">
+          Chinese Chess Attendance Report Generator
+        </h1>
+        <p class="text-gray-600 mt-2">
+          Upload CSV, select dates and divisions, then generate your report
+        </p>
+      </div>
 
-      <!-- Input and Control Panel -->
-      <div class="container-box p-6 rounded-lg mb-8">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">
-          1. Upload CSV File
+      <!-- Step 1: File Upload -->
+      <div class="container-box p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+          <span
+            class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3"
+            >1</span
+          >
+          Upload CSV File
         </h2>
-        <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <div class="flex flex-col sm:flex-row gap-4 items-start">
           <input
             type="file"
             id="csvFile"
             accept=".csv"
-            class="w-full sm:w-auto flex-grow text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            class="flex-grow text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-gray-300 rounded-lg p-2"
           />
           <button
-            onclick="processCSV()"
-            id="processButton"
-            class="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition duration-150 shadow-md"
+            onclick="analyzeCSV()"
+            id="analyzeButton"
+            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition duration-150 shadow-md whitespace-nowrap"
           >
-            Process & Generate Report
+            Analyze File
           </button>
         </div>
-        <p id="message" class="mt-4 text-sm text-gray-500 hidden">
-          Please select a CSV file to begin processing.
-        </p>
+        <p id="uploadMessage" class="mt-3 text-sm hidden"></p>
       </div>
 
-      <!-- Output Panel -->
-      <div class="container-box p-6 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">
-          2. Generated CSV Output
+      <!-- Step 2: Date & Division Selection (Hidden initially) -->
+      <div id="selectionPanel" class="hidden container-box p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+          <span
+            class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3"
+            >2</span
+          >
+          Select Dates & Divisions
         </h2>
 
-        <!-- Output Text Area -->
+        <!-- Division Filter -->
+        <div class="mb-6">
+          <h3
+            class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3"
+          >
+            Divisions Found
+          </h3>
+          <div id="divisionContainer" class="flex flex-wrap gap-2">
+            <!-- Checkboxes injected here -->
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            Select which divisions to include in the report
+          </p>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-3">
+            <h3
+              class="text-sm font-semibold text-gray-600 uppercase tracking-wide"
+            >
+              Available Dates
+            </h3>
+            <div class="space-x-2">
+              <button
+                onclick="selectAllDates(true)"
+                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                Select All
+              </button>
+              <button
+                onclick="selectAllDates(false)"
+                class="text-xs text-gray-500 hover:text-gray-700 font-medium"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          <div id="dateContainer" class="space-y-4">
+            <!-- Date checkboxes grouped by month -->
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t">
+          <button
+            onclick="generateReport()"
+            id="generateButton"
+            class="px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition duration-150 shadow-md flex items-center gap-2"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path>
+            </svg>
+            Generate Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Output -->
+      <div id="outputPanel" class="hidden container-box p-6 rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-700">Generated Report</h2>
+          <div class="text-sm text-gray-600" id="reportSummary"></div>
+        </div>
+
         <textarea
           id="csvOutput"
           readonly
-          placeholder="The processed attendance data will appear here..."
-          class="csv-output w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-800 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-        </textarea>
+          placeholder="Report will appear here..."
+          class="csv-output w-full p-4 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-4"
+          rows="10"
+        ></textarea>
 
-        <!-- Download Button -->
-        <div class="mt-4 flex justify-end">
+        <div class="flex justify-end">
           <button
             onclick="downloadCSV()"
             id="downloadButton"
-            disabled
-            class="px-6 py-2 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition duration-150 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition duration-150 shadow-md flex items-center gap-2"
           >
-            Download Output (.csv)
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              ></path>
+            </svg>
+            Download CSV
           </button>
         </div>
       </div>
     </div>
 
     <script>
-      // --- Utility Functions for CSV and Date Handling ---
+      // Global storage for parsed data
+      let parsedData = [];
+      let availableDates = new Map(); // Map<dateString, {sortKey, display, month, count}>
+      let availableDivisions = new Map();
 
-      // Simple CSV parser for standard comma-separated values, handling quotes
+      // --- Utility Functions ---
+
       function parseCSV(text) {
         const rows = text.trim().split("\n");
         if (rows.length === 0) return [];
 
         const data = [];
         for (let i = 1; i < rows.length; i++) {
-          // Start from 1 to skip the header row
           const row = rows[i];
           if (row.trim() === "") continue;
 
-          // Split by comma, respecting quotes
           const values = [];
           let inQuote = false;
           let current = "";
@@ -117,11 +226,11 @@
             const char = row[j];
 
             if (char === '"') {
-              inQuote = !inQuote;
-              // Handle double quotes inside a quoted field (escaped quote)
-              if (j + 1 < row.length && row[j + 1] === '"' && inQuote) {
+              if (inQuote && j + 1 < row.length && row[j + 1] === '"') {
                 current += '"';
-                j++; // Skip the next quote since it's part of the content
+                j++;
+              } else {
+                inQuote = !inQuote;
               }
             } else if (char === "," && !inQuote) {
               values.push(current.trim());
@@ -130,65 +239,48 @@
               current += char;
             }
           }
-          values.push(current.trim()); // Push the last column
+          values.push(current.trim());
 
-          // Clean up leading/trailing quotes from values
           const cleanedValues = values.map((v) =>
-            v.replace(/^"|"$/g, "").trim()
+            v.replace(/^"|"$/g, "").trim(),
           );
           data.push(cleanedValues);
         }
         return data;
       }
 
-      // Converts DD/MM/YYYY to MM-DD for display and YYYY-MM-DD for sorting
-      function formatDate(dateStr) {
+      function parseDate(dateStr) {
         const parts = dateStr.split("/");
-        // Ensure dateStr is valid (e.g., has 3 parts)
-        if (parts.length < 3) {
-          return { sortKey: "9999-99-99", headerDisplay: "Invalid Date" };
-        }
+        if (parts.length !== 3) return null;
 
         const [day, month, year] = parts;
-        // Note: Date constructor uses 0-indexed month, so month - 1
         const date = new Date(year, month - 1, day);
 
-        // Handle potentially invalid dates
-        if (isNaN(date)) {
-          return { sortKey: "9999-99-99", headerDisplay: "Invalid Date" };
-        }
+        if (isNaN(date)) return null;
 
-        const displayMonth = date.toLocaleString("en-US", { month: "short" });
-        const displayDay = day.padStart(2, "0");
-        const sortKey = `${year}-${month.padStart(2, "0")}-${displayDay}`;
-        const headerDisplay = `${displayMonth}-${displayDay}`;
-
-        return { sortKey, headerDisplay };
+        return {
+          sortKey: `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
+          display: `${date.toLocaleString("en-US", { month: "short" })}-${day.padStart(2, "0")}`,
+          fullDate: date,
+          original: dateStr,
+        };
       }
 
-      // --- Core Application Logic ---
-
-      function updateUI(message = "", isError = false) {
-        const msgEl = document.getElementById("message");
-        msgEl.textContent = message;
-        msgEl.classList.remove("hidden", "text-red-500", "text-gray-500");
-        msgEl.classList.add(isError ? "text-red-500" : "text-gray-500");
-        if (message === "") msgEl.classList.add("hidden");
+      function showMessage(elementId, message, isError = false) {
+        const el = document.getElementById(elementId);
+        el.textContent = message;
+        el.className = `mt-3 text-sm ${isError ? "text-red-600 font-medium" : "text-green-600 font-medium"}`;
+        el.classList.remove("hidden");
       }
 
-      function processCSV() {
+      // --- Step 1: Analyze CSV ---
+
+      function analyzeCSV() {
         const fileInput = document.getElementById("csvFile");
-        const outputArea = document.getElementById("csvOutput");
-        const downloadBtn = document.getElementById("downloadButton");
-
-        outputArea.value = "Processing...";
-        downloadBtn.disabled = true;
-        updateUI("");
-
         const file = fileInput.files[0];
+
         if (!file) {
-          outputArea.value = "";
-          updateUI("Please select a CSV file first.", true);
+          showMessage("uploadMessage", "Please select a CSV file first.", true);
           return;
         }
 
@@ -196,209 +288,342 @@
         reader.onload = function (e) {
           try {
             const rawData = e.target.result;
-            const parsedData = parseCSV(rawData);
+            parsedData = parseCSV(rawData);
 
             if (parsedData.length === 0) {
-              updateUI("CSV file is empty or unreadable.", true);
-              outputArea.value = "";
+              showMessage(
+                "uploadMessage",
+                "CSV file is empty or unreadable.",
+                true,
+              );
               return;
             }
 
-            // Index mapping based on the provided CSV sample (0-indexed)
-            const ADMIN_INDEX = 4;
-            const NAME_INDEX = 3;
-            const ACTIVITY_TYPE_INDEX = 5;
-            const DATE_INDEX = 6;
-            const DIVISION_INDEX = 11; // Index for the "Division" column
+            extractMetadata();
 
-            // Specific dates the user confirmed are official Chinese Chess training sessions
-            // DD/MM/YYYY format based on input CSV
-            const requiredDates = new Set([
-              "07/11/2025",
-              "21/11/2025",
-              "28/11/2025",
-            ]);
-
-            // 1. Filter for 'Training/Workshop' AND 'Chinese Chess' division AND required dates
-            const trainingRecords = parsedData.filter((row) => {
-              // Check if row has enough columns
-              const hasRequiredData =
-                row.length > DIVISION_INDEX && row.length > DATE_INDEX;
-              if (!hasRequiredData) return false;
-
-              const isTraining =
-                row[ACTIVITY_TYPE_INDEX] &&
-                row[ACTIVITY_TYPE_INDEX].toLowerCase() === "training/workshop";
-              const isChineseChess =
-                row[DIVISION_INDEX] &&
-                row[DIVISION_INDEX].toLowerCase() === "chinese chess";
-              const isRequiredDate =
-                row[DATE_INDEX] && requiredDates.has(row[DATE_INDEX]); // Check against the exact date string
-
-              // Only include records that satisfy ALL three conditions
-              return isTraining && isChineseChess && isRequiredDate;
-            });
-
-            if (trainingRecords.length === 0) {
-              updateUI(
-                'No relevant "Chinese Chess" training records found on the specified dates (7/11, 21/11, 28/11) in the CSV.',
-                true
+            if (availableDates.size === 0) {
+              showMessage(
+                "uploadMessage",
+                "No valid dates found in CSV.",
+                true,
               );
-              outputArea.value = "";
               return;
             }
 
-            const studentAttendance = {};
-            const uniqueDates = new Set();
+            renderDivisionSelectors();
+            renderDateSelectors();
+            document
+              .getElementById("selectionPanel")
+              .classList.remove("hidden");
+            document.getElementById("outputPanel").classList.add("hidden");
 
-            // 2. Build student attendance map and collect unique dates
-            trainingRecords.forEach((row) => {
-              const adminNo = row[ADMIN_INDEX];
-              const name = row[NAME_INDEX];
-              const dateStr = row[DATE_INDEX];
-
-              if (adminNo && name && dateStr) {
-                const { sortKey } = formatDate(dateStr);
-                uniqueDates.add(sortKey); // Add sortable date to set
-
-                if (!studentAttendance[adminNo]) {
-                  // Clean up the name by removing leading/trailing quotes if parseCSV missed any
-                  studentAttendance[adminNo] = {
-                    name: name.replace(/^"|"$/g, ""),
-                    attendance: {},
-                    totalAttended: 0,
-                  };
-                }
-                // Mark attendance for this date (ensures uniqueness per student per day)
-                studentAttendance[adminNo].attendance[sortKey] = 1;
-              }
-            });
-
-            // 3. Prepare the student data array
-            // Sorting the dates will ensure the output columns are in chronological order
-            const sortedDates = Array.from(uniqueDates).sort();
-            const uniqueTrainingCount = sortedDates.length;
-            const finalOutput = [];
-
-            Object.keys(studentAttendance)
-              .sort()
-              .forEach((adminNo) => {
-                const student = studentAttendance[adminNo];
-                let totalAttended = 0;
-                const dateAttendance = {};
-
-                // Calculate total attendance and percentage
-                sortedDates.forEach((sortKey) => {
-                  const attended = student.attendance[sortKey] || 0;
-                  dateAttendance[sortKey] = attended;
-                  totalAttended += attended;
-                });
-
-                // Now uses the globally scoped uniqueTrainingCount
-                const percentage =
-                  uniqueTrainingCount > 0
-                    ? Math.round((totalAttended / uniqueTrainingCount) * 100)
-                    : 0;
-
-                // Create the final data row
-                const dataRow = [
-                  adminNo,
-                  student.name,
-                  totalAttended,
-                  percentage,
-                ];
-
-                // Append the date-specific attendance flags
-                sortedDates.forEach((sortKey) => {
-                  dataRow.push(dateAttendance[sortKey]);
-                });
-
-                finalOutput.push(dataRow);
-              });
-
-            // 4. Generate the two-row CSV header
-            const dateHeadersDisplay = sortedDates.map((sortKey) => {
-              // Find the original date string corresponding to the sortKey
-              const originalRecord = trainingRecords.find(
-                (r) => formatDate(r[DATE_INDEX]).sortKey === sortKey
-              );
-              if (originalRecord) {
-                return formatDate(originalRecord[DATE_INDEX]).headerDisplay;
-              }
-              // Fallback if record somehow isn't found (shouldn't happen)
-              return "N/A";
-            });
-
-            const header1 = [
-              "Admin Number",
-              "Name",
-              "Total",
-              "Percentage",
-              "Trainings Attended",
-              ...Array(dateHeadersDisplay.length - 1).fill(""),
-            ].join(",");
-
-            const header2 = ["", "", "", "", ...dateHeadersDisplay].join(",");
-
-            // 5. Combine all parts into the final CSV string
-            const csvContent = [
-              header1,
-              header2,
-              ...finalOutput.map((row) => row.join(",")),
-            ].join("\n");
-
-            outputArea.value = csvContent;
-            downloadBtn.disabled = false;
-            updateUI(
-              `Report generated successfully for the ${uniqueTrainingCount} Chinese Chess trainings you specified.`,
-              false
+            showMessage(
+              "uploadMessage",
+              `Found ${parsedData.length} records across ${availableDates.size} dates and ${availableDivisions.size} divisions.`,
             );
           } catch (error) {
-            console.error("Error processing CSV:", error);
-            outputArea.value = "";
-            updateUI(
-              `An error occurred during processing: ${error.message}. Please check your CSV file format.`,
-              true
+            console.error(error);
+            showMessage(
+              "uploadMessage",
+              "Error parsing CSV: " + error.message,
+              true,
             );
           }
-        };
-
-        reader.onerror = () => {
-          outputArea.value = "";
-          updateUI("Error reading file. Please try again.", true);
         };
 
         reader.readAsText(file);
       }
 
-      // --- Download Function ---
+      function extractMetadata() {
+        availableDates.clear();
+        availableDivisions.clear();
+
+        const DATE_INDEX = 6;
+        const DIVISION_INDEX = 11;
+
+        parsedData.forEach((row) => {
+          if (row.length > DATE_INDEX && row[DATE_INDEX]) {
+            const dateStr = row[DATE_INDEX];
+            const parsed = parseDate(dateStr);
+
+            if (parsed) {
+              if (!availableDates.has(dateStr)) {
+                availableDates.set(dateStr, {
+                  ...parsed,
+                  count: 0,
+                  divisions: new Set(),
+                });
+              }
+              availableDates.get(dateStr).count++;
+            }
+          }
+
+          if (row.length > DIVISION_INDEX && row[DIVISION_INDEX]) {
+            const div = row[DIVISION_INDEX].trim();
+            if (div) {
+              if (!availableDivisions.has(div)) {
+                availableDivisions.set(div, 0);
+              }
+              availableDivisions.set(div, availableDivisions.get(div) + 1);
+            }
+          }
+        });
+
+        availableDates = new Map(
+          [...availableDates].sort((a, b) =>
+            a[1].sortKey.localeCompare(b[1].sortKey),
+          ),
+        );
+      }
+
+      // --- Step 2: Render Selectors ---
+
+      function renderDivisionSelectors() {
+        const container = document.getElementById("divisionContainer");
+        container.innerHTML = "";
+
+        const sortedDivisions = [...availableDivisions.keys()].sort((a, b) =>
+          a.localeCompare(b),
+        );
+
+        sortedDivisions.forEach((division) => {
+          const count = availableDivisions.get(division);
+          const isChecked = division === "Chinese Chess" ? "checked" : "";
+
+          const label = document.createElement("label");
+          label.className = "cursor-pointer";
+          label.innerHTML = `
+            <input type="checkbox" class="division-checkbox hidden" value="${division}" ${isChecked}>
+            <div class="px-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-sm font-medium transition-all hover:bg-gray-100 flex items-center gap-2">
+              <span>${division}</span>
+              <span class="text-xs opacity-60 bg-white px-2 py-0.5 rounded-full">${count}</span>
+            </div>
+          `;
+          container.appendChild(label);
+        });
+      }
+
+      function renderDateSelectors() {
+        const container = document.getElementById("dateContainer");
+        container.innerHTML = "";
+
+        const monthGroups = new Map();
+        availableDates.forEach((data, dateStr) => {
+          const monthKey = data.sortKey.substring(0, 7); // YYYY-MM
+          if (!monthGroups.has(monthKey)) {
+            monthGroups.set(monthKey, {
+              month: data.fullDate.toLocaleString("en-US", {
+                month: "long",
+                year: "numeric",
+              }),
+              dates: [],
+            });
+          }
+          monthGroups.get(monthKey).dates.push({ dateStr, ...data });
+        });
+
+        const sortedMonths = [...monthGroups.keys()].sort();
+
+        sortedMonths.forEach((monthKey) => {
+          const group = monthGroups.get(monthKey);
+
+          const monthDiv = document.createElement("div");
+          monthDiv.className =
+            "border border-gray-200 rounded-lg p-4 bg-gray-50";
+
+          const header = document.createElement("div");
+          header.className = "flex justify-between items-center mb-3";
+          header.innerHTML = `
+            <h4 class="font-semibold text-gray-700">${group.month}</h4>
+            <span class="text-xs text-gray-500">${group.dates.length} date(s)</span>
+          `;
+          monthDiv.appendChild(header);
+
+          const datesGrid = document.createElement("div");
+          datesGrid.className = "flex flex-wrap gap-2";
+
+          group.dates.forEach(({ dateStr, display, count }) => {
+            const label = document.createElement("label");
+            label.className = "cursor-pointer";
+            label.title = `${count} records on ${display}`;
+            label.innerHTML = `
+              <input type="checkbox" class="date-checkbox hidden" value="${dateStr}" checked>
+              <div class="px-3 py-1.5 rounded border border-gray-300 bg-white text-sm transition-all hover:bg-gray-50 flex flex-col items-center min-w-[4.5rem]">
+                <span class="font-semibold">${display}</span>
+                <span class="text-xs opacity-60">${count} rec</span>
+              </div>
+            `;
+            datesGrid.appendChild(label);
+          });
+
+          monthDiv.appendChild(datesGrid);
+          container.appendChild(monthDiv);
+        });
+      }
+
+      function selectAllDates(select) {
+        document.querySelectorAll(".date-checkbox").forEach((cb) => {
+          cb.checked = select;
+        });
+      }
+
+      // --- Step 3: Generate Report ---
+
+      function generateReport() {
+        const selectedDivisions = new Set();
+        document
+          .querySelectorAll(".division-checkbox:checked")
+          .forEach((cb) => {
+            selectedDivisions.add(cb.value.toLowerCase());
+          });
+
+        if (selectedDivisions.size === 0) {
+          alert("Please select at least one division.");
+          return;
+        }
+
+        const selectedDates = new Set();
+        document.querySelectorAll(".date-checkbox:checked").forEach((cb) => {
+          selectedDates.add(cb.value);
+        });
+
+        if (selectedDates.size === 0) {
+          alert("Please select at least one date.");
+          return;
+        }
+
+        const ADMIN_INDEX = 4;
+        const NAME_INDEX = 3;
+        const ACTIVITY_TYPE_INDEX = 5;
+        const DATE_INDEX = 6;
+        const DIVISION_INDEX = 11;
+
+        const filteredRecords = parsedData.filter((row) => {
+          if (row.length <= DIVISION_INDEX) return false;
+
+          const isTraining =
+            row[ACTIVITY_TYPE_INDEX] &&
+            row[ACTIVITY_TYPE_INDEX].toLowerCase() === "training/workshop";
+          const division = row[DIVISION_INDEX]
+            ? row[DIVISION_INDEX].toLowerCase()
+            : "";
+          const isSelectedDivision = selectedDivisions.has(division);
+          const date = row[DATE_INDEX];
+          const isSelectedDate = selectedDates.has(date);
+
+          return isTraining && isSelectedDivision && isSelectedDate;
+        });
+
+        if (filteredRecords.length === 0) {
+          alert("No records found matching the selected criteria.");
+          return;
+        }
+
+        // Build attendance map - FIX: Store display info with sortKey
+        const studentMap = new Map();
+        const dateMap = new Map(); // sortKey -> display
+
+        filteredRecords.forEach((row) => {
+          const adminNo = row[ADMIN_INDEX];
+          const name = row[NAME_INDEX];
+          const dateStr = row[DATE_INDEX];
+
+          if (!adminNo || !name || !dateStr) return;
+
+          const parsed = parseDate(dateStr);
+          if (!parsed) return;
+
+          // Store the display for this sortKey
+          dateMap.set(parsed.sortKey, parsed.display);
+
+          if (!studentMap.has(adminNo)) {
+            studentMap.set(adminNo, {
+              name: name.replace(/^"|"$/g, ""),
+              attendance: new Map(),
+            });
+          }
+
+          studentMap.get(adminNo).attendance.set(parsed.sortKey, 1);
+        });
+
+        const sortedDates = Array.from(dateMap.keys()).sort();
+
+        const outputRows = [];
+        const sortedAdmins = Array.from(studentMap.keys()).sort();
+
+        sortedAdmins.forEach((adminNo) => {
+          const student = studentMap.get(adminNo);
+          let attendedCount = 0;
+          const dateColumns = [];
+
+          sortedDates.forEach((dateKey) => {
+            const attended = student.attendance.has(dateKey) ? 1 : 0;
+            dateColumns.push(attended);
+            attendedCount += attended;
+          });
+
+          const percentage =
+            sortedDates.length > 0
+              ? Math.round((attendedCount / sortedDates.length) * 100)
+              : 0;
+
+          outputRows.push([
+            adminNo,
+            student.name,
+            attendedCount,
+            percentage + "%",
+            ...dateColumns,
+          ]);
+        });
+
+        // FIX: Use the stored display names instead of reparsing
+        const dateHeaders = sortedDates.map((sortKey) => dateMap.get(sortKey));
+
+        const header1 = [
+          "Admin Number",
+          "Name",
+          "Total",
+          "Percentage",
+          "Attended",
+          ...Array(dateHeaders.length - 1).fill(""),
+        ];
+        const header2 = ["", "", "", "", ...dateHeaders];
+
+        const csvContent = [
+          header1.join(","),
+          header2.join(","),
+          ...outputRows.map((row) => row.join(",")),
+        ].join("\n");
+
+        document.getElementById("csvOutput").value = csvContent;
+        document.getElementById("outputPanel").classList.remove("hidden");
+        document.getElementById("reportSummary").textContent =
+          `${outputRows.length} students | ${sortedDates.length} dates | ${filteredRecords.length} total records`;
+
+        document
+          .getElementById("outputPanel")
+          .scrollIntoView({ behavior: "smooth" });
+      }
 
       function downloadCSV() {
         const csvText = document.getElementById("csvOutput").value;
         if (!csvText) {
-          updateUI("No data to download.", true);
+          alert("No data to download.");
           return;
         }
 
         const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
 
-        // Fallback for browsers
-        if (link.download !== undefined) {
-          const url = URL.createObjectURL(blob);
-          link.setAttribute("href", url);
-          link.setAttribute("download", "chinese_chess_attendance_report.csv");
-          link.style.visibility = "hidden";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          // Use custom modal instead of alert
-          updateUI(
-            "Your browser does not support direct download. Please copy the text from the box.",
-            true
-          );
-        }
+        const date = new Date().toISOString().split("T")[0];
+        link.setAttribute("href", url);
+        link.setAttribute("download", `attendance_report_${date}.csv`);
+        link.style.visibility = "hidden";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     </script>
   </body>
