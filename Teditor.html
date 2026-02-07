@@ -1,0 +1,794 @@
+import { useState, useCallback, useRef } from “react”;
+
+const defaultTournament = {
+name: “3rd Li Xi Sen Cup 2025”,
+format: “Swiss-system”,
+formatDesc: “Players paired each round by score.”,
+timeControl: “25 min + 10 sec/move”,
+scoring: { win: 2, draw: 1, loss: 0 },
+tiebreakers: [
+“Buchholz (sum of opponents’ scores)”,
+“Head-to-head result”,
+“Number of wins”,
+“Wins as Black”,
+“Number of Black games”,
+“Progressive score”,
+“Koya system”
+],
+rulesUrl: “”,
+additionalRules: “”,
+standingsColumns: “排名,编号,组别,姓名 Name,积分,对手分,直胜,胜,后手胜,后手,最高,递减,犯规”,
+standings: [],
+players: {},
+ratings: {},
+rounds: []
+};
+
+const samplePlayer = { id: “1”, cn: “陈东良”, en: “Tan Tong Liang”, level: “无级”, rating: 1650, group: “个人” };
+
+function TabButton({ active, onClick, children }) {
+return (
+<button
+onClick={onClick}
+className={`px-4 py-2 text-sm font-semibold rounded-t-lg border border-b-0 transition-all ${ active ? "bg-white text-red-900 border-gray-300" : "bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200" }`}
+>
+{children}
+</button>
+);
+}
+
+function Section({ title, children, subtitle }) {
+return (
+<div className="mb-6">
+<h3 className="text-lg font-bold text-red-900 mb-1">{title}</h3>
+{subtitle && <p className="text-xs text-gray-500 mb-3">{subtitle}</p>}
+{children}
+</div>
+);
+}
+
+function Input({ label, value, onChange, placeholder, type = “text”, small = false }) {
+return (
+<div className={small ? “flex-1 min-w-0” : “mb-3”}>
+<label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+<input
+type={type}
+value={value}
+onChange={e => onChange(e.target.value)}
+placeholder={placeholder}
+className=“w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-300 focus:border-red-400 outline-none”
+/>
+</div>
+);
+}
+
+function TextArea({ label, value, onChange, placeholder, rows = 3 }) {
+return (
+<div className="mb-3">
+<label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+<textarea
+value={value}
+onChange={e => onChange(e.target.value)}
+placeholder={placeholder}
+rows={rows}
+className=“w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-300 focus:border-red-400 outline-none font-mono”
+/>
+</div>
+);
+}
+
+export default function XQEditor() {
+const [tab, setTab] = useState(“info”);
+const [t, setT] = useState(defaultTournament);
+const [copied, setCopied] = useState(false);
+const [previewOpen, setPreviewOpen] = useState(false);
+const outputRef = useRef(null);
+
+const update = (key, val) => setT(prev => ({ …prev, [key]: val }));
+
+// Players
+const [playerRows, setPlayerRows] = useState([{ …samplePlayer }]);
+const addPlayer = () => {
+const nextId = String(playerRows.length + 1);
+setPlayerRows(prev => […prev, { id: nextId, cn: “”, en: “”, level: “无级”, rating: 1500, group: “个人” }]);
+};
+const updatePlayer = (idx, field, val) => {
+setPlayerRows(prev => {
+const copy = […prev];
+copy[idx] = { …copy[idx], [field]: val };
+return copy;
+});
+};
+const removePlayer = idx => setPlayerRows(prev => prev.filter((_, i) => i !== idx));
+
+// Rounds
+const [roundsData, setRoundsData] = useState([]);
+const addRound = () => {
+const rn = roundsData.length + 1;
+setRoundsData(prev => […prev, { roundNumber: rn, matches: [{ table: 1, red: “”, black: “”, result: “2:0” }] }]);
+};
+const addMatch = rIdx => {
+setRoundsData(prev => {
+const copy = JSON.parse(JSON.stringify(prev));
+const nextT = copy[rIdx].matches.length + 1;
+copy[rIdx].matches.push({ table: nextT, red: “”, black: “”, result: “2:0” });
+return copy;
+});
+};
+const updateMatch = (rIdx, mIdx, field, val) => {
+setRoundsData(prev => {
+const copy = JSON.parse(JSON.stringify(prev));
+copy[rIdx].matches[mIdx][field] = val;
+return copy;
+});
+};
+const removeMatch = (rIdx, mIdx) => {
+setRoundsData(prev => {
+const copy = JSON.parse(JSON.stringify(prev));
+copy[rIdx].matches.splice(mIdx, 1);
+return copy;
+});
+};
+const removeRound = rIdx => setRoundsData(prev => prev.filter((_, i) => i !== rIdx));
+
+// Standings
+const [standingsRows, setStandingsRows] = useState([]);
+const [standingsCols, setStandingsCols] = useState(defaultTournament.standingsColumns);
+const addStanding = () => {
+const cols = standingsCols.split(”,”).map(c => c.trim());
+const row = {};
+cols.forEach(c => (row[c] = “”));
+setStandingsRows(prev => […prev, row]);
+};
+const updateStanding = (idx, col, val) => {
+setStandingsRows(prev => {
+const copy = […prev];
+copy[idx] = { …copy[idx], [col]: val };
+return copy;
+});
+};
+const removeStanding = idx => setStandingsRows(prev => prev.filter((_, i) => i !== idx));
+
+// Tiebreakers
+const [tiebreakers, setTiebreakers] = useState(defaultTournament.tiebreakers);
+const addTiebreaker = () => setTiebreakers(prev => […prev, “”]);
+const updateTiebreaker = (idx, val) => setTiebreakers(prev => { const c = […prev]; c[idx] = val; return c; });
+const removeTiebreaker = idx => setTiebreakers(prev => prev.filter((_, i) => i !== idx));
+const moveTiebreaker = (idx, dir) => {
+setTiebreakers(prev => {
+const c = […prev];
+const ni = idx + dir;
+if (ni < 0 || ni >= c.length) return c;
+[c[idx], c[ni]] = [c[ni], c[idx]];
+return c;
+});
+};
+
+// Paste CSV for players
+const [csvPaste, setCsvPaste] = useState(””);
+const importCsv = () => {
+if (!csvPaste.trim()) return;
+const lines = csvPaste.trim().split(”\n”);
+const rows = [];
+lines.forEach((line, i) => {
+const cols = line.split(”\t”).length > 1 ? line.split(”\t”) : line.split(”,”);
+if (cols.length >= 2) {
+rows.push({
+id: cols[0]?.trim() || String(i + 1),
+cn: cols[1]?.trim() || “”,
+en: cols[2]?.trim() || “”,
+level: cols[3]?.trim() || “无级”,
+rating: parseInt(cols[4]?.trim()) || 1500,
+group: cols[5]?.trim() || “个人”
+});
+}
+});
+if (rows.length) setPlayerRows(rows);
+setCsvPaste(””);
+};
+
+// Paste CSV for standings
+const [standingsCsvPaste, setStandingsCsvPaste] = useState(””);
+const importStandingsCsv = () => {
+if (!standingsCsvPaste.trim()) return;
+const lines = standingsCsvPaste.trim().split(”\n”);
+const cols = standingsCols.split(”,”).map(c => c.trim());
+const rows = [];
+lines.forEach(line => {
+const parts = line.split(”\t”).length > 1 ? line.split(”\t”) : line.split(”,”);
+const row = {};
+cols.forEach((c, i) => (row[c] = parts[i]?.trim() || “”));
+rows.push(row);
+});
+if (rows.length) setStandingsRows(rows);
+setStandingsCsvPaste(””);
+};
+
+// Paste CSV for rounds
+const [roundsCsvPaste, setRoundsCsvPaste] = useState(””);
+const importRoundsCsv = () => {
+if (!roundsCsvPaste.trim()) return;
+const lines = roundsCsvPaste.trim().split(”\n”);
+const roundsMap = {};
+lines.forEach(line => {
+const cols = line.split(”\t”).length > 1 ? line.split(”\t”) : line.split(”,”);
+if (cols.length >= 4) {
+const rn = parseInt(cols[0]?.trim()) || 1;
+if (!roundsMap[rn]) roundsMap[rn] = { roundNumber: rn, matches: [] };
+roundsMap[rn].matches.push({
+table: parseInt(cols[1]?.trim()) || roundsMap[rn].matches.length + 1,
+red: cols[2]?.trim() || “”,
+black: cols[3]?.trim() || “”,
+result: cols[4]?.trim() || “2:0”
+});
+}
+});
+const sorted = Object.values(roundsMap).sort((a, b) => a.roundNumber - b.roundNumber);
+if (sorted.length) setRoundsData(sorted);
+setRoundsCsvPaste(””);
+};
+
+// Generate output
+const generateCode = useCallback(() => {
+const esc = s => String(s).replace(/\/g, “\\”).replace(/”/g, ‘\”’);
+
+```
+// Build player map: { "1": "陈东良", ... }
+const playersObj = {};
+playerRows.forEach(p => { playersObj[p.id] = p.cn; });
+
+// Build ratings map
+const ratingsObj = {};
+playerRows.forEach(p => {
+  ratingsObj[p.id] = { e: p.en, l: p.level, r: parseInt(p.rating) || 1500 };
+});
+
+// Build rounds
+const roundsArr = roundsData.map(r => {
+  const matches = r.matches.map(m => {
+    const scores = m.result === "2:0" ? [2, 0] : m.result === "0:2" ? [0, 2] : m.result === "1:1" ? [1, 1] : [0, 0];
+    return `{table:${m.table},red:"${esc(m.red)}",black:"${esc(m.black)}",result:"${esc(m.result)}",scores:[${scores.join(",")}]}`;
+  });
+  return `{roundNumber:${r.roundNumber},matches:[${matches.join(",")}]}`;
+});
+
+// Build standings HTML
+const cols = standingsCols.split(",").map(c => c.trim());
+let standingsHtml = `<div class="xq-sc-card"><div style="overflow-x:auto"><table><thead><tr>`;
+cols.forEach(c => { standingsHtml += `<th>${c}</th>`; });
+standingsHtml += `</tr></thead><tbody>`;
+standingsRows.forEach((row, i) => {
+  const rank = parseInt(row[cols[0]]) || i + 1;
+  const isTie = row[cols[cols.length - 1]]?.trim() ? ` class="xq-tie"` : "";
+  let rkClass = rank === 1 ? "g" : rank === 2 ? "s" : rank === 3 ? "br" : "";
+  standingsHtml += `<tr${isTie}>`;
+  cols.forEach((c, ci) => {
+    let val = row[c] || "";
+    if (ci === 0 && rkClass) val = `<span class="xq-rk ${rkClass}">${val}</span>`;
+    else if (ci === 0) val = val;
+    if (c.includes("积分") || c.includes("Points")) val = `<strong>${val}</strong>`;
+    standingsHtml += `<td>${val}</td>`;
+  });
+  standingsHtml += `</tr>`;
+});
+standingsHtml += `</tbody></table></div></div>`;
+
+// Build info HTML
+let infoHtml = "";
+
+// Format
+infoHtml += `<div class="xq-info"><h3>赛制 Format</h3><p>${esc(t.format)} tournament. ${esc(t.formatDesc)}</p>`;
+if (t.timeControl) infoHtml += `<p style="margin-top:5px">时限 Time control: ${esc(t.timeControl)}</p>`;
+infoHtml += `</div>`;
+
+// Scoring
+infoHtml += `<div class="xq-info"><h3>计分 Scoring</h3><p>胜 Win = ${t.scoring.win} pts. 和 Draw = ${t.scoring.draw} pt. 负 Loss = ${t.scoring.loss} pts.</p>`;
+if (tiebreakers.length) {
+  infoHtml += `<p style="margin-top:5px">Tiebreakers (in order):</p>`;
+  tiebreakers.forEach((tb, i) => {
+    if (tb.trim()) infoHtml += `<p>${i + 1}. ${esc(tb)}</p>`;
+  });
+}
+infoHtml += `</div>`;
+
+// Rules link
+if (t.rulesUrl || t.additionalRules) {
+  infoHtml += `<div class="xq-info"><h3>规则 Rules</h3>`;
+  if (t.rulesUrl) infoHtml += `<p><a href="${esc(t.rulesUrl)}" target="_blank" style="color:var(--crimson);text-decoration:underline">📋 Rules &amp; Regulations</a></p>`;
+  if (t.additionalRules) infoHtml += `<p style="margin-top:5px">${esc(t.additionalRules)}</p>`;
+  infoHtml += `</div>`;
+}
+
+// How to use
+infoHtml += `<div class="xq-info"><h3>使用说明 How to Use</h3><p>Select a round to filter. Click any player name to see their ID, rating, and full match history.</p></div>`;
+
+// Now assemble TD and RD
+let playersStr = "";
+Object.entries(playersObj).forEach(([k, v]) => { playersStr += `${k}:"${esc(v)}",`; });
+playersStr = playersStr.slice(0, -1);
+
+let ratingsStr = "";
+Object.entries(ratingsObj).forEach(([k, v]) => {
+  ratingsStr += `${k}:{e:"${esc(v.e)}",l:"${esc(v.l)}",r:${v.r}},`;
+});
+ratingsStr = ratingsStr.slice(0, -1);
+
+// Read the dashboard template (static CSS + HTML + JS)
+// We output the full wp:html block
+const output = `<!-- wp:html -->
+```
+
+<style>
+.xq-dash,.xq-dash *,.xq-dash *::before,.xq-dash *::after{box-sizing:border-box!important;margin:0;padding:0;font-family:'DM Sans','Noto Serif SC',sans-serif;line-height:1.5}
+.xq-dash div,.xq-dash span,.xq-dash h2,.xq-dash h3,.xq-dash h4,.xq-dash button,.xq-dash table,.xq-dash thead,.xq-dash tbody,.xq-dash tr,.xq-dash th,.xq-dash td{float:none!important;clear:none!important;text-indent:0!important;letter-spacing:normal}
+.xq-dash p{display:contents!important;margin:0!important;padding:0!important}
+.xq-dash br{display:none!important}
+.xq-dash .xq-info p{display:block!important;margin:0!important}
+.entry-content .xq-dash,.wp-block-post-content .xq-dash,.is-layout-flow .xq-dash{width:100%!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important}
+.xq-dash{--crimson:#8c2f39;--crimson-dark:#6b232b;--crimson-deep:#4a181f;--gold:#d4a04a;--gold-light:#f0d6a0;--gold-pale:#fdf4e0;--cream:#fdf8f0;--cream-dark:#f5edd8;--ink:#1a1a1a;--ink-light:#4a4a4a;--ink-muted:#8a8a8a;--white:#fff;--border:#e8e0d0;--red-player:#c0392b;--red-bg:#fef5f3;--red-border:#f5c6c0;--black-player:#2c3e50;--black-bg:#f0f3f5;--black-border:#c8d0d8;--card-bg:var(--white);--body-bg:var(--cream);--radius:10px;--radius-sm:7px;--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);--tr:.25s cubic-bezier(.4,0,.2,1);width:100%;background:var(--body-bg);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);font-size:14px;color:var(--ink);transition:background .4s,color .4s,border-color .4s}
+.xq-dash.dark{--crimson:#d4626e;--crimson-dark:#a34450;--crimson-deep:#1a1215;--gold:#e8b85a;--gold-light:#c9a45a;--gold-pale:rgba(212,160,74,.12);--cream:#1a1a20;--cream-dark:#222230;--ink:#e8e4de;--ink-light:#b8b4ae;--ink-muted:#787470;--white:#242430;--border:#3a3840;--red-player:#e8685c;--red-bg:rgba(200,60,45,.1);--red-border:rgba(200,60,45,.25);--black-player:#8ab4d8;--black-bg:rgba(80,130,180,.08);--black-border:rgba(80,130,180,.2);--card-bg:#242430;--body-bg:#1a1a20}
+.xq-dash .xq-header{background:linear-gradient(135deg,var(--crimson-deep),var(--crimson-dark) 50%,var(--crimson-dark));color:#fff;padding:14px 16px 12px;text-align:center;position:relative;transition:background .4s}
+.xq-dash.dark .xq-header{background:linear-gradient(135deg,#12080a,#2a1520 50%,#1e1018)}
+.xq-dash .xq-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-light),var(--gold),transparent)}
+.xq-dash .xq-header h2{font-family:'Noto Serif SC',serif!important;font-size:1.1rem!important;font-weight:700!important;letter-spacing:.06em;margin:0!important;padding:0!important;color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,.25);border:none!important;text-align:center!important;background:none!important;line-height:1.4!important}
+.xq-dash .xq-header .xq-sub{font-size:.72rem;color:var(--gold-light);margin-top:2px}
+.xq-dash .xq-header .xq-meta{display:flex;justify-content:center;gap:6px;margin-top:3px;font-size:.65rem;color:var(--gold-light);opacity:.85}
+.xq-dash .xq-theme-toggle{position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border:none!important;border-radius:20px;padding:4px 8px;cursor:pointer;font-size:.8rem;line-height:1;color:#fff;transition:background .3s;backdrop-filter:blur(4px)}
+.xq-dash .xq-theme-toggle:hover{background:rgba(255,255,255,.25)}
+.xq-dash .xq-nav{display:flex!important;gap:4px;padding:8px 10px;background:var(--card-bg);border-bottom:1px solid var(--border);transition:background .4s,border-color .4s;width:100%!important}
+.xq-dash .xq-nav button{flex:1!important;display:block!important;padding:8px 0!important;text-align:center!important;font-size:.76rem!important;font-weight:600!important;color:var(--ink-muted)!important;cursor:pointer;border:none!important;background:var(--cream)!important;border-radius:20px!important;transition:all var(--tr);outline:none!important;line-height:1.4!important;margin:0!important;text-decoration:none!important;text-transform:none!important;letter-spacing:normal!important;box-shadow:none}
+.xq-dash .xq-nav button:hover{color:var(--crimson)!important;background:var(--gold-pale)!important}
+.xq-dash .xq-nav button.active{background:var(--crimson)!important;color:#fff!important;box-shadow:0 2px 8px rgba(140,47,57,.25)!important}
+.xq-dash.dark .xq-nav button.active{box-shadow:0 2px 8px rgba(212,98,110,.3)!important}
+.xq-dash .xq-body{padding:10px 12px;transition:background .4s}
+.xq-dash .xq-tab{display:none!important}
+.xq-dash .xq-tab.active{display:block!important;animation:xqFade .3s ease}
+@keyframes xqFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.xq-dash .xq-rounds{display:flex!important;flex-wrap:wrap!important;gap:4px;margin-bottom:10px}
+.xq-dash .xq-rounds button{width:32px;height:32px;border-radius:50%;border:2px solid var(--border)!important;background:var(--card-bg)!important;font-weight:600;font-size:.76rem;color:var(--ink-light);cursor:pointer;transition:all var(--tr);display:flex;align-items:center;justify-content:center;padding:0;outline:none;line-height:1}
+.xq-dash .xq-rounds button:hover{border-color:var(--crimson)!important;color:var(--crimson);transform:scale(1.06)}
+.xq-dash .xq-rounds button.active{background:var(--crimson)!important;border-color:var(--crimson)!important;color:#fff!important;box-shadow:0 2px 8px rgba(140,47,57,.25)}
+.xq-dash .xq-rounds button.xq-all{width:auto;border-radius:16px;padding:0 11px;font-size:.7rem}
+.xq-dash .xq-stats{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px;margin-bottom:10px}
+.xq-dash .xq-stat{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 4px;text-align:center;transition:background .4s,border-color .4s}
+.xq-dash .xq-stat .sl{font-size:.58rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.02em}
+.xq-dash .xq-stat .sv{font-size:1.1rem;font-weight:700;color:var(--crimson)}
+.xq-dash .xq-stat .sp{font-size:.6rem;color:var(--gold);font-weight:600}
+.xq-dash .xq-pi{background:var(--card-bg);border:1px solid var(--gold);border-radius:var(--radius);padding:10px;margin-bottom:10px;display:none!important;box-shadow:0 0 0 2px rgba(212,160,74,.12);transition:background .4s,border-color .4s}
+.xq-dash .xq-pi.active{display:block!important;animation:xqFade .25s ease}
+.xq-dash .xq-pi-top{display:flex!important;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.xq-dash .xq-pi-name{font-family:'Noto Serif SC',serif;font-size:1rem;font-weight:700;color:var(--crimson)}
+.xq-dash .xq-pi-sub{font-size:.7rem;color:var(--ink-muted)}
+.xq-dash .xq-pi-badge{background:linear-gradient(135deg,var(--crimson),var(--crimson-dark));color:var(--gold-light);padding:3px 7px;border-radius:5px;font-size:.72rem;font-weight:600;white-space:nowrap}
+.xq-dash .xq-pi-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px;margin-top:6px}
+.xq-dash .xq-pi-s{text-align:center;padding:5px 3px;background:var(--cream);border-radius:5px;transition:background .4s}
+.xq-dash .xq-pi-s .v{font-size:.95rem;font-weight:700;color:var(--crimson)}
+.xq-dash .xq-pi-s .l{font-size:.58rem;color:var(--ink-muted);text-transform:uppercase}
+.xq-dash .xq-pi-hist{margin-top:8px;border-top:1px solid var(--border);padding-top:6px}
+.xq-dash .xq-pi-hist h4{font-size:.72rem!important;color:var(--ink-muted)!important;margin:0 0 5px 0!important;padding:0!important;border:none!important;font-weight:600!important;background:none!important;text-align:left!important}
+.xq-dash .xq-hm{display:flex!important;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:.75rem;transition:border-color .4s}
+.xq-dash .xq-hm:last-child{border-bottom:none}
+.xq-dash .xq-rb{background:var(--cream-dark);padding:1px 5px;border-radius:8px;font-weight:600;font-size:.65rem;color:var(--ink-muted);flex-shrink:0;transition:background .4s}
+.xq-dash .xq-mr{font-weight:700;font-size:.68rem;padding:1px 6px;border-radius:8px;flex-shrink:0}
+.xq-dash .xq-mr.win{background:#e8f5e9;color:#2e7d32}
+.xq-dash .xq-mr.loss{background:#fde8e5;color:#c0392b}
+.xq-dash .xq-mr.draw{background:var(--gold-pale);color:#b8860b}
+.xq-dash.dark .xq-mr.win{background:rgba(46,125,50,.18);color:#66bb6a}
+.xq-dash.dark .xq-mr.loss{background:rgba(192,57,43,.18);color:#e57373}
+.xq-dash.dark .xq-mr.draw{background:rgba(212,160,74,.15);color:var(--gold)}
+.xq-dash .xq-clear{margin-top:6px;padding:5px 10px;background:var(--cream-dark);border:none!important;border-radius:5px;font-weight:600;font-size:.73rem;color:var(--ink-light);cursor:pointer;width:100%;transition:background .3s}
+.xq-dash .xq-clear:hover{background:var(--border)}
+.xq-dash .xq-ml{display:flex!important;flex-direction:column!important;gap:7px}
+.xq-dash .xq-rs{text-align:center;padding:7px 0;font-weight:700;font-size:.75rem;color:var(--crimson);letter-spacing:.04em;border-bottom:2px solid var(--border);margin-bottom:2px}
+.xq-dash .xq-mc{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;border:1px solid var(--border);transition:all var(--tr)}
+.xq-dash .xq-mc:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.xq-dash .xq-mc.hl{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,160,74,.18)}
+.xq-dash .xq-mh{display:flex!important;align-items:center;justify-content:space-between;padding:3px 8px;background:var(--cream);border-bottom:1px solid var(--border);font-size:.65rem;color:var(--ink-muted);font-weight:500;transition:background .4s,border-color .4s}
+.xq-dash .xq-tn{background:var(--crimson);color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;flex-shrink:0}
+.xq-dash .xq-badge{font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:16px}
+.xq-dash .xq-badge.rw{background:#fde8e5;color:var(--red-player)}
+.xq-dash .xq-badge.bw{background:#e8ecf0;color:var(--black-player)}
+.xq-dash .xq-badge.dw{background:var(--gold-pale);color:#b8860b}
+.xq-dash .xq-badge.fw{background:#f0f0f0;color:var(--ink-muted)}
+.xq-dash.dark .xq-badge.rw{background:rgba(200,60,45,.15);color:var(--red-player)}
+.xq-dash.dark .xq-badge.bw{background:rgba(80,130,180,.15);color:var(--black-player)}
+.xq-dash.dark .xq-badge.dw{background:rgba(212,160,74,.15);color:var(--gold)}
+.xq-dash.dark .xq-badge.fw{background:rgba(255,255,255,.06);color:var(--ink-muted)}
+.xq-dash .xq-mb{display:flex!important;align-items:stretch;min-height:44px}
+.xq-dash .xq-ps{flex:1;display:flex!important;align-items:center;padding:7px 8px;gap:5px;min-width:0;cursor:pointer;transition:all .15s}
+.xq-dash .xq-ps:hover{filter:brightness(.95)}
+.xq-dash .xq-ps.r{background:var(--red-bg)}
+.xq-dash .xq-ps.b{background:var(--black-bg);flex-direction:row-reverse;text-align:right}
+.xq-dash.dark .xq-ps.r{background:rgba(200,60,45,.06)}
+.xq-dash.dark .xq-ps.b{background:rgba(80,130,180,.06)}
+.xq-dash .xq-pi2{flex:1;min-width:0}
+.xq-dash .xq-pn{font-weight:600;font-size:.82rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xq-dash .xq-ps.r .xq-pn{color:var(--red-player)}
+.xq-dash .xq-ps.b .xq-pn{color:var(--black-player)}
+.xq-dash .xq-sc2{font-size:.62rem;font-weight:700;margin-top:1px}
+.xq-dash .xq-sc2 span{padding:1px 4px;border-radius:7px}
+.xq-dash .xq-ps.r .xq-sc2 span{background:var(--red-border);color:var(--red-player)}
+.xq-dash .xq-ps.b .xq-sc2 span{background:var(--black-border);color:var(--black-player)}
+.xq-dash .xq-vs{display:flex!important;flex-direction:column;align-items:center;justify-content:center;width:38px;flex-shrink:0;background:var(--cream);transition:background .4s}
+.xq-dash .xq-vsc{font-weight:700;font-size:.85rem;color:var(--crimson);line-height:1}
+.xq-dash .xq-vsl{font-size:.48rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-muted);margin-top:1px}
+.xq-dash .xq-mc.rw .xq-ps.r{border-left:3px solid var(--red-player)}
+.xq-dash .xq-mc.bw .xq-ps.b{border-right:3px solid var(--black-player)}
+.xq-dash .xq-sc-card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow:hidden;border:1px solid var(--border);transition:all .4s}
+.xq-dash .xq-sc-card table{width:100%;border-collapse:collapse;font-size:.74rem}
+.xq-dash .xq-sc-card thead th{background:var(--crimson)!important;color:#fff!important;padding:7px 5px;font-weight:600;text-align:center;font-size:.63rem;white-space:nowrap;border:none!important;border-right:1px solid rgba(255,255,255,.1)!important}
+.xq-dash .xq-sc-card thead th:last-child{border-right:none!important}
+.xq-dash .xq-sc-card tbody tr{border-bottom:1px solid var(--border)!important;transition:background var(--tr)}
+.xq-dash .xq-sc-card tbody tr:hover{background:var(--gold-pale)!important}
+.xq-dash .xq-sc-card tbody tr:nth-child(even){background:var(--cream)}
+.xq-dash .xq-sc-card tbody td{padding:6px 5px;vertical-align:middle;text-align:center;border:none!important;color:var(--ink);transition:color .4s}
+.xq-dash .xq-sc-card tbody td:nth-child(4){text-align:left;font-weight:600;padding-left:8px}
+.xq-dash .xq-sc-card tbody td:nth-child(5){font-weight:700;font-size:.88rem;color:var(--crimson)}
+.xq-dash .xq-rk{display:inline-block;padding:2px 5px;border-radius:3px;font-weight:700;font-size:.68rem}
+.xq-dash .xq-rk.g{background:linear-gradient(135deg,#ffd700,#ffa500);color:#fff}
+.xq-dash .xq-rk.s{background:linear-gradient(135deg,#c0c0c0,#808080);color:#fff}
+.xq-dash .xq-rk.br{background:linear-gradient(135deg,#cd7f32,#8b4513);color:#fff}
+.xq-dash .xq-tie{background-color:rgba(212,160,74,.1)!important}
+.xq-dash .xq-info{background:var(--card-bg);border-radius:var(--radius);padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm);border:1px solid var(--border);transition:all .4s}
+.xq-dash .xq-info h3{font-family:'Noto Serif SC',serif!important;font-size:.88rem!important;color:var(--crimson)!important;margin:0 0 5px 0!important;padding:0!important;border:none!important;background:none!important;text-align:left!important}
+.xq-dash .xq-info p{font-size:.78rem!important;color:var(--ink-light)!important;line-height:1.6!important;margin:0!important;display:block!important}
+.xq-dash .xq-info a{color:var(--crimson)!important;text-decoration:underline!important}
+@media(max-width:480px){.xq-dash .xq-header h2{font-size:.95rem!important}.xq-dash .xq-pn{font-size:.76rem}.xq-dash .xq-ps{padding:5px 6px}.xq-dash .xq-vs{width:32px}.xq-dash .xq-vsc{font-size:.78rem}.xq-dash .xq-stats,.xq-dash .xq-pi-grid{grid-template-columns:repeat(2,1fr)!important}}
+</style>
+
+<div class="xq-dash" id="xqDash">
+<div class="xq-header">
+<h2 id="tournamentName">${esc(t.name)}</h2>
+<div class="xq-sub">Xiangqi Tournament Dashboard</div>
+<div class="xq-meta"><span id="totalRounds"></span> <span id="totalPlayers"></span> <span id="totalMatches"></span></div>
+<button class="xq-theme-toggle" onclick="xqToggleTheme()" title="Toggle dark/light mode" id="xqThemeBtn">🌙</button>
+</div>
+<div class="xq-nav">
+<button class="active" onclick="xqTab('matches',this)">对阵 Matches</button>
+<button onclick="xqTab('standings',this)">排名 Standings</button>
+<button onclick="xqTab('info',this)">信息 Info</button>
+</div>
+<div class="xq-body">
+<div id="xq-tab-matches" class="xq-tab active">
+<div class="xq-rounds" id="roundSelector"></div>
+<div class="xq-stats"><div class="xq-stat"><div class="sl">Red 先手胜</div><div class="sv" id="winRedCount">0</div><div class="sp" id="winRedPct">0%</div></div><div class="xq-stat"><div class="sl">Black 后手胜</div><div class="sv" id="winBlackCount">0</div><div class="sp" id="winBlackPct">0%</div></div><div class="xq-stat"><div class="sl">Draw 和棋</div><div class="sv" id="drawCount">0</div><div class="sp" id="drawPct">0%</div></div><div class="xq-stat"><div class="sl">Games 已赛</div><div class="sv" id="completedCount">0</div><div class="sp" id="totalGamesCount">of 0</div></div></div>
+<div class="xq-pi" id="playerInfoCard"><div class="xq-pi-top"><div><div class="xq-pi-name" id="piName">-</div><div class="xq-pi-sub" id="piSub">-</div></div><div class="xq-pi-badge" id="piRating">-</div></div><div class="xq-pi-grid"><div class="xq-pi-s"><div class="v" id="piMatches">0</div><div class="l">Matches</div></div><div class="xq-pi-s"><div class="v" id="piPoints">0</div><div class="l">Points</div></div><div class="xq-pi-s"><div class="v" id="piWins">0</div><div class="l">Wins</div></div><div class="xq-pi-s"><div class="v" id="piWinRate">0%</div><div class="l">Win Rate</div></div></div><div class="xq-pi-hist" id="piHistory"></div><button class="xq-clear" onclick="xqClear()">Show All Matches</button></div>
+<div class="xq-ml" id="matchList"></div>
+</div>
+<div id="xq-tab-standings" class="xq-tab">
+${standingsHtml}
+</div>
+<div id="xq-tab-info" class="xq-tab">
+${infoHtml}
+</div>
+</div>
+</div>
+<script>
+(function(){
+var TD={tournamentName:"${esc(t.name)}",rounds:[${roundsArr.join(",")}],players:{${playersStr}}};
+var RD={${ratingsStr}};
+var D=TD,NR=D.rounds.length,CR=1,SP=null;
+function ri(p){return RD[p]||RD[parseInt(p)]||{}}
+function sb(p,rn){var s=0,id=p.toString();for(var i=0;i<D.rounds.length;i++){var r=D.rounds[i];if(r.roundNumber>=rn)break;for(var j=0;j<r.matches.length;j++){var m=r.matches[j];if(m.red===id)s+=m.scores[0];else if(m.black===id)s+=m.scores[1]}}return s}
+function fs(p){var id=p.toString(),w=0,d=0,l=0,pt=0,h=[];for(var i=0;i<D.rounds.length;i++){var r=D.rounds[i];for(var j=0;j<r.matches.length;j++){var m=r.matches[j],rs=null,op=null,c=null;if(m.red===id){c="red";op=m.black;if(m.scores[0]===2){rs="win";w++;pt+=2}else if(m.scores[0]===1){rs="draw";d++;pt+=1}else{rs="loss";l++}}else if(m.black===id){c="black";op=m.red;if(m.scores[1]===2){rs="win";w++;pt+=2}else if(m.scores[1]===1){rs="draw";d++;pt+=1}else{rs="loss";l++}}if(rs)h.push({round:r.roundNumber,opp:op,color:c,result:rs})}}return{w:w,d:d,l:l,pt:pt,h:h}}
+var isDark=(function(){var h=new Date().getHours();return h>=19||h<7})();
+function applyTheme(){var el=document.getElementById("xqDash"),btn=document.getElementById("xqThemeBtn");if(isDark){el.classList.add("dark");btn.textContent="\\u2600\\uFE0F"}else{el.classList.remove("dark");btn.textContent="\\uD83C\\uDF19"}}
+window.xqToggleTheme=function(){isDark=!isDark;applyTheme()};
+window.xqTab=function(t,btn){var tabs=document.querySelectorAll(".xq-dash .xq-tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.remove("active");var btns=document.querySelectorAll(".xq-dash .xq-nav button");for(var i=0;i<btns.length;i++)btns[i].classList.remove("active");document.getElementById("xq-tab-"+t).classList.add("active");btn.classList.add("active")};
+function rnds(){var el=document.getElementById("roundSelector");var h="<button class=\\"xq-all "+(CR==="ALL"?"active":"")+"\\\" onclick=\\"xqRnd('ALL')\\">All</button>";for(var r=1;r<=NR;r++)h+="<button "+(r===CR?"class=\\"active\\"":"")+" onclick=\\"xqRnd("+r+")\\">"+r+"</button>";el.innerHTML=h}
+window.xqRnd=function(r){CR=r;rnds();stats();render()};
+function stats(){var ms=[];if(CR==="ALL")for(var i=0;i<D.rounds.length;i++)ms=ms.concat(D.rounds[i].matches);else{for(var i=0;i<D.rounds.length;i++)if(D.rounds[i].roundNumber===CR){ms=D.rounds[i].matches;break}}var rd=0,bk=0,dr=0,cp=0;for(var i=0;i<ms.length;i++){cp++;if(ms[i].result==="2:0")rd++;else if(ms[i].result==="0:2")bk++;else if(ms[i].result==="1:1")dr++}var t=rd+bk+dr;var p=function(v){return t>0?((v/t)*100).toFixed(1):"0.0"};document.getElementById("winRedCount").textContent=rd;document.getElementById("winBlackCount").textContent=bk;document.getElementById("drawCount").textContent=dr;document.getElementById("completedCount").textContent=cp;document.getElementById("totalGamesCount").textContent="of "+ms.length;document.getElementById("winRedPct").textContent=p(rd)+"%";document.getElementById("winBlackPct").textContent=p(bk)+"%";document.getElementById("drawPct").textContent=p(dr)+"%"}
+window.xqPlayer=function(pid){var id=pid.toString();SP=id;var nm=D.players[id]||"?";var inf=ri(id);var st=fs(id);document.getElementById("piName").textContent=nm;document.getElementById("piSub").textContent="ID: "+id+" \\u00B7 "+(inf.e||"")+" \\u00B7 "+(inf.l||"");document.getElementById("piRating").textContent="R"+(inf.r||"\\u2014");document.getElementById("piMatches").textContent=st.w+st.d+st.l;document.getElementById("piPoints").textContent=st.pt;document.getElementById("piWins").textContent=st.w;var tm=st.w+st.d+st.l;document.getElementById("piWinRate").textContent=tm>0?Math.round((st.pt/(tm*2))*100)+"%":"0%";var hEl=document.getElementById("piHistory");var hh="<h4>\\u5BF9\\u5C40\\u8BB0\\u5F55 Match History</h4>";for(var i=0;i<st.h.length;i++){var x=st.h[i];var on=D.players[x.opp]||"?";var oi=ri(x.opp);var rc=x.result==="win"?"win":x.result==="loss"?"loss":"draw";var rl=x.result==="win"?"\\u80DC W":x.result==="loss"?"\\u8D1F L":"\\u548C D";var ci=x.color==="red"?"\\uD83D\\uDD34":"\\u26AB";hh+="<div class=\\"xq-hm\\"><span class=\\"xq-rb\\">R"+x.round+"</span><span>"+ci+"</span><span style=\\"flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\\">vs "+on+" <span style=\\"color:var(--ink-muted);font-size:.62rem\\">(R"+(oi.r||"\\u2014")+")</span></span><span class=\\"xq-mr "+rc+"\\">"+rl+"</span></div>"}hEl.innerHTML=hh;document.getElementById("playerInfoCard").classList.add("active");render()};
+window.xqClear=function(){SP=null;document.getElementById("playerInfoCard").classList.remove("active");render()};
+function render(){var el=document.getElementById("matchList");el.innerHTML="";var gs=[];if(CR==="ALL")for(var i=0;i<D.rounds.length;i++){var r=D.rounds[i];gs.push({t:"Round "+r.roundNumber,rn:r.roundNumber,ms:r.matches})}else{for(var i=0;i<D.rounds.length;i++)if(D.rounds[i].roundNumber===CR){gs.push({t:null,rn:D.rounds[i].roundNumber,ms:D.rounds[i].matches});break}}for(var g=0;g<gs.length;g++){var gr=gs[g];var ms=gr.ms;if(SP){var fm=[];for(var i=0;i<ms.length;i++)if(ms[i].red===SP||ms[i].black===SP)fm.push(ms[i]);ms=fm}if(!ms.length)continue;if(gr.t)el.innerHTML+="<div class=\\"xq-rs\\">"+gr.t+"</div>";for(var i=0;i<ms.length;i++){var m=ms[i];var rp=D.players[m.red]||"?";var bp=m.black?(D.players[m.black]||"?"):"\\u2014";var rs=sb(m.red,gr.rn);var bs=m.black?sb(m.black,gr.rn):0;var bd="",vs="",cc="";if(m.result==="2:0"){bd="<span class=\\"xq-badge rw\\">\\u7EA2\\u80DC</span>";vs="1 : 0";cc="rw"}else if(m.result==="0:2"){bd="<span class=\\"xq-badge bw\\">\\u9ED1\\u80DC</span>";vs="0 : 1";cc="bw"}else if(m.result==="1:1"){bd="<span class=\\"xq-badge dw\\">\\u548C\\u68CB</span>";vs="\\u00BD : \\u00BD";cc=""}else{bd="<span class=\\"xq-badge fw\\">\\u5F03\\u6743</span>";vs="\\u2014";cc=""}var hl=SP&&(m.red===SP||m.black===SP);el.innerHTML+="<div class=\\"xq-mc "+cc+(hl?" hl":"")+"\\"><div class=\\"xq-mh\\"><div style=\\"display:flex;align-items:center;gap:4px\\"><span class=\\"xq-tn\\">"+m.table+"</span><span>\\u7B2C"+gr.rn+"\\u8F6E \\u53F0"+m.table+"</span></div>"+bd+"</div><div class=\\"xq-mb\\"><div class=\\"xq-ps r\\" onclick=\\"xqPlayer('"+m.red+"')\\"><div class=\\"xq-pi2\\"><div class=\\"xq-pn\\">"+rp+"</div><div class=\\"xq-sc2\\"><span>"+rs+"pts</span></div></div></div><div class=\\"xq-vs\\"><div class=\\"xq-vsc\\">"+vs+"</div><div class=\\"xq-vsl\\">vs</div></div><div class=\\"xq-ps b\\" onclick=\\"" +(m.black?"xqPlayer('"+m.black+"')":"")+"\\\">"+(m.black?"<div class=\\"xq-pi2\\"><div class=\\"xq-pn\\">"+bp+"</div><div class=\\"xq-sc2\\"><span>"+bs+"pts</span></div></div>":"<div class=\\"xq-pi2\\"><div class=\\"xq-pn\\">\\u2014</div></div>")+"</div></div></div>"}}}
+function init(){document.getElementById("tournamentName").textContent=D.tournamentName;var pc=Object.keys(D.players).length;var mc=0;for(var i=0;i<D.rounds.length;i++)mc+=D.rounds[i].matches.length;document.getElementById("totalRounds").textContent=NR+" Rounds";document.getElementById("totalPlayers").textContent=pc+" Players";document.getElementById("totalMatches").textContent=mc+" Matches";applyTheme();rnds();stats();render()}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+<\/script>
+<!-- /wp:html -->`;
+
+```
+return output;
+```
+
+}, [t, playerRows, roundsData, standingsRows, standingsCols, tiebreakers]);
+
+const copyToClipboard = () => {
+const code = generateCode();
+navigator.clipboard.writeText(code).then(() => {
+setCopied(true);
+setTimeout(() => setCopied(false), 2000);
+});
+};
+
+const playerLookup = {};
+playerRows.forEach(p => { playerLookup[p.id] = p.cn || p.en || p.id; });
+
+return (
+<div className=“min-h-screen bg-stone-50” style={{ fontFamily: “‘Noto Sans SC’, ‘DM Sans’, sans-serif” }}>
+{/* Header */}
+<div className="bg-gradient-to-r from-red-900 via-red-800 to-red-900 text-white px-6 py-4 shadow-lg">
+<div className="max-w-5xl mx-auto flex items-center justify-between">
+<div>
+<h1 className="text-xl font-bold tracking-wide">象棋赛事编辑器</h1>
+<p className="text-amber-200 text-xs mt-0.5">Xiangqi Tournament Dashboard Editor</p>
+</div>
+<div className="flex gap-2">
+<button
+onClick={() => setPreviewOpen(!previewOpen)}
+className=“px-4 py-2 bg-white bg-opacity-15 hover:bg-opacity-25 rounded-lg text-sm font-semibold transition-all”
+>
+{previewOpen ? “✕ Close Preview” : “👁 Preview”}
+</button>
+<button
+onClick={copyToClipboard}
+className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${ copied ? "bg-green-500 text-white" : "bg-amber-400 text-red-900 hover:bg-amber-300 shadow-lg" }`}
+>
+{copied ? “✓ Copied!” : “📋 Copy WP Code”}
+</button>
+</div>
+</div>
+</div>
+
+```
+  <div className="max-w-5xl mx-auto px-4 py-4">
+    {/* Tabs */}
+    <div className="flex gap-1 mb-0 border-b border-gray-300">
+      {[
+        ["info", "📋 Tournament Info"],
+        ["players", "👥 Players & Ratings"],
+        ["rounds", "🏁 Rounds & Matches"],
+        ["standings", "🏆 Standings"],
+        ["output", "⚡ Output"]
+      ].map(([key, label]) => (
+        <TabButton key={key} active={tab === key} onClick={() => setTab(key)}>
+          {label}
+        </TabButton>
+      ))}
+    </div>
+
+    <div className="bg-white rounded-b-xl rounded-tr-xl shadow-md p-6 border border-gray-200 border-t-0">
+      {/* === INFO TAB === */}
+      {tab === "info" && (
+        <div>
+          <Section title="基本信息 Basic Info">
+            <Input label="Tournament Name 赛事名称" value={t.name} onChange={v => update("name", v)} placeholder="e.g. 3rd Li Xi Sen Cup 2025" />
+            <div className="flex gap-3">
+              <Input label="Format 赛制" value={t.format} onChange={v => update("format", v)} placeholder="Swiss-system" small />
+              <Input label="Time Control 时限" value={t.timeControl} onChange={v => update("timeControl", v)} placeholder="25 min + 10 sec/move" small />
+            </div>
+            <Input label="Format Description" value={t.formatDesc} onChange={v => update("formatDesc", v)} placeholder="Players paired each round by score." />
+          </Section>
+
+          <Section title="计分 Scoring">
+            <div className="flex gap-3">
+              <Input label="Win 胜" value={t.scoring.win} onChange={v => update("scoring", { ...t.scoring, win: v })} type="number" small />
+              <Input label="Draw 和" value={t.scoring.draw} onChange={v => update("scoring", { ...t.scoring, draw: v })} type="number" small />
+              <Input label="Loss 负" value={t.scoring.loss} onChange={v => update("scoring", { ...t.scoring, loss: v })} type="number" small />
+            </div>
+          </Section>
+
+          <Section title="决胜 Tiebreakers" subtitle="Drag to reorder priority. #1 is highest priority.">
+            {tiebreakers.map((tb, i) => (
+              <div key={i} className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-bold text-gray-400 w-5 text-right">{i + 1}.</span>
+                <input
+                  value={tb}
+                  onChange={e => updateTiebreaker(i, e.target.value)}
+                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-300 outline-none"
+                  placeholder="e.g. Buchholz (sum of opponents' scores)"
+                />
+                <button onClick={() => moveTiebreaker(i, -1)} className="text-gray-400 hover:text-gray-600 text-sm" title="Move up">▲</button>
+                <button onClick={() => moveTiebreaker(i, 1)} className="text-gray-400 hover:text-gray-600 text-sm" title="Move down">▼</button>
+                <button onClick={() => removeTiebreaker(i)} className="text-red-400 hover:text-red-600 text-sm font-bold">✕</button>
+              </div>
+            ))}
+            <button onClick={addTiebreaker} className="text-sm text-red-700 font-semibold hover:text-red-900">+ Add tiebreaker</button>
+          </Section>
+
+          <Section title="规则 Rules & Regulations">
+            <Input label="Rules URL (link to PDF/page)" value={t.rulesUrl} onChange={v => update("rulesUrl", v)} placeholder="https://..." />
+            <TextArea label="Additional Rules / Notes" value={t.additionalRules} onChange={v => update("additionalRules", v)} placeholder="e.g. Mobile phones must be switched off during play..." rows={3} />
+          </Section>
+        </div>
+      )}
+
+      {/* === PLAYERS TAB === */}
+      {tab === "players" && (
+        <div>
+          <Section title="批量导入 Bulk Import" subtitle="Paste from spreadsheet: ID, Chinese Name, English Name, Level, Rating, Group (tab or comma separated)">
+            <TextArea value={csvPaste} onChange={setCsvPaste} placeholder={"1\t陈东良\tTan Tong Liang\t无级\t1650\t个人\n2\t邓维英\tPatrick Teng\t无级\t1705\t个人"} rows={4} />
+            <button onClick={importCsv} className="px-4 py-2 bg-red-800 text-white rounded-lg text-sm font-semibold hover:bg-red-700">Import Players</button>
+          </Section>
+
+          <Section title={`选手列表 Players (${playerRows.length})`}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-red-800 text-white">
+                    <th className="px-2 py-2 text-left rounded-tl">ID</th>
+                    <th className="px-2 py-2 text-left">中文名</th>
+                    <th className="px-2 py-2 text-left">English</th>
+                    <th className="px-2 py-2 text-left">Level</th>
+                    <th className="px-2 py-2 text-left">Rating</th>
+                    <th className="px-2 py-2 text-left">Group</th>
+                    <th className="px-2 py-2 rounded-tr"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {playerRows.map((p, i) => (
+                    <tr key={i} className={i % 2 ? "bg-amber-50" : "bg-white"}>
+                      <td className="px-1 py-1"><input value={p.id} onChange={e => updatePlayer(i, "id", e.target.value)} className="w-12 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1"><input value={p.cn} onChange={e => updatePlayer(i, "cn", e.target.value)} className="w-24 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1"><input value={p.en} onChange={e => updatePlayer(i, "en", e.target.value)} className="w-36 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1">
+                        <select value={p.level} onChange={e => updatePlayer(i, "level", e.target.value)} className="px-1 py-1 border rounded text-xs">
+                          <option>无级</option><option>乙级</option><option>甲级</option><option>大师</option><option>特大</option>
+                        </select>
+                      </td>
+                      <td className="px-1 py-1"><input type="number" value={p.rating} onChange={e => updatePlayer(i, "rating", e.target.value)} className="w-16 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1"><input value={p.group} onChange={e => updatePlayer(i, "group", e.target.value)} className="w-16 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1"><button onClick={() => removePlayer(i)} className="text-red-400 hover:text-red-600 font-bold">✕</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button onClick={addPlayer} className="mt-2 text-sm text-red-700 font-semibold hover:text-red-900">+ Add player</button>
+          </Section>
+        </div>
+      )}
+
+      {/* === ROUNDS TAB === */}
+      {tab === "rounds" && (
+        <div>
+          <Section title="批量导入 Bulk Import" subtitle="Paste: Round#, Table#, Red ID, Black ID, Result (2:0 / 0:2 / 1:1)">
+            <TextArea value={roundsCsvPaste} onChange={setRoundsCsvPaste} placeholder={"1\t1\t1\t2\t2:0\n1\t2\t3\t4\t2:0\n2\t1\t4\t1\t0:2"} rows={4} />
+            <button onClick={importRoundsCsv} className="px-4 py-2 bg-red-800 text-white rounded-lg text-sm font-semibold hover:bg-red-700">Import Rounds</button>
+          </Section>
+
+          {roundsData.map((rd, rIdx) => (
+            <Section key={rIdx} title={`第${rd.roundNumber}轮 Round ${rd.roundNumber}`}>
+              <table className="w-full text-xs border-collapse mb-2">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-2 py-1.5 text-left">Table</th>
+                    <th className="px-2 py-1.5 text-left">Red 红</th>
+                    <th className="px-2 py-1.5 text-left">Black 黑</th>
+                    <th className="px-2 py-1.5 text-left">Result</th>
+                    <th className="px-2 py-1.5"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rd.matches.map((m, mIdx) => (
+                    <tr key={mIdx} className={mIdx % 2 ? "bg-amber-50" : ""}>
+                      <td className="px-1 py-1"><input type="number" value={m.table} onChange={e => updateMatch(rIdx, mIdx, "table", parseInt(e.target.value) || 1)} className="w-12 px-1 py-1 border rounded text-xs" /></td>
+                      <td className="px-1 py-1">
+                        <div className="flex items-center gap-1">
+                          <input value={m.red} onChange={e => updateMatch(rIdx, mIdx, "red", e.target.value)} className="w-12 px-1 py-1 border rounded text-xs" placeholder="ID" />
+                          <span className="text-gray-400 text-xs truncate max-w-20">{playerLookup[m.red] || ""}</span>
+                        </div>
+                      </td>
+                      <td className="px-1 py-1">
+                        <div className="flex items-center gap-1">
+                          <input value={m.black} onChange={e => updateMatch(rIdx, mIdx, "black", e.target.value)} className="w-12 px-1 py-1 border rounded text-xs" placeholder="ID" />
+                          <span className="text-gray-400 text-xs truncate max-w-20">{playerLookup[m.black] || ""}</span>
+                        </div>
+                      </td>
+                      <td className="px-1 py-1">
+                        <select value={m.result} onChange={e => updateMatch(rIdx, mIdx, "result", e.target.value)} className="px-1 py-1 border rounded text-xs">
+                          <option value="2:0">2:0 红胜</option>
+                          <option value="0:2">0:2 黑胜</option>
+                          <option value="1:1">1:1 和棋</option>
+                          <option value="-:-">-:- 弃权</option>
+                        </select>
+                      </td>
+                      <td className="px-1 py-1"><button onClick={() => removeMatch(rIdx, mIdx)} className="text-red-400 hover:text-red-600 font-bold">✕</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="flex gap-2">
+                <button onClick={() => addMatch(rIdx)} className="text-sm text-red-700 font-semibold hover:text-red-900">+ Add match</button>
+                <button onClick={() => removeRound(rIdx)} className="text-sm text-gray-400 font-semibold hover:text-red-600 ml-auto">Delete round</button>
+              </div>
+            </Section>
+          ))}
+          <button onClick={addRound} className="px-4 py-2 bg-red-800 text-white rounded-lg text-sm font-semibold hover:bg-red-700">+ Add Round</button>
+        </div>
+      )}
+
+      {/* === STANDINGS TAB === */}
+      {tab === "standings" && (
+        <div>
+          <Section title="表格列 Column Headers" subtitle="Comma-separated column names for the standings table">
+            <Input label="Columns" value={standingsCols} onChange={setStandingsCols} placeholder="排名,编号,组别,姓名 Name,积分,..." />
+          </Section>
+
+          <Section title="批量导入 Bulk Import" subtitle="Paste standings rows (tab or comma separated, matching column order above)">
+            <TextArea value={standingsCsvPaste} onChange={setStandingsCsvPaste} placeholder={"1\t22\t个人\t黎德义\t12\t58\t\t5\t2\t3\t11\t52\t"} rows={4} />
+            <button onClick={importStandingsCsv} className="px-4 py-2 bg-red-800 text-white rounded-lg text-sm font-semibold hover:bg-red-700">Import Standings</button>
+          </Section>
+
+          <Section title={`排名表 Standings (${standingsRows.length} rows)`}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-red-800 text-white">
+                    {standingsCols.split(",").map((c, i) => (
+                      <th key={i} className="px-2 py-2 text-left whitespace-nowrap">{c.trim()}</th>
+                    ))}
+                    <th className="px-2 py-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {standingsRows.map((row, i) => (
+                    <tr key={i} className={i % 2 ? "bg-amber-50" : "bg-white"}>
+                      {standingsCols.split(",").map((c, ci) => (
+                        <td key={ci} className="px-1 py-1">
+                          <input
+                            value={row[c.trim()] || ""}
+                            onChange={e => updateStanding(i, c.trim(), e.target.value)}
+                            className="w-full min-w-8 px-1 py-1 border rounded text-xs"
+                          />
+                        </td>
+                      ))}
+                      <td className="px-1 py-1"><button onClick={() => removeStanding(i)} className="text-red-400 hover:text-red-600 font-bold">✕</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button onClick={addStanding} className="mt-2 text-sm text-red-700 font-semibold hover:text-red-900">+ Add row</button>
+          </Section>
+        </div>
+      )}
+
+      {/* === OUTPUT TAB === */}
+      {tab === "output" && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <Section title="生成代码 Generated WordPress Code" subtitle="Copy this entire block and paste into WP Code Editor" />
+            <button
+              onClick={copyToClipboard}
+              className={`px-5 py-2 rounded-lg text-sm font-bold transition-all flex-shrink-0 ${
+                copied ? "bg-green-500 text-white" : "bg-red-800 text-white hover:bg-red-700"
+              }`}
+            >
+              {copied ? "✓ Copied!" : "📋 Copy Code"}
+            </button>
+          </div>
+          <div className="bg-gray-900 rounded-xl p-4 overflow-auto max-h-96">
+            <pre ref={outputRef} className="text-green-300 text-xs whitespace-pre-wrap break-all font-mono leading-relaxed">
+              {generateCode()}
+            </pre>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">
+            💡 <strong>Usage:</strong> Paste the dark-mode-toggle.html as a separate Custom HTML block below this one.
+          </p>
+        </div>
+      )}
+    </div>
+
+    {/* Preview panel */}
+    {previewOpen && (
+      <div className="mt-4 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-600 border-b">
+          Preview (approximate — paste into WP for final result)
+        </div>
+        <div className="p-4">
+          <iframe
+            srcDoc={generateCode().replace("<!-- wp:html -->", "").replace("<!-- /wp:html -->", "")}
+            className="w-full border border-gray-200 rounded-lg"
+            style={{ height: "600px" }}
+            title="Dashboard Preview"
+          />
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+```
+
+);
+}
