@@ -20,7 +20,6 @@ label{font-size:.75rem;color:var(--mu);font-weight:600;text-transform:uppercase;
 input,select,textarea{background:#0d0d20;border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:7px 10px;font-size:.88rem;font-family:inherit;width:100%;transition:border-color .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac)}
 input[type=number]{max-width:90px}
-input[type=range]{padding:4px 0;accent-color:var(--ac);cursor:pointer;max-width:130px}
 textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:all .2s;white-space:nowrap}
 .bp{background:var(--ac);color:#000}.bp:hover{background:#6ab5ff}
@@ -37,12 +36,21 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .dvd{border:none;border-top:1px solid var(--bd);margin:14px 0}
 .cc{background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px}
 #ctable{width:100%;border-collapse:collapse;margin-top:8px;font-size:.85rem}
-#ctable th,#ctable td{padding:8px 10px;border:1px solid var(--bd)}
+#ctable th,#ctable td{padding:8px 10px;border:1px solid var(--bd);vertical-align:middle}
 #ctable th{background:#0d0d20;color:var(--mu);font-weight:600;text-transform:uppercase;font-size:.72rem}
-.ofrow{display:flex;align-items:center;gap:8px}
+/* Arrow offset controls */
+.ofrow{display:flex;align-items:center;gap:6px}
+.ofval{min-width:48px;text-align:center;color:var(--ac);font-size:.85rem;font-weight:700;background:#0d0d20;border:1px solid var(--bd);border-radius:5px;padding:3px 6px}
+.arrbtn{width:28px;height:28px;border-radius:5px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.arrbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
+.arrbtn:active{transform:scale(.92)}
+
+/* DISPLAY */
 #display{display:none;flex-direction:column;min-height:100vh;padding:20px;gap:18px}
 #fctrl{position:fixed;top:14px;right:14px;display:flex;flex-direction:column;gap:7px;z-index:200;opacity:.2;transition:opacity .3s}
 #fctrl:hover{opacity:1}
+
+/* Timer section with CLOCK */
 #tsec{text-align:center;padding:24px 20px 18px;background:var(--panel);border-radius:12px;border:1px solid var(--bd)}
 #tlbl{font-size:1.1rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 #tdisp{font-size:clamp(3.5rem,11vw,9rem);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:var(--gr);text-shadow:0 0 40px currentColor,0 0 70px currentColor;transition:color .5s,text-shadow .5s;line-height:1}
@@ -52,6 +60,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 #tmsg{margin-top:10px;font-size:1.3rem;color:var(--ac2);min-height:2em;font-weight:600}
 #tbtns{display:flex;gap:12px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+
+/* Real-time clock strip */
+#clockstrip{display:flex;justify-content:center;align-items:center;gap:18px;margin-top:10px;flex-wrap:wrap}
+#clockbox{font-size:clamp(1.4rem,4vw,2.8rem);font-weight:700;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.08em;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 18px}
+#datebox{font-size:.92rem;color:var(--mu);background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 14px;letter-spacing:.04em}
+
 #ssec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:20px;transition:all .3s}
 #ssec.hidden{display:none}
 #shdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
@@ -74,6 +88,23 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .snum{font-weight:700;font-size:.76rem;color:#aae0ff}
 .sbadge{font-size:.58rem;padding:1px 3px;border-radius:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px}
 .seat.emp{border-style:dashed;opacity:.3}
+
+/* Attendance / Image upload panel */
+#attsec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:20px}
+#attsec.hidden{display:none}
+#atthdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+#atttitle{font-size:1.1rem;font-weight:700;color:var(--ac2)}
+#attgrid{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.attcard{position:relative;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;overflow:hidden;width:200px;flex-shrink:0}
+.attcard img{width:100%;height:150px;object-fit:cover;display:block}
+.attcard .attlbl{padding:6px 10px;font-size:.78rem;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attcard .attdel{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(255,23,68,.85);border:none;color:#fff;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.attcard:hover .attdel{opacity:1}
+#dropzone{width:200px;height:175px;border:2px dashed var(--bd);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .25s;color:var(--mu);font-size:.85rem;text-align:center;padding:12px;flex-shrink:0}
+#dropzone:hover,#dropzone.over{border-color:var(--ac);color:var(--ac);background:rgba(74,158,255,.06)}
+#dropzone .dico2{font-size:2.2rem}
+#attfile{display:none}
+
 #toast{position:fixed;bottom:18px;right:18px;background:var(--ac);color:#000;padding:9px 16px;border-radius:7px;font-weight:600;font-size:.88rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
@@ -141,7 +172,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
     <div style="overflow-x:auto">
       <table id="ctable">
-        <thead><tr><th>Column</th><th>Seats in column</th><th>Vertical offset (↑↓ px)</th><th>Right spacer (px)</th></tr></thead>
+        <thead><tr>
+          <th>Column</th>
+          <th>Seats in column</th>
+          <th>Vertical Offset ↕</th>
+          <th>Right spacer (px)</th>
+        </tr></thead>
         <tbody id="ctbody"></tbody>
       </table>
     </div>
@@ -152,14 +188,20 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 <div id="display">
   <div id="fctrl">
     <button class="btn bs sm" onclick="togSeat()" id="tbtn">🪑 Hide Seating</button>
+    <button class="btn bs sm" onclick="togAtt()" id="abtn">📷 Hide Attendance</button>
     <button class="btn bs sm" onclick="exitD()">✏ Edit</button>
     <button class="btn bgr sm" onclick="tStart()" id="sb1">▶ Start</button>
     <button class="btn bw sm" onclick="tPause()" id="pb1" style="display:none">⏸ Pause</button>
     <button class="btn bs sm" onclick="tReset()">↺ Reset</button>
   </div>
+
   <div id="tsec">
     <div id="tlbl">Time Remaining</div>
     <div id="tdisp">--:--</div>
+    <div id="clockstrip">
+      <div id="clockbox">--:--:--</div>
+      <div id="datebox">Loading...</div>
+    </div>
     <div id="tmsg"></div>
     <div id="tbtns">
       <button class="btn bgr lg" onclick="tStart()" id="sb2">▶ Start Timer</button>
@@ -167,6 +209,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
       <button class="btn bs" onclick="tReset()">↺ Reset</button>
     </div>
   </div>
+
   <div id="ssec">
     <div id="shdr">
       <div id="stitle">Seating Arrangement</div>
@@ -174,7 +217,29 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
     <div id="hall"></div>
   </div>
+
+  <!-- ATTENDANCE IMAGE UPLOAD -->
+  <div id="attsec">
+    <div id="atthdr">
+      <div id="atttitle">📋 Attendance Photos</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="attcount" style="font-size:.82rem;color:var(--mu)">0 images</span>
+        <button class="btn br sm" onclick="clearAtt()" id="clearattbtn" style="display:none">🗑 Clear All</button>
+      </div>
+    </div>
+    <p style="color:var(--mu);font-size:.82rem;margin-bottom:12px">Upload attendance sheets or photos here. Images are stored locally in this browser session.</p>
+    <div id="attgrid">
+      <div id="dropzone" onclick="document.getElementById('attfile').click()"
+        ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
+        <span class="dico2">📷</span>
+        <span><strong>Click or drag</strong><br>to upload images</span>
+        <span style="font-size:.72rem;color:var(--mu)">JPG, PNG, PDF preview</span>
+      </div>
+    </div>
+    <input type="file" id="attfile" accept="image/*" multiple onchange="attFiles(this.files)">
+  </div>
 </div>
+
 <div id="toast"></div>
 
 <script>
@@ -183,14 +248,18 @@ const CLR=[
   {bg:'rgba(255,159,74,.15)',bd:'rgba(255,159,74,.5)',bbl:'rgba(255,159,74,.3)',tx:'#ffbf7a',dot:'#ff9f4a'},
   {bg:'rgba(0,230,118,.15)',bd:'rgba(0,230,118,.5)',bbl:'rgba(0,230,118,.3)',tx:'#60f0a0',dot:'#00e676'},
 ];
-let T={total:0,rem:0,run:false,iv:null,wy:30,wr:10,lbl:'Time Remaining',ot:'TIME IS UP',msgs:[],fired:new Set()};
-let CS=[]; // col state
 
+let T={total:0,rem:0,run:false,iv:null,wy:30,wr:10,lbl:'Time Remaining',ot:'TIME IS UP',msgs:[],fired:new Set()};
+let CS=[];
+let attImages=[];
+
+// ─── TABS ───
 function tab(id){
   document.querySelectorAll('.tabx').forEach((b,i)=>b.classList.toggle('on',['t1','t2','t3'][i]===id));
   document.querySelectorAll('.tc').forEach(c=>c.classList.toggle('on',c.id===id));
 }
 
+// ─── CLASS CONFIG ───
 let ccSaved=[
   {name:'Class 3A',stu:30,st:1},
   {name:'Class 3B',stu:30,st:1},
@@ -215,6 +284,7 @@ function renderCC(){
   }
 }
 
+// ─── COLUMN CONFIG with ARROW BUTTONS ───
 function renderCT(){
   const n=+document.getElementById('ncols').value||4;
   while(CS.length<n) CS.push({s:8,o:0,sp:12});
@@ -227,9 +297,13 @@ function renderCT(){
     <td><input type="number" id="cse${i}" value="${col.s}" min="1" max="80" style="max-width:70px"></td>
     <td>
       <div class="ofrow">
-        <input type="range" id="cof${i}" value="${col.o}" min="-300" max="300" step="4"
-          oninput="document.getElementById('cov${i}').textContent=this.value+'px'">
-        <span id="cov${i}" style="min-width:40px;color:var(--mu);font-size:.8rem">${col.o}px</span>
+        <button class="arrbtn" onclick="adjOff(${i},-20)" title="Move up 20px">▲</button>
+        <button class="arrbtn" onclick="adjOff(${i},-4)" title="Move up 4px" style="font-size:.7rem">▲</button>
+        <span class="ofval" id="cov${i}">${col.o}px</span>
+        <button class="arrbtn" onclick="adjOff(${i},4)" title="Move down 4px" style="font-size:.7rem">▼</button>
+        <button class="arrbtn" onclick="adjOff(${i},20)" title="Move down 20px">▼</button>
+        <button class="arrbtn" onclick="resetOff(${i})" title="Reset to 0" style="font-size:.7rem;color:var(--mu)">⊙</button>
+        <input type="hidden" id="cof${i}" value="${col.o}">
       </div>
     </td>
     <td><input type="number" id="csp${i}" value="${col.sp}" min="0" max="120" style="max-width:70px"></td>`;
@@ -237,6 +311,22 @@ function renderCT(){
   }
 }
 
+function adjOff(i, delta){
+  const hid=document.getElementById(`cof${i}`);
+  const lbl=document.getElementById(`cov${i}`);
+  let v=parseInt(hid.value)||0;
+  v=Math.max(-300,Math.min(300,v+delta));
+  hid.value=v; lbl.textContent=v+'px';
+  CS[i].o=v;
+}
+function resetOff(i){
+  const hid=document.getElementById(`cof${i}`);
+  const lbl=document.getElementById(`cov${i}`);
+  hid.value=0; lbl.textContent='0px';
+  CS[i].o=0;
+}
+
+// ─── READ ALL CONFIG ───
 function readAll(){
   const h=+document.getElementById('th').value||0;
   const m=+document.getElementById('tm').value||0;
@@ -260,14 +350,13 @@ function readAll(){
     };
     cls.push(ccSaved[i]);
   }
-
   const ncols=+document.getElementById('ncols').value||4;
   const gap=+document.getElementById('cgap').value||2;
   const cols=[];
   for(let i=0;i<ncols;i++){
     CS[i]={
       s:+document.getElementById(`cse${i}`)?.value||8,
-      o:+document.getElementById(`cof${i}`)?.value||0,
+      o:parseInt(document.getElementById(`cof${i}`)?.value)||0,
       sp:+document.getElementById(`csp${i}`)?.value||12,
     };
     cols.push(CS[i]);
@@ -275,6 +364,7 @@ function readAll(){
   return{vname:document.getElementById('vname').value,door:document.getElementById('dpos').value,nc,cls,ncols,gap,cols};
 }
 
+// ─── LAUNCH DISPLAY ───
 function go(){
   const cfg=readAll();
   document.getElementById('editor').style.display='none';
@@ -283,18 +373,43 @@ function go(){
   document.getElementById('stitle').textContent=cfg.vname+' — Seating Arrangement';
   tReset();
   buildHall(cfg);
+  startClock();
+  renderAtt();
 }
 function exitD(){
   tPause();
+  stopClock();
   document.getElementById('display').style.display='none';
   document.getElementById('editor').style.display='flex';
 }
 
+// ─── REAL-TIME CLOCK ───
+let clockIv=null;
+function startClock(){
+  updateClock();
+  clockIv=setInterval(updateClock,1000);
+}
+function stopClock(){
+  clearInterval(clockIv);
+}
+function updateClock(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clockbox').textContent=`${hh}:${mm}:${ss}`;
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d=now.getDate(), mo=months[now.getMonth()], dy=days[now.getDay()], yr=now.getFullYear();
+  document.getElementById('datebox').textContent=`${dy}, ${d} ${mo} ${yr}`;
+}
+
+// ─── TIMER ───
 function upd(){
   const el=document.getElementById('tdisp');
   const r=T.rem, ot=r<0, abs=Math.abs(r);
-  const h=Math.floor(abs/3600),mm=Math.floor((abs%3600)/60),s=abs%60;
-  const str=(h>0?h+':':'') + String(mm).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const h=Math.floor(abs/3600),mm2=Math.floor((abs%3600)/60),s=abs%60;
+  const str=(h>0?h+':':'')+String(mm2).padStart(2,'0')+':'+String(s).padStart(2,'0');
   el.textContent=ot?'+'+str:str;
   el.className='';
   const rm=r/60;
@@ -312,35 +427,31 @@ function showBtns(run){
   [document.getElementById('sb1'),document.getElementById('sb2')].forEach(b=>b.style.display=run?'none':'');
   [document.getElementById('pb1'),document.getElementById('pb2')].forEach(b=>b.style.display=run?'':'none');
 }
-function tStart(){
-  if(T.run)return; T.run=true; showBtns(true);
-  T.iv=setInterval(()=>{T.rem--;chkMsgs();upd();},1000);
-}
+function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem--;chkMsgs();upd();},1000);}
 function tPause(){T.run=false;clearInterval(T.iv);showBtns(false);}
-function tReset(){
-  tPause(); T.rem=T.total; T.fired=new Set();
-  document.getElementById('tmsg').textContent=''; upd();
-}
+function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById('tmsg').textContent='';upd();}
 function togSeat(){
   const s=document.getElementById('ssec'),b=document.getElementById('tbtn');
   const h=s.classList.toggle('hidden');
   b.textContent=h?'🪑 Show Seating':'🪑 Hide Seating';
 }
+function togAtt(){
+  const s=document.getElementById('attsec'),b=document.getElementById('abtn');
+  const h=s.classList.toggle('hidden');
+  b.textContent=h?'📷 Show Attendance':'📷 Hide Attendance';
+}
 
+// ─── SEATING HALL ───
 function buildHall(cfg){
   const{door,nc,cls,ncols,gap,cols}=cfg;
   const hall=document.getElementById('hall');
   hall.innerHTML='';
-
-  // Flat slot list
   let flat=[];
   for(let ci=0;ci<nc;ci++){
     if(ci>0)for(let g=0;g<gap;g++)flat.push({t:'g',ci});
     const c=cls[ci];
     for(let s=0;s<c.stu;s++)flat.push({t:'s',ci,n:c.st+s});
   }
-
-  // Distribute into columns
   const colData=[];
   let si=0;
   for(let c=0;c<ncols;c++){
@@ -349,18 +460,14 @@ function buildHall(cfg){
     for(let r=0;r<cap;r++) col.push(si<flat.length?flat[si++]:{t:'e'});
     colData.push(col);
   }
-
   const wrap=document.createElement('div');
   wrap.className='hwrap'+(door==='right'?' dr':'');
-
   const doorEl=document.createElement('div');
   doorEl.className='door';
   doorEl.innerHTML='<span class="dico">🚪</span><span>DOOR</span>';
   wrap.appendChild(doorEl);
-
   const ca=document.createElement('div');
   ca.className='carea';
-
   for(let c=0;c<ncols;c++){
     const cfg2=cols[c]||{s:8,o:0,sp:12};
     if(c>0){
@@ -399,8 +506,6 @@ function buildHall(cfg){
     cw.appendChild(cs);ca.appendChild(cw);
   }
   wrap.appendChild(ca);hall.appendChild(wrap);
-
-  // Legend
   const leg=document.getElementById('sleg');
   leg.innerHTML='';
   for(let ci=0;ci<nc;ci++){
@@ -411,6 +516,61 @@ function buildHall(cfg){
       <span style="color:var(--mu);font-size:.78rem">(seats ${c2.st}–${c2.st+c2.stu-1})</span>`;
     leg.appendChild(li);
   }
+}
+
+// ─── ATTENDANCE IMAGE UPLOAD ───
+function attFiles(files){
+  if(!files||!files.length)return;
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      attImages.push({src:e.target.result,name:f.name,time:new Date().toLocaleTimeString()});
+      renderAtt();
+      toast('📷 Image added: '+f.name);
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('attfile').value='';
+}
+function renderAtt(){
+  const grid=document.getElementById('attgrid');
+  // Remove old cards (keep dropzone)
+  Array.from(grid.querySelectorAll('.attcard')).forEach(c=>c.remove());
+  const dz=document.getElementById('dropzone');
+  attImages.forEach((img,idx)=>{
+    const card=document.createElement('div');
+    card.className='attcard';
+    card.innerHTML=`<img src="${img.src}" alt="${img.name}">
+      <div class="attlbl" title="${img.name}">📄 ${img.name}<br><span style="font-size:.7rem;opacity:.6">${img.time}</span></div>
+      <button class="attdel" onclick="delAtt(${idx})" title="Remove">✕</button>`;
+    grid.insertBefore(card,dz);
+  });
+  document.getElementById('attcount').textContent=attImages.length+' image'+(attImages.length!==1?'s':'');
+  document.getElementById('clearattbtn').style.display=attImages.length?'':'none';
+}
+function delAtt(idx){
+  attImages.splice(idx,1);
+  renderAtt();
+}
+function clearAtt(){
+  if(!confirm('Remove all attendance images?'))return;
+  attImages=[];
+  renderAtt();
+}
+function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('over');}
+function dzLeave(e){document.getElementById('dropzone').classList.remove('over');}
+function dzDrop(e){
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('over');
+  attFiles(e.dataTransfer.files);
+}
+
+// ─── TOAST ───
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 window.onload=()=>{renderCC();renderCT();};
