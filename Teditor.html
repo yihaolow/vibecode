@@ -32,8 +32,8 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .bpu{background:#9b59ff;color:#fff}.bpu:hover{background:#b47aff}
 .lg{padding:12px 28px;font-size:1rem}
 .sm{padding:5px 10px;font-size:.78rem}
-.tabrow{display:flex;gap:2px;background:#0d0d20;border-radius:8px;padding:4px}
-.tabx{flex:1;text-align:center;padding:8px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--mu);border:none;background:transparent;font-family:inherit;transition:all .2s}
+.tabrow{display:flex;gap:2px;background:#0d0d20;border-radius:8px;padding:4px;flex-wrap:wrap}
+.tabx{flex:1;min-width:80px;text-align:center;padding:8px 6px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--mu);border:none;background:transparent;font-family:inherit;transition:all .2s}
 .tabx.on{background:var(--panel);color:var(--ac);border:1px solid var(--bd)}
 .tc{display:none}.tc.on{display:block}
 .dvd{border:none;border-top:1px solid var(--bd);margin:14px 0}
@@ -47,7 +47,16 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .arrbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 .arrbtn:active{transform:scale(.92)}
 
-/* Launch button group */
+/* Instructions editor */
+.inst-item{background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
+.inst-item textarea{min-height:52px;flex:1}
+.inst-bullet{background:#0d0d20;border:1px solid var(--bd);border-radius:5px;color:var(--ac2);padding:5px 8px;font-size:.85rem;width:44px;text-align:center;flex-shrink:0}
+.inst-del{width:28px;height:28px;border-radius:5px;background:rgba(255,23,68,.15);border:1px solid rgba(255,23,68,.3);color:var(--re);cursor:pointer;font-size:.85rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:2px}
+.inst-del:hover{background:var(--re);color:#fff}
+.inst-preview{background:#0d0d1a;border:1px solid var(--bd);border-radius:8px;padding:14px;margin-top:10px}
+.inst-preview h4{font-size:.75rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+/* Launch cards */
 .launchers{display:flex;gap:10px;flex-wrap:wrap}
 .lcard{flex:1;min-width:200px;background:var(--panel);border:2px solid var(--bd);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;text-align:center}
 .lcard:hover{border-color:var(--ac);background:#15152e}
@@ -56,34 +65,46 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .lcard .ltitle{font-size:1rem;font-weight:700;margin-bottom:4px}
 .lcard .ldesc{font-size:.78rem;color:var(--mu)}
 
-/* ══ SHARED DISPLAY CHROME ══ */
+/* ══ DISPLAY ══ */
 #display{display:none;flex-direction:column;min-height:100vh}
+
+/* Floating controls */
 #fctrl{position:fixed;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:300;opacity:.1;transition:opacity .3s}
 #fctrl:hover{opacity:1}
 
+/* ══ COLUMN ADJUST PANEL (live, in display) ══ */
+#coladj{position:fixed;left:12px;bottom:12px;z-index:300;opacity:.1;transition:opacity .3s;display:none}
+#coladj:hover{opacity:1}
+#coladj-inner{background:rgba(10,10,26,.92);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);max-height:80vh;overflow-y:auto}
+#coladj-title{font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:600}
+.cadj-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.cadj-lbl{font-size:.72rem;color:var(--mu);min-width:38px}
+.cadj-val{min-width:42px;text-align:center;font-size:.78rem;font-weight:700;color:var(--ac);background:#0d0d20;border:1px solid var(--bd);border-radius:4px;padding:2px 4px}
+.cadj-btn{width:24px;height:24px;border-radius:4px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;line-height:1}
+.cadj-btn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
+.cadj-btn:active{transform:scale(.9)}
+.cadj-rst{width:20px;height:20px;border-radius:4px;border:1px solid var(--bd);background:#1a1a30;color:var(--mu);cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.cadj-rst:hover{background:#333;color:var(--tx)}
+
 /* ══ SEATING PHASE ══ */
 #seatphase{display:none;flex-direction:column;height:100vh;overflow:hidden}
-/* Top bar: tiny clock + venue name */
 #spbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--bd);gap:12px;flex-shrink:0}
 #spvenue{font-size:1rem;font-weight:700;color:var(--ac);letter-spacing:.04em}
 #spclock{font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em}
 #spdate{font-size:.78rem;color:var(--mu)}
-/* Main area: image left, seats right */
 #spmain{display:flex;flex:1;overflow:hidden;gap:0}
-/* Image panel — takes up the bulk of the screen */
+
+/* Image panel */
 #imgpanel{flex:1;position:relative;background:#06060f;overflow:hidden;display:flex;align-items:center;justify-content:center}
-/* Upload drop overlay when no images */
 #imgdrop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--mu);cursor:pointer;transition:background .2s}
 #imgdrop:hover,#imgdrop.over{background:rgba(74,158,255,.06)}
 #imgdrop .dico{font-size:4rem;opacity:.3}
 #imgdrop p{font-size:1rem;opacity:.5}
 #imgdrop small{font-size:.8rem;opacity:.35}
-/* Slides */
 .spslide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease}
 .spslide.active{opacity:1}
 .spslide img{max-width:100%;max-height:100%;object-fit:contain;display:block;cursor:zoom-in}
-/* Image nav overlay — bottom of image panel */
-#imgoverlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7));opacity:0;transition:opacity .25s}
+#imgoverlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.75));opacity:0;transition:opacity .25s}
 #imgpanel:hover #imgoverlay{opacity:1}
 .imgnavbtn{width:36px;height:36px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .imgnavbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
@@ -95,11 +116,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .imgplaybtn{padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:.75rem;font-weight:600;font-family:inherit;transition:all .15s}
 .imgplaybtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 #imgcount{font-size:.75rem;color:rgba(255,255,255,.5)}
-/* Upload-more button bottom-right corner */
-#imgupload{position:absolute;top:10px;right:10px;opacity:0;transition:opacity .2s}
+#imgupload{position:absolute;top:10px;right:10px;opacity:0;transition:opacity .2s;z-index:10}
 #imgpanel:hover #imgupload{opacity:1}
-/* Seats panel — right side, scrollable */
-#seatpanel{width:auto;min-width:220px;max-width:460px;background:var(--panel);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+
+/* Seat panel */
+#seatpanel{width:auto;min-width:200px;max-width:460px;background:var(--panel);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#seatpanel.hidden{display:none!important}
 #spseathdr{padding:10px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
 #spseattitle{font-size:.85rem;font-weight:700;color:var(--ac);margin-bottom:4px}
 #spseatleg{display:flex;gap:10px;flex-wrap:wrap}
@@ -107,9 +129,15 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .legdot{width:10px;height:10px;border-radius:2px;border:2px solid;flex-shrink:0}
 #sphall{overflow:auto;padding:10px;flex:1}
 
+/* Instructions strip in seating phase */
+#spinst{flex-shrink:0;border-top:1px solid var(--bd);background:#0d0d1a;padding:8px 16px;display:none}
+#spinst.show{display:flex}
+#spinst-inner{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;width:100%}
+.spin-item{display:flex;gap:7px;align-items:flex-start;font-size:.82rem;color:var(--tx)}
+.spin-bullet{color:var(--ac2);font-weight:700;flex-shrink:0;min-width:18px}
+
 /* ══ EXAM PHASE ══ */
 #examphase{display:none;flex-direction:column;min-height:100vh;padding:16px;gap:14px}
-/* Timer */
 #tsec{text-align:center;padding:20px 20px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--bd)}
 #tlbl{font-size:1rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
 #tdisp{font-size:clamp(3.5rem,12vw,10rem);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:var(--gr);text-shadow:0 0 40px currentColor,0 0 80px currentColor;transition:color .5s,text-shadow .5s;line-height:1}
@@ -119,11 +147,9 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 #tmsg{margin-top:8px;font-size:1.3rem;color:var(--ac2);min-height:1.8em;font-weight:600}
 #tbtns{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-/* Clock bar */
 #clockbar{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
 #clockbox{font-size:clamp(1.8rem,4.5vw,3.2rem);font-weight:900;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 20px}
 #datebox{font-size:.9rem;color:var(--mu);background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 14px}
-/* Exam phase bottom row: seats */
 #exrow{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
 #exseat{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:16px;flex:1;min-width:0}
 #exseat.hidden{display:none}
@@ -132,7 +158,14 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 #exleg{display:flex;gap:12px;flex-wrap:wrap}
 #exhall{overflow:auto;padding:4px}
 
-/* Shared hall styles */
+/* Instructions panel in exam phase */
+#exinst{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:16px;flex:0 0 auto;max-width:320px;display:none}
+#exinst.show{display:block}
+#exinst h3{font-size:.88rem;font-weight:700;color:var(--ac2);margin-bottom:10px;letter-spacing:.04em}
+.exinst-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:.85rem;line-height:1.45}
+.exinst-bullet{color:var(--ac2);font-weight:700;flex-shrink:0;font-size:.9rem}
+
+/* Shared seat styles */
 .hwrap{display:flex;align-items:flex-start;gap:12px;min-width:max-content}
 .hwrap.dr{flex-direction:row-reverse}
 .door{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;background:linear-gradient(135deg,#2a1a00,#4a3000);border:2px solid var(--ac2);border-radius:7px;color:var(--ac2);font-weight:700;font-size:.7rem;writing-mode:vertical-rl;min-height:70px;letter-spacing:.1em;align-self:center}
@@ -140,7 +173,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .carea{display:flex;align-items:flex-start}
 .cwrap{display:flex;flex-direction:column;align-items:center}
 .clbl{font-size:.62rem;color:var(--mu);margin-bottom:4px;font-weight:600}
-.cseats{display:flex;flex-direction:column;gap:3px}
+.cseats{display:flex;flex-direction:column;gap:3px;transition:margin-top .15s}
 .sgap{height:18px}
 .seat{width:52px;height:40px;border-radius:5px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.55rem;line-height:1.2;padding:2px;cursor:default;transition:transform .15s}
 .seat:hover{transform:scale(1.08);z-index:10;position:relative}
@@ -148,7 +181,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .sbadge{font-size:.55rem;padding:1px 3px;border-radius:2px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48px}
 .seat.emp{border-style:dashed;opacity:.3}
 
-/* ── LIGHTBOX ── */
+/* Lightbox */
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:1000;display:none;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox.open{display:flex}
 #lbimg{max-width:94vw;max-height:90vh;object-fit:contain;border-radius:6px}
@@ -167,13 +200,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 
 <!-- ══════════ EDITOR ══════════ -->
 <div id="editor">
-  <div class="etop">
-    <h1>🏫 Exam Hall Display Editor</h1>
-  </div>
+  <div class="etop"><h1>🏫 Exam Hall Display Editor</h1></div>
   <div class="tabrow">
     <button class="tabx on" onclick="tab('t1')">⏱ Timer</button>
     <button class="tabx" onclick="tab('t2')">🪑 Seating</button>
     <button class="tabx" onclick="tab('t3')">📐 Columns</button>
+    <button class="tabx" onclick="tab('t4')">📋 Instructions</button>
   </div>
 
   <!-- TIMER -->
@@ -218,7 +250,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   <!-- COLUMNS -->
   <div id="t3" class="tc panel">
     <h2>Column Configuration</h2>
-    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column.</p>
+    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column. You can also adjust column offsets live in the display using the floating ↕ panel.</p>
     <div class="row" style="margin-bottom:14px">
       <div class="fg" style="max-width:140px"><label>Number of Columns</label><input type="number" id="ncols" value="4" min="1" max="20" onchange="renderCT()"></div>
       <div class="fg" style="max-width:200px"><label>Empty seats gap between classes</label><input type="number" id="cgap" value="2" min="0" max="10"></div>
@@ -232,34 +264,66 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
   </div>
 
-  <!-- LAUNCH CARDS -->
+  <!-- INSTRUCTIONS -->
+  <div id="t4" class="tc panel">
+    <h2>Custom Instructions</h2>
+    <p style="color:var(--mu);font-size:.83rem;margin-bottom:14px">These instructions will be displayed as a panel during the exam. Each line is a separate bullet point.</p>
+    <div class="row" style="align-items:center;margin-bottom:14px">
+      <div class="fg"><label>Instructions Title</label><input type="text" id="insttitle" value="📋 Exam Instructions"></div>
+      <div class="fg" style="max-width:200px"><label>Show in</label>
+        <select id="instwhere">
+          <option value="both">Both phases</option>
+          <option value="seating">Seating phase only</option>
+          <option value="exam">Exam phase only</option>
+          <option value="none">Hidden</option>
+        </select>
+      </div>
+    </div>
+    <div id="instlist"></div>
+    <button class="btn bp" onclick="addInst()" style="margin-top:4px">+ Add Instruction</button>
+    <div class="inst-preview">
+      <h4>Preview</h4>
+      <div id="instpreview"></div>
+    </div>
+  </div>
+
+  <!-- LAUNCH -->
   <div class="panel">
     <h2>Launch Display</h2>
-    <p style="color:var(--mu);font-size:.83rem;margin-bottom:14px">Choose which view to launch. You can switch between modes any time using the floating controls.</p>
+    <p style="color:var(--mu);font-size:.83rem;margin-bottom:14px">Choose which view to launch. Switch between modes anytime using the floating controls.</p>
     <div class="launchers">
       <div class="lcard seat" onclick="goSeating()">
         <div class="lico">🪑</div>
         <div class="ltitle" style="color:#9b59ff">Seating Phase</div>
-        <div class="ldesc">Big attendance image + seat chart side by side. No timer. For when students are finding their seats.</div>
+        <div class="ldesc">Big attendance image + seat chart. No timer. For when students are finding their seats.</div>
       </div>
       <div class="lcard" onclick="goExam()">
         <div class="lico">⏱</div>
         <div class="ltitle" style="color:var(--gr)">Exam Phase</div>
-        <div class="ldesc">Full-screen countdown timer + clock. Seat chart shown below. For when the exam is running.</div>
+        <div class="ldesc">Full-screen countdown timer + clock. Seat chart + instructions shown below.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════ DISPLAY SHELL ══════════ -->
+<!-- ══════════ DISPLAY ══════════ -->
 <div id="display">
 
-  <!-- Floating controls — always visible on hover -->
+  <!-- Floating main controls -->
   <div id="fctrl">
     <button class="btn bpu sm" onclick="switchToSeating()" id="modeseat">🪑 Seating View</button>
     <button class="btn bgr sm" onclick="switchToExam()" id="modeexam">⏱ Exam View</button>
+    <button class="btn bs sm" onclick="togSeat()" id="tbtn">🪑 Hide Seating</button>
     <div style="border-top:1px solid var(--bd);margin:2px 0"></div>
     <button class="btn bs sm" onclick="exitD()">✏ Edit</button>
+  </div>
+
+  <!-- Floating column adjuster (bottom-left) -->
+  <div id="coladj">
+    <div id="coladj-inner">
+      <div id="coladj-title">↕ Column Offsets</div>
+      <div id="cadjrows"></div>
+    </div>
   </div>
 
   <!-- ── SEATING PHASE ── -->
@@ -267,12 +331,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     <div id="spbar">
       <div id="spvenue">Examination Hall</div>
       <div style="display:flex;align-items:center;gap:14px">
-        <div id="spdate" style="color:var(--mu)"></div>
+        <div id="spdate"></div>
         <div id="spclock">--:--:--</div>
       </div>
     </div>
     <div id="spmain">
-      <!-- BIG IMAGE LEFT -->
+      <!-- Big image -->
       <div id="imgpanel" onclick="imgPanelClick(event)"
         ondragover="imgDragOver(event)" ondragleave="imgDragLeave(event)" ondrop="imgDrop(event)">
         <div id="imgdrop">
@@ -280,12 +344,11 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
           <p>Click or drag &amp; drop attendance images here</p>
           <small>JPG / PNG — multiple files supported</small>
         </div>
-        <!-- slides injected here -->
         <div id="imgoverlay">
           <button class="imgnavbtn" onclick="event.stopPropagation();galPrev()">‹</button>
           <div style="display:flex;align-items:center;gap:10px">
             <div id="imgdots"></div>
-            <span id="imgcount" style="font-size:.75rem;color:rgba(255,255,255,.4)"></span>
+            <span id="imgcount"></span>
           </div>
           <div id="imgctrl">
             <select id="imgspeed" onchange="if(galPlaying)startGallery()">
@@ -300,9 +363,9 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
           </div>
           <button class="imgnavbtn" onclick="event.stopPropagation();galNext()">›</button>
         </div>
-        <button id="imgupload" class="btn bs sm" onclick="event.stopPropagation();document.getElementById('attfile').click()" style="z-index:10">+ Add Images</button>
+        <button id="imgupload" class="btn bs sm" onclick="event.stopPropagation();document.getElementById('attfile').click()">+ Add Images</button>
       </div>
-      <!-- SEATS RIGHT -->
+      <!-- Seat panel -->
       <div id="seatpanel">
         <div id="spseathdr">
           <div id="spseattitle">Seating</div>
@@ -310,6 +373,10 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
         </div>
         <div id="sphall"></div>
       </div>
+    </div>
+    <!-- Instructions strip at bottom -->
+    <div id="spinst">
+      <div id="spinst-inner"></div>
     </div>
   </div>
 
@@ -337,12 +404,17 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
         </div>
         <div id="exhall"></div>
       </div>
+      <!-- Instructions panel in exam -->
+      <div id="exinst">
+        <h3 id="exinsttitle">📋 Exam Instructions</h3>
+        <div id="exinstlist"></div>
+      </div>
     </div>
   </div>
 
 </div><!-- /display -->
 
-<!-- LIGHTBOX -->
+<!-- Lightbox -->
 <div id="lightbox" onclick="lbClose()">
   <button id="lbclose" onclick="lbClose()">✕</button>
   <button id="lbprev" onclick="event.stopPropagation();lbShift(-1)">‹</button>
@@ -366,10 +438,14 @@ let CS=[];
 let attImages=[], galIdx=0, galIv=null, galPlaying=true;
 let clockIv=null, cfg=null;
 
+// Which halls are currently rendered (for live offset updates)
+let activeHalls={}; // hallId -> colElements array
+
 // ── TABS ──
 function tab(id){
-  document.querySelectorAll('.tabx').forEach((b,i)=>b.classList.toggle('on',['t1','t2','t3'][i]===id));
+  document.querySelectorAll('.tabx').forEach((b,i)=>b.classList.toggle('on',['t1','t2','t3','t4'][i]===id));
   document.querySelectorAll('.tc').forEach(c=>c.classList.toggle('on',c.id===id));
+  if(id==='t4')renderInstPreview();
 }
 
 // ── CLASS CONFIG ──
@@ -427,6 +503,43 @@ function resetOff(i){
   CS[i].o=0;
 }
 
+// ── INSTRUCTIONS ──
+let instItems=[
+  {bullet:'1.',text:'Place your student ID on the top-right corner of your desk.'},
+  {bullet:'2.',text:'No electronic devices are permitted during the examination.'},
+  {bullet:'3.',text:'Raise your hand if you need assistance from an invigilator.'},
+];
+function renderInstList(){
+  const list=document.getElementById('instlist'); list.innerHTML='';
+  instItems.forEach((item,i)=>{
+    const div=document.createElement('div'); div.className='inst-item';
+    div.innerHTML=`
+      <input type="text" class="inst-bullet" value="${item.bullet}" onchange="instItems[${i}].bullet=this.value;renderInstPreview()" placeholder="•" title="Bullet / number">
+      <textarea onchange="instItems[${i}].text=this.value;renderInstPreview()" oninput="instItems[${i}].text=this.value;renderInstPreview()">${item.text}</textarea>
+      <button class="inst-del" onclick="delInst(${i})" title="Remove">✕</button>`;
+    list.appendChild(div);
+  });
+  renderInstPreview();
+}
+function addInst(){
+  instItems.push({bullet:`${instItems.length+1}.`,text:''});
+  renderInstList();
+}
+function delInst(i){
+  instItems.splice(i,1);
+  renderInstList();
+}
+function renderInstPreview(){
+  const prev=document.getElementById('instpreview'); prev.innerHTML='';
+  instItems.forEach(item=>{
+    if(!item.text.trim())return;
+    const d=document.createElement('div'); d.className='exinst-item';
+    d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    prev.appendChild(d);
+  });
+}
+function getInstWhere(){return document.getElementById('instwhere').value;}
+
 // ── READ CONFIG ──
 function readAll(){
   const h=+document.getElementById('th').value||0, m=+document.getElementById('tm').value||0;
@@ -448,30 +561,31 @@ function readAll(){
     CS[i]={s:+document.getElementById(`cse${i}`)?.value||8,o:parseInt(document.getElementById(`cof${i}`)?.value)||0,sp:+document.getElementById(`csp${i}`)?.value||12};
     cols.push(CS[i]);
   }
-  return{vname:document.getElementById('vname').value,door:document.getElementById('dpos').value,nc,cls,ncols,gap,cols};
+  return{
+    vname:document.getElementById('vname').value,
+    door:document.getElementById('dpos').value,
+    nc,cls,ncols,gap,cols,
+    insttitle:document.getElementById('insttitle').value,
+    instwhere:getInstWhere(),
+    instItems:[...instItems]
+  };
 }
 
 // ── LAUNCH ──
-function goSeating(){
-  cfg=readAll();
+function goSeating(){cfg=readAll();showDisplay();switchToSeating();}
+function goExam(){cfg=readAll();showDisplay();switchToExam();}
+function showDisplay(){
   document.getElementById('editor').style.display='none';
   document.getElementById('display').style.display='flex';
   startClock();
-  switchToSeating();
-}
-function goExam(){
-  cfg=readAll();
-  document.getElementById('editor').style.display='none';
-  document.getElementById('display').style.display='flex';
-  startClock();
-  switchToExam();
 }
 function exitD(){
-  tPause(); stopClock(); stopGallery();
+  tPause();stopClock();stopGallery();
   document.getElementById('display').style.display='none';
-  document.getElementById('editor').style.display='flex';
   document.getElementById('seatphase').style.display='none';
   document.getElementById('examphase').style.display='none';
+  document.getElementById('coladj').style.display='none';
+  document.getElementById('editor').style.display='flex';
 }
 
 function switchToSeating(){
@@ -479,20 +593,120 @@ function switchToSeating(){
   document.getElementById('seatphase').style.display='flex';
   document.getElementById('modeseat').style.opacity='.4';
   document.getElementById('modeexam').style.opacity='1';
+  document.getElementById('tbtn').textContent='🪑 Hide Seating';
+  document.getElementById('seatpanel').classList.remove('hidden');
   document.getElementById('spvenue').textContent=cfg?.vname||'Examination Hall';
-  document.getElementById('spseattitle').textContent=cfg?.vname||'';
+  document.getElementById('spseattitle').textContent=cfg?.vname||'Seating';
   buildHall(cfg,'sphall','spseatleg');
   renderGallery();
+  buildInstStrip();
+  buildColAdj();
+  document.getElementById('coladj').style.display='block';
 }
 function switchToExam(){
   document.getElementById('seatphase').style.display='none';
   document.getElementById('examphase').style.display='flex';
   document.getElementById('modeexam').style.opacity='.4';
   document.getElementById('modeseat').style.opacity='1';
+  document.getElementById('tbtn').textContent='🪑 Hide Seating';
+  document.getElementById('exseat').classList.remove('hidden');
   document.getElementById('tlbl').textContent=T.lbl;
   document.getElementById('exseattitle').textContent=(cfg?.vname||'')+' — Seating';
   buildHall(cfg,'exhall','exleg');
+  buildInstExam();
+  buildColAdj();
+  document.getElementById('coladj').style.display='block';
   tReset();
+}
+
+// ── TOGGLE SEATING ──
+function togSeat(){
+  const phase=document.getElementById('seatphase').style.display!=='none'?'seat':'exam';
+  if(phase==='seat'){
+    const p=document.getElementById('seatpanel');
+    const hidden=p.classList.toggle('hidden');
+    document.getElementById('tbtn').textContent=hidden?'🪑 Show Seating':'🪑 Hide Seating';
+    document.getElementById('coladj').style.display=hidden?'none':'block';
+  } else {
+    const p=document.getElementById('exseat');
+    const hidden=p.classList.toggle('hidden');
+    document.getElementById('tbtn').textContent=hidden?'🪑 Show Seating':'🪑 Hide Seating';
+    document.getElementById('coladj').style.display=hidden?'none':'block';
+  }
+}
+
+// ── LIVE COLUMN ADJUSTER (display panel) ──
+function buildColAdj(){
+  if(!cfg)return;
+  const n=cfg.ncols, rows=document.getElementById('cadjrows');
+  rows.innerHTML='';
+  for(let i=0;i<n;i++){
+    const row=document.createElement('div'); row.className='cadj-row';
+    row.innerHTML=`<span class="cadj-lbl">Col ${i+1}</span>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},-20)" title="-20px" style="font-size:.65rem">▲▲</button>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},-4)" title="-4px">▲</button>
+      <span class="cadj-val" id="lcov${i}">${CS[i]?.o||0}px</span>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},4)" title="+4px">▼</button>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},20)" title="+20px" style="font-size:.65rem">▼▼</button>
+      <button class="cadj-rst" onclick="liveResetOff(${i})" title="Reset">⊙</button>`;
+    rows.appendChild(row);
+  }
+}
+
+function liveAdjOff(i, delta){
+  while(CS.length<=i) CS.push({s:8,o:0,sp:12});
+  let v=Math.max(-300,Math.min(300,(CS[i].o||0)+delta));
+  CS[i].o=v;
+  // Update label in adjuster panel
+  const lbl=document.getElementById(`lcov${i}`);
+  if(lbl)lbl.textContent=v+'px';
+  // Update editor hidden input & label if present
+  const eh=document.getElementById(`cof${i}`),el=document.getElementById(`cov${i}`);
+  if(eh)eh.value=v; if(el)el.textContent=v+'px';
+  // Update live rendered seats
+  applyLiveOffset(i,v);
+}
+function liveResetOff(i){liveAdjOff(i,-(CS[i]?.o||0));}
+
+// Apply offset to all rendered .cseats elements for column i
+function applyLiveOffset(colIdx, val){
+  // Both hall containers
+  ['sphall','exhall'].forEach(hallId=>{
+    const hall=document.getElementById(hallId);
+    if(!hall)return;
+    // cseats elements are indexed by column position in the .carea
+    const cseats=hall.querySelectorAll('.cseats');
+    if(cseats[colIdx]) cseats[colIdx].style.marginTop=val+'px';
+  });
+}
+
+// ── INSTRUCTIONS ──
+function buildInstStrip(){
+  const where=cfg?.instwhere||'both';
+  const strip=document.getElementById('spinst');
+  const inner=document.getElementById('spinst-inner');
+  inner.innerHTML='';
+  if(where==='exam'||where==='none'||!cfg?.instItems?.length){strip.classList.remove('show');return;}
+  cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
+    const d=document.createElement('div'); d.className='spin-item';
+    d.innerHTML=`<span class="spin-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    inner.appendChild(d);
+  });
+  if(inner.children.length) strip.classList.add('show'); else strip.classList.remove('show');
+}
+function buildInstExam(){
+  const where=cfg?.instwhere||'both';
+  const box=document.getElementById('exinst');
+  const list=document.getElementById('exinstlist');
+  list.innerHTML='';
+  if(where==='seating'||where==='none'||!cfg?.instItems?.length){box.classList.remove('show');return;}
+  document.getElementById('exinsttitle').textContent=cfg.insttitle||'📋 Exam Instructions';
+  cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
+    const d=document.createElement('div'); d.className='exinst-item';
+    d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    list.appendChild(d);
+  });
+  if(list.children.length) box.classList.add('show'); else box.classList.remove('show');
 }
 
 // ── CLOCK ──
@@ -502,7 +716,6 @@ function stopClock(){clearInterval(clockIv);}
 function updateClock(){
   const n=new Date();
   const ts=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
-  // Update all clock elements
   document.getElementById('clockbox').textContent=ts;
   document.getElementById('spclock').textContent=ts;
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -529,14 +742,14 @@ function chkMsgs(){
   for(const m of T.msgs){if(rm<=m.at&&!T.fired.has(m.at)){T.fired.add(m.at);document.getElementById('tmsg').textContent=m.msg;}}
 }
 function showBtns(run){
-  [document.getElementById('sb2')].forEach(b=>b.style.display=run?'none':'');
-  [document.getElementById('pb2')].forEach(b=>b.style.display=run?'':'none');
+  document.getElementById('sb2').style.display=run?'none':'';
+  document.getElementById('pb2').style.display=run?'':'none';
 }
 function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem--;chkMsgs();updTimer();},1000);}
 function tPause(){T.run=false;clearInterval(T.iv);showBtns(false);}
 function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById('tmsg').textContent='';updTimer();}
 
-// ── BUILD HALL (reusable) ──
+// ── BUILD HALL ──
 function buildHall(cfg,hallId,legId){
   if(!cfg)return;
   const{door,nc,cls,ncols,gap,cols}=cfg;
@@ -580,7 +793,6 @@ function buildHall(cfg,hallId,legId){
     cw.appendChild(cs); ca.appendChild(cw);
   }
   wrap.appendChild(ca); hall.appendChild(wrap);
-  // Legend
   const leg=document.getElementById(legId); leg.innerHTML='';
   for(let ci=0;ci<nc;ci++){
     const c2=cls[ci], clr=CLR[ci%CLR.length];
@@ -639,13 +851,10 @@ function renderImgDots(){
 }
 
 // ── IMAGE UPLOAD ──
-function imgPanelClick(e){
-  if(!attImages.length) document.getElementById('attfile').click();
-}
+function imgPanelClick(e){if(!attImages.length) document.getElementById('attfile').click();}
 function imgDragOver(e){e.preventDefault();document.getElementById('imgdrop').classList.add('over');document.getElementById('imgpanel').style.outline='2px dashed var(--ac)';}
 function imgDragLeave(){document.getElementById('imgdrop').classList.remove('over');document.getElementById('imgpanel').style.outline='';}
 function imgDrop(e){e.preventDefault();imgDragLeave();attFiles(e.dataTransfer.files);}
-
 function attFiles(files){
   if(!files||!files.length)return;
   const oldLen=attImages.length; let loaded=0;
@@ -662,11 +871,6 @@ function attFiles(files){
     reader.readAsDataURL(f);
   });
   document.getElementById('attfile').value='';
-}
-function delAtt(idx){
-  attImages.splice(idx,1);
-  if(galIdx>=attImages.length)galIdx=Math.max(0,attImages.length-1);
-  renderGallery();
 }
 
 // ── LIGHTBOX ──
@@ -690,7 +894,7 @@ function lbKey(e){if(e.key==='ArrowLeft')lbShift(-1);if(e.key==='ArrowRight')lbS
 // ── TOAST ──
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
-window.onload=()=>{renderCC();renderCT();};
+window.onload=()=>{renderCC();renderCT();renderInstList();};
 </script>
 </body>
 </html>
