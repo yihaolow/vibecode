@@ -250,15 +250,24 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   <!-- COLUMNS -->
   <div id="t3" class="tc panel">
     <h2>Column Configuration</h2>
-    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column. You can also adjust column offsets live in the display using the floating ↕ panel.</p>
-    <div class="row" style="margin-bottom:14px">
+    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column. Use the ▲▼ buttons in the live display to shift columns up/down by one seat slot.</p>
+    <div class="row" style="margin-bottom:6px">
       <div class="fg" style="max-width:140px"><label>Number of Columns</label><input type="number" id="ncols" value="4" min="1" max="20" onchange="renderCT()"></div>
-      <div class="fg" style="max-width:200px"><label>Empty seats gap between classes</label><input type="number" id="cgap" value="2" min="0" max="10"></div>
+      <div class="fg" style="max-width:180px"><label>Gap between classes (seats)</label><input type="number" id="cgap" value="1" min="0" max="10"></div>
       <div style="display:flex;align-items:flex-end"><button class="btn bs" onclick="renderCT()">🔄 Refresh</button></div>
+    </div>
+    <div class="row" style="margin-bottom:14px;align-items:flex-end">
+      <div class="fg">
+        <label>Quick seat count — e.g. <span style="color:var(--ac)">5,3,5,4,3</span></label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="quickseats" placeholder="e.g. 5,3,5,4,3" style="max-width:220px">
+          <button class="btn bp sm" onclick="applyQuickSeats()">Apply</button>
+        </div>
+      </div>
     </div>
     <div style="overflow-x:auto">
       <table id="ctable">
-        <thead><tr><th>Column</th><th>Seats</th><th>Vertical Offset ↕</th><th>Right spacer (px)</th></tr></thead>
+        <thead><tr><th>Column</th><th>Seats in col</th><th>Slot offset (▲▼ = 1 seat)</th><th>Right spacer (px)</th></tr></thead>
         <tbody id="ctbody"></tbody>
       </table>
     </div>
@@ -476,6 +485,7 @@ function renderCC(){
 }
 
 // ── COLUMN CONFIG ──
+// CS[i].o = slot offset (integer: number of empty seats prepended at top)
 function renderCT(){
   const n=+document.getElementById('ncols').value||4;
   while(CS.length<n) CS.push({s:8,o:0,sp:12});
@@ -487,12 +497,10 @@ function renderCT(){
     <td><input type="number" id="cse${i}" value="${col.s}" min="1" max="80" style="max-width:70px"></td>
     <td>
       <div class="ofrow">
-        <button class="arrbtn" onclick="adjOff(${i},-20)" title="-20px" style="font-size:.7rem">▲▲</button>
-        <button class="arrbtn" onclick="adjOff(${i},-4)" title="-4px" style="font-size:.75rem">▲</button>
-        <span class="ofval" id="cov${i}">${col.o}px</span>
-        <button class="arrbtn" onclick="adjOff(${i},4)" title="+4px" style="font-size:.75rem">▼</button>
-        <button class="arrbtn" onclick="adjOff(${i},20)" title="+20px" style="font-size:.7rem">▼▼</button>
-        <button class="arrbtn" onclick="resetOff(${i})" title="Reset" style="font-size:.7rem;color:var(--mu)">⊙</button>
+        <button class="arrbtn" onclick="adjOff(${i},-1)" title="Shift up 1 seat">▲</button>
+        <span class="ofval" id="cov${i}">${col.o} slots</span>
+        <button class="arrbtn" onclick="adjOff(${i},1)" title="Shift down 1 seat">▼</button>
+        <button class="arrbtn" onclick="resetOff(${i})" title="Reset to 0" style="font-size:.7rem;color:var(--mu)">⊙</button>
         <input type="hidden" id="cof${i}" value="${col.o}">
       </div>
     </td>
@@ -502,13 +510,30 @@ function renderCT(){
 }
 function adjOff(i,d){
   const h=document.getElementById(`cof${i}`),l=document.getElementById(`cov${i}`);
-  let v=Math.max(-300,Math.min(300,(parseInt(h.value)||0)+d));
-  h.value=v; l.textContent=v+'px'; CS[i].o=v;
+  let v=Math.max(0,Math.min(20,(parseInt(h.value)||0)+d));
+  h.value=v; l.textContent=v+' slots'; CS[i].o=v;
 }
 function resetOff(i){
   document.getElementById(`cof${i}`).value=0;
-  document.getElementById(`cov${i}`).textContent='0px';
+  document.getElementById(`cov${i}`).textContent='0 slots';
   CS[i].o=0;
+}
+function applyQuickSeats(){
+  const raw=document.getElementById('quickseats').value.trim();
+  if(!raw)return;
+  const vals=raw.split(/[,\s]+/).map(v=>parseInt(v)).filter(v=>v>0&&v<=80);
+  if(!vals.length){toast('⚠ No valid numbers found');return;}
+  // Update ncols to match
+  document.getElementById('ncols').value=vals.length;
+  while(CS.length<vals.length) CS.push({s:8,o:0,sp:12});
+  vals.forEach((v,i)=>{ CS[i].s=v; });
+  renderCT();
+  // Now update the inputs
+  vals.forEach((v,i)=>{
+    const el=document.getElementById(`cse${i}`);
+    if(el) el.value=v;
+  });
+  toast(`✅ Applied ${vals.length} columns: ${vals.join(', ')}`);
 }
 
 // ── INSTRUCTIONS ──
@@ -601,7 +626,7 @@ function readAll(){
     ccSaved[i]={name:document.getElementById(`cn${i}`)?.value||`Class ${i+1}`,stu:+document.getElementById(`cs${i}`)?.value||30,st:+document.getElementById(`ck${i}`)?.value||1};
     cls.push(ccSaved[i]);
   }
-  const ncols=+document.getElementById('ncols').value||4, gap=+document.getElementById('cgap').value||2, cols=[];
+  const ncols=+document.getElementById('ncols').value||4, gap=+document.getElementById('cgap').value??1, cols=[];
   for(let i=0;i<ncols;i++){
     CS[i]={s:+document.getElementById(`cse${i}`)?.value||8,o:parseInt(document.getElementById(`cof${i}`)?.value)||0,sp:+document.getElementById(`csp${i}`)?.value||12};
     cols.push(CS[i]);
@@ -688,11 +713,9 @@ function buildColAdj(){
   for(let i=0;i<n;i++){
     const row=document.createElement('div'); row.className='cadj-row';
     row.innerHTML=`<span class="cadj-lbl">Col ${i+1}</span>
-      <button class="cadj-btn" onclick="liveAdjOff(${i},-20)" title="-20px" style="font-size:.65rem">▲▲</button>
-      <button class="cadj-btn" onclick="liveAdjOff(${i},-4)" title="-4px">▲</button>
-      <span class="cadj-val" id="lcov${i}">${CS[i]?.o||0}px</span>
-      <button class="cadj-btn" onclick="liveAdjOff(${i},4)" title="+4px">▼</button>
-      <button class="cadj-btn" onclick="liveAdjOff(${i},20)" title="+20px" style="font-size:.65rem">▼▼</button>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},-1)" title="Shift up 1 seat">▲</button>
+      <span class="cadj-val" id="lcov${i}">${CS[i]?.o||0}</span>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},1)" title="Shift down 1 seat">▼</button>
       <button class="cadj-rst" onclick="liveResetOff(${i})" title="Reset">⊙</button>`;
     rows.appendChild(row);
   }
@@ -700,30 +723,22 @@ function buildColAdj(){
 
 function liveAdjOff(i, delta){
   while(CS.length<=i) CS.push({s:8,o:0,sp:12});
-  let v=Math.max(-300,Math.min(300,(CS[i].o||0)+delta));
+  let v=Math.max(0,Math.min(20,(CS[i].o||0)+delta));
   CS[i].o=v;
-  // Update label in adjuster panel
+  // Update display label
   const lbl=document.getElementById(`lcov${i}`);
-  if(lbl)lbl.textContent=v+'px';
-  // Update editor hidden input & label if present
-  const eh=document.getElementById(`cof${i}`),el=document.getElementById(`cov${i}`);
-  if(eh)eh.value=v; if(el)el.textContent=v+'px';
-  // Update live rendered seats
-  applyLiveOffset(i,v);
+  if(lbl) lbl.textContent=v;
+  // Sync back to editor inputs
+  const eh=document.getElementById(`cof${i}`), el=document.getElementById(`cov${i}`);
+  if(eh) eh.value=v; if(el) el.textContent=v+' slots';
+  // Sync cfg cols so rebuild is correct
+  if(cfg&&cfg.cols[i]) cfg.cols[i].o=v;
+  // Rebuild whichever hall is visible
+  const inSeat=document.getElementById('seatphase').style.display!=='none';
+  if(inSeat) buildHall(cfg,'sphall','spseatleg');
+  else buildHall(cfg,'exhall','exleg');
 }
-function liveResetOff(i){liveAdjOff(i,-(CS[i]?.o||0));}
-
-// Apply offset to all rendered .cseats elements for column i
-function applyLiveOffset(colIdx, val){
-  // Both hall containers
-  ['sphall','exhall'].forEach(hallId=>{
-    const hall=document.getElementById(hallId);
-    if(!hall)return;
-    // cseats elements are indexed by column position in the .carea
-    const cseats=hall.querySelectorAll('.cseats');
-    if(cseats[colIdx]) cseats[colIdx].style.marginTop=val+'px';
-  });
-}
+function liveResetOff(i){ liveAdjOff(i,-(CS[i]?.o||0)); }
 
 // ── INSTRUCTIONS ──
 function buildInstStrip(){
@@ -799,18 +814,30 @@ function buildHall(cfg,hallId,legId){
   if(!cfg)return;
   const{door,nc,cls,ncols,gap,cols}=cfg;
   const hall=document.getElementById(hallId); hall.innerHTML='';
+
+  // Build flat seat list with 1-seat gaps between classes
   let flat=[];
   for(let ci=0;ci<nc;ci++){
-    if(ci>0)for(let g=0;g<gap;g++)flat.push({t:'g',ci});
+    if(ci>0) for(let g=0;g<Math.max(1,gap);g++) flat.push({t:'g',ci});
     const c=cls[ci];
-    for(let s=0;s<c.stu;s++)flat.push({t:'s',ci,n:c.st+s});
+    for(let s=0;s<c.stu;s++) flat.push({t:'s',ci,n:c.st+s});
   }
+
+  // Distribute into columns, respecting slot offset (empty seats at top)
   const colData=[]; let si=0;
   for(let c=0;c<ncols;c++){
-    const cap=(cols[c]||{s:8}).s, col=[];
-    for(let r=0;r<cap;r++) col.push(si<flat.length?flat[si++]:{t:'e'});
+    const colcfg=cols[c]||{s:8,o:0,sp:12};
+    const slotOffset=Math.max(0,colcfg.o||0);
+    const capacity=Math.max(1,colcfg.s);
+    const col=[];
+    // Prepend offset empty slots
+    for(let r=0;r<slotOffset;r++) col.push({t:'e'});
+    // Fill remaining with actual seats
+    const remaining=capacity; // total visible seats (offset does NOT reduce count)
+    for(let r=0;r<remaining;r++) col.push(si<flat.length?flat[si++]:{t:'e'});
     colData.push(col);
   }
+
   const wrap=document.createElement('div');
   wrap.className='hwrap'+(door==='right'?' dr':'');
   const doorEl=document.createElement('div');
@@ -822,11 +849,16 @@ function buildHall(cfg,hallId,legId){
     if(c>0){const sp=document.createElement('div');sp.style.width=Math.max(4,(cols[c-1]||{sp:12}).sp)+'px';sp.style.flexShrink='0';ca.appendChild(sp);}
     const cw=document.createElement('div'); cw.className='cwrap';
     const lb=document.createElement('div'); lb.className='clbl'; lb.textContent=`Col ${c+1}`; cw.appendChild(lb);
-    const cs=document.createElement('div'); cs.className='cseats'; cs.style.marginTop=(cfg2.o||0)+'px';
+    const cs=document.createElement('div'); cs.className='cseats';
+    // No margin-top — offset is handled by prepended empty slots above
     for(const slot of colData[c]){
-      if(slot.t==='g'){const g=document.createElement('div');g.className='sgap';cs.appendChild(g);}
-      else if(slot.t==='e'){const s=document.createElement('div');s.className='seat emp';s.style.background='rgba(20,35,50,.4)';s.style.borderColor='rgba(40,70,100,.5)';cs.appendChild(s);}
-      else{
+      if(slot.t==='g'){
+        const g=document.createElement('div'); g.className='sgap'; cs.appendChild(g);
+      } else if(slot.t==='e'){
+        const s=document.createElement('div'); s.className='seat emp';
+        s.style.background='rgba(20,35,50,.4)'; s.style.borderColor='rgba(40,70,100,.5)';
+        cs.appendChild(s);
+      } else {
         const clr=CLR[slot.ci%CLR.length], c2=cls[slot.ci];
         const s=document.createElement('div'); s.className='seat';
         s.style.background=clr.bg; s.style.borderColor=clr.bd;
