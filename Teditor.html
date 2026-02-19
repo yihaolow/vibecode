@@ -58,12 +58,12 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 
 /* Launch cards */
 .launchers{display:flex;gap:10px;flex-wrap:wrap}
-.lcard{flex:1;min-width:200px;background:var(--panel);border:2px solid var(--bd);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;text-align:center}
+.lcard{flex:1;min-width:200px;background:var(--panel);border:2px solid var(--bd);border-radius:10px;padding:16px 16px 18px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0}
 .lcard:hover{border-color:var(--ac);background:#15152e}
 .lcard.seat:hover{border-color:#9b59ff}
-.lcard .lico{font-size:2rem;margin-bottom:6px}
-.lcard .ltitle{font-size:1rem;font-weight:700;margin-bottom:4px}
-.lcard .ldesc{font-size:.78rem;color:var(--mu)}
+.lcard .lico{font-size:2rem;line-height:1;margin-bottom:8px;display:block}
+.lcard .ltitle{font-size:1rem;font-weight:700;margin-bottom:6px;display:block}
+.lcard .ldesc{font-size:.78rem;color:var(--mu);line-height:1.45;display:block}
 
 /* ══ DISPLAY ══ */
 #display{display:none;flex-direction:column;min-height:100vh}
@@ -285,6 +285,14 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
       <h4>Preview</h4>
       <div id="instpreview"></div>
     </div>
+    <div class="dvd"></div>
+    <h3 style="color:var(--ac2);margin-bottom:8px">⚡ Crash Failsafe — Plain Text Copy</h3>
+    <p style="color:var(--mu);font-size:.82rem;margin-bottom:10px">Keep this text somewhere safe (notes app, printed). If the page crashes, you can re-paste it here and your instructions will be restored instantly.</p>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <button class="btn bp sm" onclick="exportInstText()">📋 Copy to Clipboard</button>
+      <button class="btn bs sm" onclick="importInstText()">📥 Import from Text Below</button>
+    </div>
+    <textarea id="insttextbox" placeholder="Instructions will appear here when you click Copy. Paste previously copied text here and click Import to restore." style="min-height:110px;font-family:monospace;font-size:.82rem"></textarea>
   </div>
 
   <!-- LAUNCH -->
@@ -537,6 +545,43 @@ function renderInstPreview(){
     d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
     prev.appendChild(d);
   });
+  // Keep text box in sync
+  const tb=document.getElementById('insttextbox');
+  if(tb&&tb!==document.activeElement) tb.value=serializeInst();
+}
+function serializeInst(){
+  const title=document.getElementById('insttitle').value||'';
+  const where=document.getElementById('instwhere').value||'both';
+  let out=`TITLE: ${title}\nSHOW: ${where}\n---\n`;
+  instItems.forEach(item=>{out+=`${item.bullet}|${item.text}\n`;});
+  return out.trimEnd();
+}
+function exportInstText(){
+  const text=serializeInst();
+  document.getElementById('insttextbox').value=text;
+  navigator.clipboard?.writeText(text).then(()=>toast('📋 Copied to clipboard!')).catch(()=>toast('📋 Text ready — copy manually'));
+}
+function importInstText(){
+  const raw=document.getElementById('insttextbox').value.trim();
+  if(!raw){toast('Nothing to import');return;}
+  const lines=raw.split('\n');
+  let title='', where='both', items=[], inData=false;
+  for(const line of lines){
+    if(line.startsWith('TITLE:')){title=line.slice(6).trim();}
+    else if(line.startsWith('SHOW:')){where=line.slice(5).trim();}
+    else if(line==='---'){inData=true;}
+    else if(inData&&line.includes('|')){
+      const idx=line.indexOf('|');
+      items.push({bullet:line.slice(0,idx),text:line.slice(idx+1)});
+    }
+  }
+  if(!items.length){toast('⚠ No instructions found — check format');return;}
+  if(title) document.getElementById('insttitle').value=title;
+  const ws=document.getElementById('instwhere');
+  if(['both','seating','exam','none'].includes(where)) ws.value=where;
+  instItems=items;
+  renderInstList();
+  toast('✅ Instructions imported!');
 }
 function getInstWhere(){return document.getElementById('instwhere').value;}
 
