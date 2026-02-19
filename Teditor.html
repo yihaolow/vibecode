@@ -8,6 +8,8 @@
 :root{--bg:#0a0a1a;--panel:#111128;--bd:#2a2a4a;--ac:#4a9eff;--ac2:#ff9f4a;--tx:#e8e8f0;--mu:#7070a0;--gr:#00e676;--ye:#ffea00;--re:#ff1744}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+
+/* ── EDITOR ── */
 #editor{display:flex;flex-direction:column;min-height:100vh;padding:20px;gap:14px;max-width:1100px;margin:0 auto}
 .etop{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 h1{font-size:1.5rem;font-weight:800;color:var(--ac)}
@@ -20,6 +22,7 @@ label{font-size:.75rem;color:var(--mu);font-weight:600;text-transform:uppercase;
 input,select,textarea{background:#0d0d20;border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:7px 10px;font-size:.88rem;font-family:inherit;width:100%;transition:border-color .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac)}
 input[type=number]{max-width:90px}
+input[type=time]{max-width:130px;font-size:1rem;padding:6px 10px}
 textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:all .2s;white-space:nowrap}
 .bp{background:var(--ac);color:#000}.bp:hover{background:#6ab5ff}
@@ -38,35 +41,43 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 #ctable{width:100%;border-collapse:collapse;margin-top:8px;font-size:.85rem}
 #ctable th,#ctable td{padding:8px 10px;border:1px solid var(--bd);vertical-align:middle}
 #ctable th{background:#0d0d20;color:var(--mu);font-weight:600;text-transform:uppercase;font-size:.72rem}
-/* Arrow offset controls */
 .ofrow{display:flex;align-items:center;gap:6px}
 .ofval{min-width:48px;text-align:center;color:var(--ac);font-size:.85rem;font-weight:700;background:#0d0d20;border:1px solid var(--bd);border-radius:5px;padding:3px 6px}
 .arrbtn{width:28px;height:28px;border-radius:5px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .arrbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 .arrbtn:active{transform:scale(.92)}
+.hint{font-size:.78rem;color:var(--mu);background:#0d0d1a;border:1px solid var(--bd);border-radius:6px;padding:8px 12px;margin-top:6px}
+.hint strong{color:var(--ac2)}
 
-/* DISPLAY */
+/* ── DISPLAY ── */
 #display{display:none;flex-direction:column;min-height:100vh;padding:20px;gap:18px}
-#fctrl{position:fixed;top:14px;right:14px;display:flex;flex-direction:column;gap:7px;z-index:200;opacity:.2;transition:opacity .3s}
+#fctrl{position:fixed;top:14px;right:14px;display:flex;flex-direction:column;gap:7px;z-index:200;opacity:.15;transition:opacity .3s}
 #fctrl:hover{opacity:1}
 
-/* Timer section with CLOCK */
+/* Timer */
 #tsec{text-align:center;padding:24px 20px 18px;background:var(--panel);border-radius:12px;border:1px solid var(--bd)}
-#tlbl{font-size:1.1rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+#tlbl{font-size:1.1rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
 #tdisp{font-size:clamp(3.5rem,11vw,9rem);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:var(--gr);text-shadow:0 0 40px currentColor,0 0 70px currentColor;transition:color .5s,text-shadow .5s;line-height:1}
 #tdisp.ye{color:var(--ye);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
 #tdisp.re{color:var(--re);text-shadow:0 0 40px currentColor,0 0 70px currentColor;animation:pulse 1s ease-in-out infinite}
 #tdisp.ot{color:var(--re);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-#tmsg{margin-top:10px;font-size:1.3rem;color:var(--ac2);min-height:2em;font-weight:600}
-#tbtns{display:flex;gap:12px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+#tmsg{margin-top:8px;font-size:1.3rem;color:var(--ac2);min-height:2em;font-weight:600}
+#tbtns{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
 
-/* Real-time clock strip */
-#clockstrip{display:flex;justify-content:center;align-items:center;gap:18px;margin-top:10px;flex-wrap:wrap}
-#clockbox{font-size:clamp(1.4rem,4vw,2.8rem);font-weight:700;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.08em;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 18px}
+/* Clock strip */
+#clockstrip{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px;flex-wrap:wrap}
+#clockbox{font-size:clamp(1.6rem,4vw,3rem);font-weight:900;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 20px}
 #datebox{font-size:.92rem;color:var(--mu);background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 14px;letter-spacing:.04em}
+/* Failsafe indicator */
+#fsind{font-size:.78rem;padding:5px 12px;border-radius:20px;font-weight:600;letter-spacing:.04em;background:#0d0d20;border:1px solid var(--bd);color:var(--mu)}
+#fsind.live{border-color:#00e676;color:#00e676}
+#fsind.fs{border-color:var(--ac2);color:var(--ac2);animation:fspulse 2s ease-in-out infinite}
+@keyframes fspulse{0%,100%{opacity:1}50%{opacity:.6}}
 
-#ssec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:20px;transition:all .3s}
+/* Side by side: seating + gallery */
+#mainrow{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+#ssec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:20px;transition:all .3s;flex:1;min-width:0}
 #ssec.hidden{display:none}
 #shdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 #stitle{font-size:1.2rem;font-weight:700;color:var(--ac)}
@@ -89,28 +100,68 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .sbadge{font-size:.58rem;padding:1px 3px;border-radius:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px}
 .seat.emp{border-style:dashed;opacity:.3}
 
-/* Attendance / Image upload panel */
-#attsec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:20px}
-#attsec.hidden{display:none}
-#atthdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-#atttitle{font-size:1.1rem;font-weight:700;color:var(--ac2)}
-#attgrid{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
-.attcard{position:relative;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;overflow:hidden;width:200px;flex-shrink:0}
-.attcard img{width:100%;height:150px;object-fit:cover;display:block}
-.attcard .attlbl{padding:6px 10px;font-size:.78rem;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.attcard .attdel{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(255,23,68,.85);border:none;color:#fff;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
-.attcard:hover .attdel{opacity:1}
-#dropzone{width:200px;height:175px;border:2px dashed var(--bd);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .25s;color:var(--mu);font-size:.85rem;text-align:center;padding:12px;flex-shrink:0}
-#dropzone:hover,#dropzone.over{border-color:var(--ac);color:var(--ac);background:rgba(74,158,255,.06)}
-#dropzone .dico2{font-size:2.2rem}
+/* ── GALLERY PANEL ── */
+#galwrap{width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+#galwrap.hidden{display:none}
+
+/* Rotating gallery */
+#galsec{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:16px}
+#galhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+#galtitle{font-size:1rem;font-weight:700;color:var(--ac2)}
+#galstatus{font-size:.75rem;color:var(--mu)}
+#galstage{position:relative;width:100%;aspect-ratio:4/3;background:#0d0d20;border-radius:8px;overflow:hidden;border:1px solid var(--bd);cursor:pointer}
+#galstage:hover #galzoomhint{opacity:1}
+.galslide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .8s ease;pointer-events:none}
+.galslide.active{opacity:1;pointer-events:auto}
+.galslide img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#galempty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--mu);font-size:.88rem}
+#galempty .ico{font-size:2.4rem;opacity:.4}
+#galzoomhint{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);color:var(--mu);font-size:.7rem;padding:3px 8px;border-radius:4px;opacity:0;transition:opacity .2s;pointer-events:none}
+#galnav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+.galnavbtn{width:32px;height:32px;border-radius:6px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.galnavbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
+#galdots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center}
+.gdot{width:7px;height:7px;border-radius:50%;background:var(--bd);cursor:pointer;transition:all .2s;border:none}
+.gdot.on{background:var(--ac);width:18px;border-radius:4px}
+#galctrl{display:flex;gap:6px;align-items:center}
+.galplaybtn{padding:4px 10px;border-radius:5px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:.78rem;font-weight:600;font-family:inherit;transition:all .15s}
+.galplaybtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
+#galspeed{max-width:70px;font-size:.78rem;padding:4px 6px}
+
+/* Thumbnail strip */
+#galthumb{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:14px}
+#galthumbhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#galthumbhdr span{font-size:.85rem;font-weight:600;color:var(--mu)}
+#thumbrow{display:flex;gap:8px;flex-wrap:wrap}
+.tcard{position:relative;width:72px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;transition:all .2s;flex-shrink:0}
+.tcard:hover{border-color:var(--ac);transform:scale(1.05)}
+.tcard.on{border-color:var(--ac)}
+.tcard img{width:100%;height:54px;object-fit:cover;display:block}
+.tcard .tdel{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(255,23,68,.9);border:none;color:#fff;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.tcard:hover .tdel{opacity:1}
+#addbtn{width:72px;height:58px;border:2px dashed var(--bd);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--mu);font-size:.65rem;transition:all .2s;background:transparent;font-family:inherit}
+#addbtn:hover{border-color:var(--ac);color:var(--ac);background:rgba(74,158,255,.06)}
 #attfile{display:none}
 
+/* ── LIGHTBOX ── */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.open{display:flex}
+#lbimg{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.8)}
+#lbclose{position:fixed;top:18px;right:22px;font-size:2rem;color:rgba(255,255,255,.7);cursor:pointer;background:none;border:none;line-height:1;transition:color .15s}
+#lbclose:hover{color:#fff}
+#lbcap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:.85rem;text-align:center;pointer-events:none}
+#lbprev,#lbnext{position:fixed;top:50%;transform:translateY(-50%);font-size:2rem;color:rgba(255,255,255,.6);cursor:pointer;background:rgba(0,0,0,.4);border:none;padding:10px 14px;border-radius:8px;transition:all .15s;z-index:1001}
+#lbprev:hover,#lbnext:hover{background:rgba(74,158,255,.5);color:#fff}
+#lbprev{left:14px}#lbnext{right:14px}
+
+/* Toast */
 #toast{position:fixed;bottom:18px;right:18px;background:var(--ac);color:#000;padding:9px 16px;border-radius:7px;font-weight:600;font-size:.88rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 
+<!-- ══ EDITOR ══ -->
 <div id="editor">
   <div class="etop">
     <h1>🏫 Exam Hall Display Editor</h1>
@@ -122,7 +173,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     <button class="tabx" onclick="tab('t3')">📐 Columns</button>
   </div>
 
-  <!-- TIMER -->
+  <!-- TIMER TAB -->
   <div id="t1" class="tc on panel">
     <h2>Timer Settings</h2>
     <div class="row">
@@ -135,6 +186,23 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
       <div class="fg"><label>Timer Label</label><input type="text" id="tlbltxt" value="Time Remaining"></div>
       <div class="fg"><label>Overtime Message</label><input type="text" id="otmsg" value="⏰ TIME IS UP — Please stop writing!"></div>
     </div>
+    <div class="dvd"></div>
+    <h3 style="color:var(--ac2);margin-bottom:10px">⚡ Crash Failsafe — Start Time</h3>
+    <div class="row">
+      <div class="fg" style="max-width:180px">
+        <label>Exam Start Time (24h)</label>
+        <input type="time" id="starttime" value="">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn bs" onclick="setStartNow()">🕐 Use Current Time</button>
+      </div>
+    </div>
+    <div class="hint">
+      <strong>How failsafe works:</strong> If you set a start time and the page crashes &amp; reloads,
+      the timer will automatically calculate how much time has elapsed since the start and resume
+      from the correct remaining time — no need to manually reset. Leave blank to use manual Start button only.
+    </div>
+    <div class="dvd"></div>
     <div class="row">
       <div class="fg"><label>Timed Messages (minutes=message, one per line)</label>
         <textarea id="cdmsgs">30=⚠ 30 minutes remaining
@@ -145,7 +213,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
   </div>
 
-  <!-- SEATING -->
+  <!-- SEATING TAB -->
   <div id="t2" class="tc panel">
     <h2>Venue &amp; Classes</h2>
     <div class="row">
@@ -161,10 +229,10 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     <div id="cclist"></div>
   </div>
 
-  <!-- COLUMNS -->
+  <!-- COLUMNS TAB -->
   <div id="t3" class="tc panel">
     <h2>Column Configuration</h2>
-    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column. Student numbers are continuous across columns.</p>
+    <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column.</p>
     <div class="row" style="margin-bottom:14px">
       <div class="fg" style="max-width:140px"><label>Number of Columns</label><input type="number" id="ncols" value="4" min="1" max="20" onchange="renderCT()"></div>
       <div class="fg" style="max-width:200px"><label>Empty seats gap between classes</label><input type="number" id="cgap" value="2" min="0" max="10"></div>
@@ -172,35 +240,32 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
     <div style="overflow-x:auto">
       <table id="ctable">
-        <thead><tr>
-          <th>Column</th>
-          <th>Seats in column</th>
-          <th>Vertical Offset ↕</th>
-          <th>Right spacer (px)</th>
-        </tr></thead>
+        <thead><tr><th>Column</th><th>Seats</th><th>Vertical Offset ↕</th><th>Right spacer (px)</th></tr></thead>
         <tbody id="ctbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- DISPLAY -->
+<!-- ══ DISPLAY ══ -->
 <div id="display">
   <div id="fctrl">
     <button class="btn bs sm" onclick="togSeat()" id="tbtn">🪑 Hide Seating</button>
-    <button class="btn bs sm" onclick="togAtt()" id="abtn">📷 Hide Attendance</button>
+    <button class="btn bs sm" onclick="togGal()" id="gbtn">🖼 Hide Gallery</button>
     <button class="btn bs sm" onclick="exitD()">✏ Edit</button>
     <button class="btn bgr sm" onclick="tStart()" id="sb1">▶ Start</button>
     <button class="btn bw sm" onclick="tPause()" id="pb1" style="display:none">⏸ Pause</button>
     <button class="btn bs sm" onclick="tReset()">↺ Reset</button>
   </div>
 
+  <!-- Timer -->
   <div id="tsec">
     <div id="tlbl">Time Remaining</div>
     <div id="tdisp">--:--</div>
     <div id="clockstrip">
       <div id="clockbox">--:--:--</div>
       <div id="datebox">Loading...</div>
+      <div id="fsind">⏱ Manual Mode</div>
     </div>
     <div id="tmsg"></div>
     <div id="tbtns">
@@ -210,36 +275,72 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
   </div>
 
-  <div id="ssec">
-    <div id="shdr">
-      <div id="stitle">Seating Arrangement</div>
-      <div id="sleg"></div>
+  <!-- Seating + Gallery side by side -->
+  <div id="mainrow">
+    <div id="ssec">
+      <div id="shdr">
+        <div id="stitle">Seating Arrangement</div>
+        <div id="sleg"></div>
+      </div>
+      <div id="hall"></div>
     </div>
-    <div id="hall"></div>
-  </div>
 
-  <!-- ATTENDANCE IMAGE UPLOAD -->
-  <div id="attsec">
-    <div id="atthdr">
-      <div id="atttitle">📋 Attendance Photos</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span id="attcount" style="font-size:.82rem;color:var(--mu)">0 images</span>
-        <button class="btn br sm" onclick="clearAtt()" id="clearattbtn" style="display:none">🗑 Clear All</button>
+    <!-- Gallery panel -->
+    <div id="galwrap">
+      <div id="galsec">
+        <div id="galhdr">
+          <div id="galtitle">📋 Attendance</div>
+          <div id="galstatus">No images</div>
+        </div>
+        <!-- Rotating stage -->
+        <div id="galstage" onclick="lbOpen(galIdx)">
+          <div id="galempty"><span class="ico">📷</span><span>Upload images below</span></div>
+          <span id="galzoomhint">🔍 Click to enlarge</span>
+        </div>
+        <!-- Nav -->
+        <div id="galnav">
+          <button class="galnavbtn" onclick="galPrev()">‹</button>
+          <div id="galdots"></div>
+          <div id="galctrl">
+            <select id="galspeed" title="Rotation speed">
+              <option value="3000">3s</option>
+              <option value="5000" selected>5s</option>
+              <option value="8000">8s</option>
+              <option value="12000">12s</option>
+              <option value="0">Off</option>
+            </select>
+            <button class="galplaybtn" id="galplaybtn" onclick="galTogglePlay()">⏸ Pause</button>
+          </div>
+          <button class="galnavbtn" onclick="galNext()">›</button>
+        </div>
+      </div>
+
+      <!-- Thumbnails -->
+      <div id="galthumb">
+        <div id="galthumbhdr">
+          <span>📷 Images <span id="attcount" style="color:var(--ac)">0</span></span>
+          <button class="btn br sm" onclick="clearAtt()" id="clearattbtn" style="display:none">🗑 Clear All</button>
+        </div>
+        <div id="thumbrow">
+          <button id="addbtn" onclick="document.getElementById('attfile').click()">
+            <span style="font-size:1.4rem">+</span><span>Add</span>
+          </button>
+        </div>
       </div>
     </div>
-    <p style="color:var(--mu);font-size:.82rem;margin-bottom:12px">Upload attendance sheets or photos here. Images are stored locally in this browser session.</p>
-    <div id="attgrid">
-      <div id="dropzone" onclick="document.getElementById('attfile').click()"
-        ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
-        <span class="dico2">📷</span>
-        <span><strong>Click or drag</strong><br>to upload images</span>
-        <span style="font-size:.72rem;color:var(--mu)">JPG, PNG, PDF preview</span>
-      </div>
-    </div>
-    <input type="file" id="attfile" accept="image/*" multiple onchange="attFiles(this.files)">
   </div>
 </div>
 
+<!-- Lightbox -->
+<div id="lightbox" onclick="lbClose()">
+  <button id="lbclose" onclick="lbClose()">✕</button>
+  <button id="lbprev" onclick="event.stopPropagation();lbShift(-1)">‹</button>
+  <img id="lbimg" src="" alt="">
+  <button id="lbnext" onclick="event.stopPropagation();lbShift(1)">›</button>
+  <div id="lbcap"></div>
+</div>
+
+<input type="file" id="attfile" accept="image/*" multiple onchange="attFiles(this.files)">
 <div id="toast"></div>
 
 <script>
@@ -249,26 +350,29 @@ const CLR=[
   {bg:'rgba(0,230,118,.15)',bd:'rgba(0,230,118,.5)',bbl:'rgba(0,230,118,.3)',tx:'#60f0a0',dot:'#00e676'},
 ];
 
-let T={total:0,rem:0,run:false,iv:null,wy:30,wr:10,lbl:'Time Remaining',ot:'TIME IS UP',msgs:[],fired:new Set()};
+let T={total:0,rem:0,run:false,iv:null,wy:30,wr:10,lbl:'Time Remaining',ot:'TIME IS UP',msgs:[],fired:new Set(),startHH:-1,startMM:-1};
 let CS=[];
 let attImages=[];
+let galIdx=0, galIv=null, galPlaying=true;
 
-// ─── TABS ───
+// ── TABS ──
 function tab(id){
   document.querySelectorAll('.tabx').forEach((b,i)=>b.classList.toggle('on',['t1','t2','t3'][i]===id));
   document.querySelectorAll('.tc').forEach(c=>c.classList.toggle('on',c.id===id));
 }
+function setStartNow(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('starttime').value=`${hh}:${mm}`;
+  toast('Start time set to '+hh+':'+mm);
+}
 
-// ─── CLASS CONFIG ───
-let ccSaved=[
-  {name:'Class 3A',stu:30,st:1},
-  {name:'Class 3B',stu:30,st:1},
-  {name:'Class 3C',stu:30,st:1},
-];
+// ── CLASS CONFIG ──
+let ccSaved=[{name:'Class 3A',stu:30,st:1},{name:'Class 3B',stu:30,st:1},{name:'Class 3C',stu:30,st:1}];
 function renderCC(){
   const n=+document.getElementById('nc').value;
-  const c=document.getElementById('cclist');
-  c.innerHTML='';
+  const c=document.getElementById('cclist'); c.innerHTML='';
   for(let i=0;i<n;i++){
     const d=ccSaved[i]||{name:`Class ${i+1}`,stu:30,st:1};
     const col=CLR[i];
@@ -284,12 +388,11 @@ function renderCC(){
   }
 }
 
-// ─── COLUMN CONFIG with ARROW BUTTONS ───
+// ── COLUMN CONFIG ──
 function renderCT(){
   const n=+document.getElementById('ncols').value||4;
   while(CS.length<n) CS.push({s:8,o:0,sp:12});
-  const tb=document.getElementById('ctbody');
-  tb.innerHTML='';
+  const tb=document.getElementById('ctbody'); tb.innerHTML='';
   for(let i=0;i<n;i++){
     const col=CS[i];
     const tr=document.createElement('tr');
@@ -297,12 +400,12 @@ function renderCT(){
     <td><input type="number" id="cse${i}" value="${col.s}" min="1" max="80" style="max-width:70px"></td>
     <td>
       <div class="ofrow">
-        <button class="arrbtn" onclick="adjOff(${i},-20)" title="Move up 20px">▲</button>
-        <button class="arrbtn" onclick="adjOff(${i},-4)" title="Move up 4px" style="font-size:.7rem">▲</button>
+        <button class="arrbtn" onclick="adjOff(${i},-20)" title="-20px">▲▲</button>
+        <button class="arrbtn" onclick="adjOff(${i},-4)" title="-4px" style="font-size:.75rem">▲</button>
         <span class="ofval" id="cov${i}">${col.o}px</span>
-        <button class="arrbtn" onclick="adjOff(${i},4)" title="Move down 4px" style="font-size:.7rem">▼</button>
-        <button class="arrbtn" onclick="adjOff(${i},20)" title="Move down 20px">▼</button>
-        <button class="arrbtn" onclick="resetOff(${i})" title="Reset to 0" style="font-size:.7rem;color:var(--mu)">⊙</button>
+        <button class="arrbtn" onclick="adjOff(${i},4)" title="+4px" style="font-size:.75rem">▼</button>
+        <button class="arrbtn" onclick="adjOff(${i},20)" title="+20px">▼▼</button>
+        <button class="arrbtn" onclick="resetOff(${i})" title="Reset" style="font-size:.7rem;color:var(--mu)">⊙</button>
         <input type="hidden" id="cof${i}" value="${col.o}">
       </div>
     </td>
@@ -310,106 +413,115 @@ function renderCT(){
     tb.appendChild(tr);
   }
 }
-
-function adjOff(i, delta){
-  const hid=document.getElementById(`cof${i}`);
-  const lbl=document.getElementById(`cov${i}`);
-  let v=parseInt(hid.value)||0;
-  v=Math.max(-300,Math.min(300,v+delta));
-  hid.value=v; lbl.textContent=v+'px';
-  CS[i].o=v;
+function adjOff(i,d){
+  const h=document.getElementById(`cof${i}`),l=document.getElementById(`cov${i}`);
+  let v=Math.max(-300,Math.min(300,(parseInt(h.value)||0)+d));
+  h.value=v; l.textContent=v+'px'; CS[i].o=v;
 }
 function resetOff(i){
-  const hid=document.getElementById(`cof${i}`);
-  const lbl=document.getElementById(`cov${i}`);
-  hid.value=0; lbl.textContent='0px';
+  document.getElementById(`cof${i}`).value=0;
+  document.getElementById(`cov${i}`).textContent='0px';
   CS[i].o=0;
 }
 
-// ─── READ ALL CONFIG ───
+// ── READ ALL ──
 function readAll(){
   const h=+document.getElementById('th').value||0;
-  const m=+document.getElementById('tm').value||0;
-  T.total=(h*3600)+(m*60); T.rem=T.total;
+  const m2=+document.getElementById('tm').value||0;
+  T.total=(h*3600)+(m2*60); T.rem=T.total;
   T.wy=+document.getElementById('wy').value||30;
   T.wr=+document.getElementById('wr').value||10;
   T.lbl=document.getElementById('tlbltxt').value||'Time Remaining';
   T.ot=document.getElementById('otmsg').value;
   T.msgs=document.getElementById('cdmsgs').value.trim().split('\n')
     .map(l=>{const[t,...r]=l.split('=');return{at:+t,msg:r.join('=')};})
-    .filter(m=>!isNaN(m.at));
+    .filter(x=>!isNaN(x.at));
   T.fired=new Set();
-
+  const sv=document.getElementById('starttime').value;
+  if(sv){const[sh,sm]=sv.split(':');T.startHH=+sh;T.startMM=+sm;}
+  else{T.startHH=-1;T.startMM=-1;}
   const nc=+document.getElementById('nc').value;
   const cls=[];
   for(let i=0;i<nc;i++){
-    ccSaved[i]={
-      name:document.getElementById(`cn${i}`)?.value||`Class ${i+1}`,
-      stu:+document.getElementById(`cs${i}`)?.value||30,
-      st:+document.getElementById(`ck${i}`)?.value||1,
-    };
+    ccSaved[i]={name:document.getElementById(`cn${i}`)?.value||`Class ${i+1}`,stu:+document.getElementById(`cs${i}`)?.value||30,st:+document.getElementById(`ck${i}`)?.value||1};
     cls.push(ccSaved[i]);
   }
   const ncols=+document.getElementById('ncols').value||4;
   const gap=+document.getElementById('cgap').value||2;
   const cols=[];
   for(let i=0;i<ncols;i++){
-    CS[i]={
-      s:+document.getElementById(`cse${i}`)?.value||8,
-      o:parseInt(document.getElementById(`cof${i}`)?.value)||0,
-      sp:+document.getElementById(`csp${i}`)?.value||12,
-    };
+    CS[i]={s:+document.getElementById(`cse${i}`)?.value||8,o:parseInt(document.getElementById(`cof${i}`)?.value)||0,sp:+document.getElementById(`csp${i}`)?.value||12};
     cols.push(CS[i]);
   }
   return{vname:document.getElementById('vname').value,door:document.getElementById('dpos').value,nc,cls,ncols,gap,cols};
 }
 
-// ─── LAUNCH DISPLAY ───
+// ── LAUNCH ──
 function go(){
   const cfg=readAll();
   document.getElementById('editor').style.display='none';
   document.getElementById('display').style.display='flex';
   document.getElementById('tlbl').textContent=T.lbl;
   document.getElementById('stitle').textContent=cfg.vname+' — Seating Arrangement';
-  tReset();
-  buildHall(cfg);
   startClock();
-  renderAtt();
+  checkFailsafe();
+  buildHall(cfg);
 }
 function exitD(){
-  tPause();
-  stopClock();
+  tPause(); stopClock(); stopGallery();
   document.getElementById('display').style.display='none';
   document.getElementById('editor').style.display='flex';
 }
 
-// ─── REAL-TIME CLOCK ───
-let clockIv=null;
-function startClock(){
-  updateClock();
-  clockIv=setInterval(updateClock,1000);
-}
-function stopClock(){
-  clearInterval(clockIv);
-}
-function updateClock(){
+// ── FAILSAFE TIMER ──
+function checkFailsafe(){
+  const ind=document.getElementById('fsind');
+  if(T.startHH<0){
+    ind.textContent='⏱ Manual Mode';
+    ind.className='fsind';
+    tReset(); return;
+  }
   const now=new Date();
-  const hh=String(now.getHours()).padStart(2,'0');
-  const mm=String(now.getMinutes()).padStart(2,'0');
-  const ss=String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clockbox').textContent=`${hh}:${mm}:${ss}`;
+  const startMs=(T.startHH*3600+T.startMM*60)*1000;
+  const nowMs=(now.getHours()*3600+now.getMinutes()*60+now.getSeconds())*1000;
+  let elapsed=nowMs-startMs;
+  if(elapsed<0) elapsed+=86400000; // past midnight edge case
+  const elapsedSec=Math.floor(elapsed/1000);
+  T.rem=T.total-elapsedSec;
+  ind.textContent=`⚡ Failsafe: started ${pad(T.startHH)}:${pad(T.startMM)}`;
+  ind.className='fsind fs';
+  updTimer();
+  // Auto-start if within exam window
+  if(T.rem>0 && elapsedSec>0){
+    T.run=true; showBtns(true);
+    T.iv=setInterval(()=>{T.rem--;chkMsgs();updTimer();},1000);
+    toast('⚡ Failsafe active — timer resumed from '+pad(T.startHH)+':'+pad(T.startMM));
+  } else if(T.rem<=0){
+    T.rem=0; updTimer();
+    document.getElementById('tmsg').textContent=T.ot;
+    toast('⚡ Exam time already ended.');
+  }
+}
+function pad(n){return String(n).padStart(2,'0');}
+
+// ── CLOCK ──
+let clockIv=null;
+function startClock(){updateClock(); clockIv=setInterval(updateClock,1000);}
+function stopClock(){clearInterval(clockIv);}
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clockbox').textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const d=now.getDate(), mo=months[now.getMonth()], dy=days[now.getDay()], yr=now.getFullYear();
-  document.getElementById('datebox').textContent=`${dy}, ${d} ${mo} ${yr}`;
+  document.getElementById('datebox').textContent=`${days[n.getDay()]}, ${n.getDate()} ${months[n.getMonth()]} ${n.getFullYear()}`;
 }
 
-// ─── TIMER ───
-function upd(){
+// ── TIMER ──
+function updTimer(){
   const el=document.getElementById('tdisp');
-  const r=T.rem, ot=r<0, abs=Math.abs(r);
-  const h=Math.floor(abs/3600),mm2=Math.floor((abs%3600)/60),s=abs%60;
-  const str=(h>0?h+':':'')+String(mm2).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  const r=T.rem,ot=r<0,abs=Math.abs(r);
+  const h=Math.floor(abs/3600),mm=Math.floor((abs%3600)/60),s=abs%60;
+  const str=(h>0?h+':':'')+pad(mm)+':'+pad(s);
   el.textContent=ot?'+'+str:str;
   el.className='';
   const rm=r/60;
@@ -419,157 +531,204 @@ function upd(){
 }
 function chkMsgs(){
   const rm=Math.floor(T.rem/60);
-  for(const m of T.msgs){
-    if(rm<=m.at&&!T.fired.has(m.at)){T.fired.add(m.at);document.getElementById('tmsg').textContent=m.msg;}
-  }
+  for(const m of T.msgs){if(rm<=m.at&&!T.fired.has(m.at)){T.fired.add(m.at);document.getElementById('tmsg').textContent=m.msg;}}
 }
 function showBtns(run){
   [document.getElementById('sb1'),document.getElementById('sb2')].forEach(b=>b.style.display=run?'none':'');
   [document.getElementById('pb1'),document.getElementById('pb2')].forEach(b=>b.style.display=run?'':'none');
 }
-function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem--;chkMsgs();upd();},1000);}
+function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem--;chkMsgs();updTimer();},1000);}
 function tPause(){T.run=false;clearInterval(T.iv);showBtns(false);}
-function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById('tmsg').textContent='';upd();}
+function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById('tmsg').textContent='';updTimer();}
 function togSeat(){
   const s=document.getElementById('ssec'),b=document.getElementById('tbtn');
-  const h=s.classList.toggle('hidden');
-  b.textContent=h?'🪑 Show Seating':'🪑 Hide Seating';
+  b.textContent=s.classList.toggle('hidden')?'🪑 Show Seating':'🪑 Hide Seating';
 }
-function togAtt(){
-  const s=document.getElementById('attsec'),b=document.getElementById('abtn');
-  const h=s.classList.toggle('hidden');
-  b.textContent=h?'📷 Show Attendance':'📷 Hide Attendance';
+function togGal(){
+  const s=document.getElementById('galwrap'),b=document.getElementById('gbtn');
+  b.textContent=s.classList.toggle('hidden')?'🖼 Show Gallery':'🖼 Hide Gallery';
 }
 
-// ─── SEATING HALL ───
+// ── HALL BUILD ──
 function buildHall(cfg){
   const{door,nc,cls,ncols,gap,cols}=cfg;
-  const hall=document.getElementById('hall');
-  hall.innerHTML='';
+  const hall=document.getElementById('hall'); hall.innerHTML='';
   let flat=[];
   for(let ci=0;ci<nc;ci++){
     if(ci>0)for(let g=0;g<gap;g++)flat.push({t:'g',ci});
     const c=cls[ci];
     for(let s=0;s<c.stu;s++)flat.push({t:'s',ci,n:c.st+s});
   }
-  const colData=[];
-  let si=0;
+  const colData=[];let si=0;
   for(let c=0;c<ncols;c++){
-    const cap=(cols[c]||{s:8}).s;
-    const col=[];
-    for(let r=0;r<cap;r++) col.push(si<flat.length?flat[si++]:{t:'e'});
+    const cap=(cols[c]||{s:8}).s;const col=[];
+    for(let r=0;r<cap;r++)col.push(si<flat.length?flat[si++]:{t:'e'});
     colData.push(col);
   }
   const wrap=document.createElement('div');
   wrap.className='hwrap'+(door==='right'?' dr':'');
   const doorEl=document.createElement('div');
-  doorEl.className='door';
-  doorEl.innerHTML='<span class="dico">🚪</span><span>DOOR</span>';
+  doorEl.className='door';doorEl.innerHTML='<span class="dico">🚪</span><span>DOOR</span>';
   wrap.appendChild(doorEl);
-  const ca=document.createElement('div');
-  ca.className='carea';
+  const ca=document.createElement('div');ca.className='carea';
   for(let c=0;c<ncols;c++){
     const cfg2=cols[c]||{s:8,o:0,sp:12};
-    if(c>0){
-      const sp=document.createElement('div');
-      sp.style.width=Math.max(4,(cols[c-1]||{sp:12}).sp)+'px';
-      sp.style.flexShrink='0';
-      ca.appendChild(sp);
-    }
-    const cw=document.createElement('div');
-    cw.className='cwrap';
-    const lb=document.createElement('div');
-    lb.className='clbl'; lb.textContent=`Col ${c+1}`;
-    cw.appendChild(lb);
-    const cs=document.createElement('div');
-    cs.className='cseats'; cs.style.marginTop=(cfg2.o||0)+'px';
+    if(c>0){const sp=document.createElement('div');sp.style.width=Math.max(4,(cols[c-1]||{sp:12}).sp)+'px';sp.style.flexShrink='0';ca.appendChild(sp);}
+    const cw=document.createElement('div');cw.className='cwrap';
+    const lb=document.createElement('div');lb.className='clbl';lb.textContent=`Col ${c+1}`;cw.appendChild(lb);
+    const cs=document.createElement('div');cs.className='cseats';cs.style.marginTop=(cfg2.o||0)+'px';
     for(const slot of colData[c]){
       if(slot.t==='g'){const g=document.createElement('div');g.className='sgap';cs.appendChild(g);}
-      else if(slot.t==='e'){
-        const s=document.createElement('div');
-        s.className='seat emp';
-        s.style.background='rgba(20,35,50,.4)';
-        s.style.borderColor='rgba(40,70,100,.5)';
-        cs.appendChild(s);
-      }else{
-        const clr=CLR[slot.ci%CLR.length];
-        const c2=cls[slot.ci];
-        const s=document.createElement('div');
-        s.className='seat';
-        s.style.background=clr.bg;s.style.borderColor=clr.bd;
+      else if(slot.t==='e'){const s=document.createElement('div');s.className='seat emp';s.style.background='rgba(20,35,50,.4)';s.style.borderColor='rgba(40,70,100,.5)';cs.appendChild(s);}
+      else{
+        const clr=CLR[slot.ci%CLR.length];const c2=cls[slot.ci];
+        const s=document.createElement('div');s.className='seat';s.style.background=clr.bg;s.style.borderColor=clr.bd;
         s.title=`${c2.name} — Seat ${slot.n}`;
-        s.innerHTML=`<span class="snum">${slot.n}</span>
-          <span class="sbadge" style="background:${clr.bbl};color:${clr.tx}">${c2.name}</span>`;
+        s.innerHTML=`<span class="snum">${slot.n}</span><span class="sbadge" style="background:${clr.bbl};color:${clr.tx}">${c2.name}</span>`;
         cs.appendChild(s);
       }
     }
     cw.appendChild(cs);ca.appendChild(cw);
   }
   wrap.appendChild(ca);hall.appendChild(wrap);
-  const leg=document.getElementById('sleg');
-  leg.innerHTML='';
+  const leg=document.getElementById('sleg');leg.innerHTML='';
   for(let ci=0;ci<nc;ci++){
     const c2=cls[ci],clr=CLR[ci%CLR.length];
     const li=document.createElement('div');li.className='legit';
-    li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span>
-      <span>${c2.name}</span>
-      <span style="color:var(--mu);font-size:.78rem">(seats ${c2.st}–${c2.st+c2.stu-1})</span>`;
+    li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span><span>${c2.name}</span><span style="color:var(--mu);font-size:.78rem">(seats ${c2.st}–${c2.st+c2.stu-1})</span>`;
     leg.appendChild(li);
   }
 }
 
-// ─── ATTENDANCE IMAGE UPLOAD ───
+// ── GALLERY ──
+function galGo(idx){
+  if(!attImages.length){galIdx=0;return;}
+  galIdx=(idx+attImages.length)%attImages.length;
+  const slides=document.querySelectorAll('.galslide');
+  slides.forEach((s,i)=>s.classList.toggle('active',i===galIdx));
+  renderDots();
+  renderThumbs();
+  document.getElementById('galstatus').textContent=`${galIdx+1} / ${attImages.length}`;
+}
+function galNext(){galGo(galIdx+1);}
+function galPrev(){galGo(galIdx-1);}
+function galTogglePlay(){
+  galPlaying=!galPlaying;
+  document.getElementById('galplaybtn').textContent=galPlaying?'⏸ Pause':'▶ Play';
+  if(galPlaying)startGallery(); else stopGallery();
+}
+function startGallery(){
+  stopGallery();
+  const spd=+document.getElementById('galspeed').value;
+  if(spd===0||!galPlaying||attImages.length<2)return;
+  galIv=setInterval(galNext,spd);
+}
+function stopGallery(){clearInterval(galIv);galIv=null;}
+document.getElementById('galspeed').addEventListener('change',()=>{if(galPlaying)startGallery();});
+
+function renderGallery(){
+  const stage=document.getElementById('galstage');
+  // Remove old slides
+  stage.querySelectorAll('.galslide').forEach(s=>s.remove());
+  const empty=document.getElementById('galempty');
+  if(!attImages.length){empty.style.display='flex';document.getElementById('galstatus').textContent='No images';renderDots();renderThumbs();stopGallery();return;}
+  empty.style.display='none';
+  attImages.forEach((img,i)=>{
+    const div=document.createElement('div');
+    div.className='galslide'+(i===galIdx?' active':'');
+    const im=document.createElement('img');im.src=img.src;im.alt=img.name;
+    div.appendChild(im);stage.appendChild(div);
+  });
+  document.getElementById('galstatus').textContent=`${galIdx+1} / ${attImages.length}`;
+  renderDots();renderThumbs();
+  document.getElementById('attcount').textContent=attImages.length;
+  document.getElementById('clearattbtn').style.display=attImages.length?'':'none';
+  if(galPlaying)startGallery();
+}
+function renderDots(){
+  const d=document.getElementById('galdots');d.innerHTML='';
+  attImages.forEach((_,i)=>{
+    const b=document.createElement('button');b.className='gdot'+(i===galIdx?' on':'');
+    b.onclick=()=>galGo(i);d.appendChild(b);
+  });
+}
+function renderThumbs(){
+  const tr=document.getElementById('thumbrow');
+  tr.querySelectorAll('.tcard').forEach(c=>c.remove());
+  const addbtn=document.getElementById('addbtn');
+  attImages.forEach((img,i)=>{
+    const card=document.createElement('div');card.className='tcard'+(i===galIdx?' on':'');
+    card.innerHTML=`<img src="${img.src}" alt="${img.name}">
+      <button class="tdel" onclick="event.stopPropagation();delAtt(${i})" title="Remove">✕</button>`;
+    card.onclick=()=>galGo(i);
+    tr.insertBefore(card,addbtn);
+  });
+}
+
+// ── IMAGE UPLOAD ──
 function attFiles(files){
   if(!files||!files.length)return;
+  const oldLen=attImages.length;
+  let loaded=0;
   Array.from(files).forEach(f=>{
     if(!f.type.startsWith('image/'))return;
     const reader=new FileReader();
     reader.onload=e=>{
       attImages.push({src:e.target.result,name:f.name,time:new Date().toLocaleTimeString()});
-      renderAtt();
-      toast('📷 Image added: '+f.name);
+      loaded++;
+      if(loaded===files.length||(loaded===1&&oldLen===0))galIdx=oldLen;
+      renderGallery();
+      toast('📷 '+f.name+' added');
     };
     reader.readAsDataURL(f);
   });
   document.getElementById('attfile').value='';
 }
-function renderAtt(){
-  const grid=document.getElementById('attgrid');
-  // Remove old cards (keep dropzone)
-  Array.from(grid.querySelectorAll('.attcard')).forEach(c=>c.remove());
-  const dz=document.getElementById('dropzone');
-  attImages.forEach((img,idx)=>{
-    const card=document.createElement('div');
-    card.className='attcard';
-    card.innerHTML=`<img src="${img.src}" alt="${img.name}">
-      <div class="attlbl" title="${img.name}">📄 ${img.name}<br><span style="font-size:.7rem;opacity:.6">${img.time}</span></div>
-      <button class="attdel" onclick="delAtt(${idx})" title="Remove">✕</button>`;
-    grid.insertBefore(card,dz);
-  });
-  document.getElementById('attcount').textContent=attImages.length+' image'+(attImages.length!==1?'s':'');
-  document.getElementById('clearattbtn').style.display=attImages.length?'':'none';
-}
 function delAtt(idx){
   attImages.splice(idx,1);
-  renderAtt();
+  if(galIdx>=attImages.length)galIdx=Math.max(0,attImages.length-1);
+  renderGallery();
 }
 function clearAtt(){
   if(!confirm('Remove all attendance images?'))return;
-  attImages=[];
-  renderAtt();
+  attImages=[];galIdx=0;
+  renderGallery();
 }
-function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('over');}
-function dzLeave(e){document.getElementById('dropzone').classList.remove('over');}
-function dzDrop(e){
-  e.preventDefault();
-  document.getElementById('dropzone').classList.remove('over');
-  attFiles(e.dataTransfer.files);
-}
+// Drag & drop on gallery stage
+const gstage=document.getElementById('galstage');
+gstage.addEventListener('dragover',e=>{e.preventDefault();gstage.style.borderColor='var(--ac)';});
+gstage.addEventListener('dragleave',()=>{gstage.style.borderColor='';});
+gstage.addEventListener('drop',e=>{e.preventDefault();gstage.style.borderColor='';attFiles(e.dataTransfer.files);});
+const addbtn=document.getElementById('addbtn');
+addbtn.addEventListener('dragover',e=>{e.preventDefault();addbtn.style.borderColor='var(--ac)';});
+addbtn.addEventListener('dragleave',()=>{addbtn.style.borderColor='';});
+addbtn.addEventListener('drop',e=>{e.preventDefault();addbtn.style.borderColor='';attFiles(e.dataTransfer.files);});
 
-// ─── TOAST ───
+// ── LIGHTBOX ──
+function lbOpen(idx){
+  if(!attImages.length)return;
+  galIdx=idx;
+  const lb=document.getElementById('lightbox');
+  document.getElementById('lbimg').src=attImages[idx].src;
+  document.getElementById('lbcap').textContent=`${attImages[idx].name}  (${idx+1} / ${attImages.length})`;
+  lb.classList.add('open');
+  document.addEventListener('keydown',lbKey);
+}
+function lbClose(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.removeEventListener('keydown',lbKey);
+}
+function lbShift(d){
+  galIdx=(galIdx+d+attImages.length)%attImages.length;
+  document.getElementById('lbimg').src=attImages[galIdx].src;
+  document.getElementById('lbcap').textContent=`${attImages[galIdx].name}  (${galIdx+1} / ${attImages.length})`;
+  galGo(galIdx);
+}
+function lbKey(e){if(e.key==='ArrowLeft')lbShift(-1);if(e.key==='ArrowRight')lbShift(1);if(e.key==='Escape')lbClose();}
+
+// ── TOAST ──
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
