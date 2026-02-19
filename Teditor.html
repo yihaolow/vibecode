@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,58 +12,58 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-
 /* == EDITOR == */
 #editor{display:flex;flex-direction:column;min-height:100vh;padding:20px;gap:14px;max-width:1100px;margin:0 auto}
 .etop{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-h1{font-size:1.5rem;font-weight:800;color:var(–ac)}
-h2{font-size:1.05rem;font-weight:700;color:var(–ac2);margin-bottom:12px}
+h1{font-size:1.5rem;font-weight:800;color:var(--ac)}
+h2{font-size:1.05rem;font-weight:700;color:var(--ac2);margin-bottom:12px}
 h3{font-size:.9rem;font-weight:600;margin-bottom:8px}
-.panel{background:var(–panel);border:1px solid var(–bd);border-radius:10px;padding:18px}
+.panel{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:18px}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
 .fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px}
-label{font-size:.75rem;color:var(–mu);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-input,select,textarea{background:#0d0d20;border:1px solid var(–bd);border-radius:6px;color:var(–tx);padding:7px 10px;font-size:.88rem;font-family:inherit;width:100%;transition:border-color .2s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(–ac)}
+label{font-size:.75rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{background:#0d0d20;border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:7px 10px;font-size:.88rem;font-family:inherit;width:100%;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac)}
 input[type=number]{max-width:90px}
 textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:all .2s;white-space:nowrap}
-.bs{background:var(–bd);color:var(–tx)}.bs:hover{background:#3a3a5a}
-.bw{background:var(–ac2);color:#000}.bw:hover{background:#ffb86a}
-.bgr{background:var(–gr);color:#000}.bgr:hover{background:#40d870}
-.bp{background:var(–ac);color:#000}.bp:hover{background:#6ab5ff}
-.br{background:var(–re);color:#fff}.br:hover{background:#ff4060}
+.bs{background:var(--bd);color:var(--tx)}.bs:hover{background:#3a3a5a}
+.bw{background:var(--ac2);color:#000}.bw:hover{background:#ffb86a}
+.bgr{background:var(--gr);color:#000}.bgr:hover{background:#40d870}
+.bp{background:var(--ac);color:#000}.bp:hover{background:#6ab5ff}
+.br{background:var(--re);color:#fff}.br:hover{background:#ff4060}
 .bpu{background:#9b59ff;color:#fff}.bpu:hover{background:#b47aff}
 .lg{padding:12px 28px;font-size:1rem}
 .sm{padding:5px 10px;font-size:.78rem}
 .tabrow{display:flex;gap:2px;background:#0d0d20;border-radius:8px;padding:4px;flex-wrap:wrap}
-.tabx{flex:1;min-width:80px;text-align:center;padding:8px 6px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(–mu);border:none;background:transparent;font-family:inherit;transition:all .2s}
-.tabx.on{background:var(–panel);color:var(–ac);border:1px solid var(–bd)}
+.tabx{flex:1;min-width:80px;text-align:center;padding:8px 6px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--mu);border:none;background:transparent;font-family:inherit;transition:all .2s}
+.tabx.on{background:var(--panel);color:var(--ac);border:1px solid var(--bd)}
 .tc{display:none}.tc.on{display:block}
-.dvd{border:none;border-top:1px solid var(–bd);margin:14px 0}
-.cc{background:#0d0d20;border:1px solid var(–bd);border-radius:8px;padding:14px;margin-bottom:10px}
+.dvd{border:none;border-top:1px solid var(--bd);margin:14px 0}
+.cc{background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px}
 #ctable{width:100%;border-collapse:collapse;margin-top:8px;font-size:.85rem}
-#ctable th,#ctable td{padding:8px 10px;border:1px solid var(–bd);vertical-align:middle}
-#ctable th{background:#0d0d20;color:var(–mu);font-weight:600;text-transform:uppercase;font-size:.72rem}
+#ctable th,#ctable td{padding:8px 10px;border:1px solid var(--bd);vertical-align:middle}
+#ctable th{background:#0d0d20;color:var(--mu);font-weight:600;text-transform:uppercase;font-size:.72rem}
 .ofrow{display:flex;align-items:center;gap:6px}
-.ofval{min-width:48px;text-align:center;color:var(–ac);font-size:.85rem;font-weight:700;background:#0d0d20;border:1px solid var(–bd);border-radius:5px;padding:3px 6px}
-.arrbtn{width:28px;height:28px;border-radius:5px;border:1px solid var(–bd);background:#1a1a30;color:var(–tx);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.arrbtn:hover{background:var(–ac);color:#000;border-color:var(–ac)}
+.ofval{min-width:48px;text-align:center;color:var(--ac);font-size:.85rem;font-weight:700;background:#0d0d20;border:1px solid var(--bd);border-radius:5px;padding:3px 6px}
+.arrbtn{width:28px;height:28px;border-radius:5px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.arrbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 .arrbtn:active{transform:scale(.92)}
 
 /* Instructions editor */
-.inst-item{background:#0d0d20;border:1px solid var(–bd);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
+.inst-item{background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
 .inst-item textarea{min-height:52px;flex:1}
-.inst-bullet{background:#0d0d20;border:1px solid var(–bd);border-radius:5px;color:var(–ac2);padding:5px 8px;font-size:.85rem;width:44px;text-align:center;flex-shrink:0}
-.inst-del{width:28px;height:28px;border-radius:5px;background:rgba(255,23,68,.15);border:1px solid rgba(255,23,68,.3);color:var(–re);cursor:pointer;font-size:.85rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:2px}
-.inst-del:hover{background:var(–re);color:#fff}
-.inst-preview{background:#0d0d1a;border:1px solid var(–bd);border-radius:8px;padding:14px;margin-top:10px}
-.inst-preview h4{font-size:.75rem;color:var(–mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.inst-bullet{background:#0d0d20;border:1px solid var(--bd);border-radius:5px;color:var(--ac2);padding:5px 8px;font-size:.85rem;width:44px;text-align:center;flex-shrink:0}
+.inst-del{width:28px;height:28px;border-radius:5px;background:rgba(255,23,68,.15);border:1px solid rgba(255,23,68,.3);color:var(--re);cursor:pointer;font-size:.85rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:2px}
+.inst-del:hover{background:var(--re);color:#fff}
+.inst-preview{background:#0d0d1a;border:1px solid var(--bd);border-radius:8px;padding:14px;margin-top:10px}
+.inst-preview h4{font-size:.75rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 
 /* Launch cards */
 .launchers{display:flex;gap:10px;flex-wrap:wrap}
-.lcard{flex:1;min-width:200px;background:var(–panel);border:2px solid var(–bd);border-radius:10px;padding:16px 16px 18px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0}
-.lcard:hover{border-color:var(–ac);background:#15152e}
+.lcard{flex:1;min-width:200px;background:var(--panel);border:2px solid var(--bd);border-radius:10px;padding:16px 16px 18px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0}
+.lcard:hover{border-color:var(--ac);background:#15152e}
 .lcard.seat:hover{border-color:#9b59ff}
 .lcard .lico{font-size:2rem;line-height:1;margin-bottom:8px;display:block}
 .lcard .ltitle{font-size:1rem;font-weight:700;margin-bottom:6px;display:block}
-.lcard .ldesc{font-size:.78rem;color:var(–mu);line-height:1.45;display:block}
+.lcard .ldesc{font-size:.78rem;color:var(--mu);line-height:1.45;display:block}
 
 /* == DISPLAY == */
 #display{display:none;flex-direction:column;min-height:100vh}
@@ -76,28 +75,28 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 /* == COLUMN ADJUST PANEL (live, in display) == */
 #coladj{position:fixed;left:12px;bottom:12px;z-index:300;opacity:.1;transition:opacity .3s;display:none}
 #coladj:hover{opacity:1}
-#coladj-inner{background:rgba(10,10,26,.92);border:1px solid var(–bd);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);max-height:80vh;overflow-y:auto}
-#coladj-title{font-size:.7rem;color:var(–mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:600}
+#coladj-inner{background:rgba(10,10,26,.92);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);max-height:80vh;overflow-y:auto}
+#coladj-title{font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:600}
 .cadj-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.cadj-lbl{font-size:.72rem;color:var(–mu);min-width:38px}
-.cadj-val{min-width:42px;text-align:center;font-size:.78rem;font-weight:700;color:var(–ac);background:#0d0d20;border:1px solid var(–bd);border-radius:4px;padding:2px 4px}
-.cadj-btn{width:24px;height:24px;border-radius:4px;border:1px solid var(–bd);background:#1a1a30;color:var(–tx);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;line-height:1}
-.cadj-btn:hover{background:var(–ac);color:#000;border-color:var(–ac)}
+.cadj-lbl{font-size:.72rem;color:var(--mu);min-width:38px}
+.cadj-val{min-width:42px;text-align:center;font-size:.78rem;font-weight:700;color:var(--ac);background:#0d0d20;border:1px solid var(--bd);border-radius:4px;padding:2px 4px}
+.cadj-btn{width:24px;height:24px;border-radius:4px;border:1px solid var(--bd);background:#1a1a30;color:var(--tx);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;line-height:1}
+.cadj-btn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 .cadj-btn:active{transform:scale(.9)}
-.cadj-rst{width:20px;height:20px;border-radius:4px;border:1px solid var(–bd);background:#1a1a30;color:var(–mu);cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.cadj-rst:hover{background:#333;color:var(–tx)}
+.cadj-rst{width:20px;height:20px;border-radius:4px;border:1px solid var(--bd);background:#1a1a30;color:var(--mu);cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.cadj-rst:hover{background:#333;color:var(--tx)}
 
 /* == SEATING PHASE == */
 #seatphase{display:none;flex-direction:column;height:100vh;overflow:hidden}
-#spbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(–panel);border-bottom:1px solid var(–bd);gap:12px;flex-shrink:0}
-#spvenue{font-size:1rem;font-weight:700;color:var(–ac);letter-spacing:.04em}
+#spbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--bd);gap:12px;flex-shrink:0}
+#spvenue{font-size:1rem;font-weight:700;color:var(--ac);letter-spacing:.04em}
 #spclock{font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em}
-#spdate{font-size:.78rem;color:var(–mu)}
+#spdate{font-size:.78rem;color:var(--mu)}
 #spmain{display:flex;flex:1;overflow:hidden;gap:0}
 
 /* Image panel */
 #imgpanel{flex:1;position:relative;background:#06060f;overflow:hidden;display:flex;align-items:center;justify-content:center}
-#imgdrop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(–mu);cursor:pointer;transition:background .2s}
+#imgdrop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--mu);cursor:pointer;transition:background .2s}
 #imgdrop:hover,#imgdrop.over{background:rgba(74,158,255,.06)}
 #imgdrop .dico{font-size:4rem;opacity:.3}
 #imgdrop p{font-size:1rem;opacity:.5}
@@ -108,72 +107,72 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 #imgoverlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.75));opacity:0;transition:opacity .25s}
 #imgpanel:hover #imgoverlay{opacity:1}
 .imgnavbtn{width:36px;height:36px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.imgnavbtn:hover{background:var(–ac);color:#000;border-color:var(–ac)}
+.imgnavbtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 #imgdots{display:flex;gap:5px;align-items:center}
 .idot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);border:none;cursor:pointer;transition:all .2s}
 .idot.on{background:#fff;width:20px;border-radius:4px}
 #imgctrl{display:flex;gap:6px;align-items:center}
 #imgspeed{max-width:68px;font-size:.75rem;padding:3px 6px;background:rgba(0,0,0,.6);border-color:rgba(255,255,255,.2)}
 .imgplaybtn{padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:.75rem;font-weight:600;font-family:inherit;transition:all .15s}
-.imgplaybtn:hover{background:var(–ac);color:#000;border-color:var(–ac)}
+.imgplaybtn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
 #imgcount{font-size:.75rem;color:rgba(255,255,255,.5)}
 #imgupload{position:absolute;top:10px;right:10px;opacity:0;transition:opacity .2s;z-index:10}
 #imgpanel:hover #imgupload{opacity:1}
 
 /* Seat panel */
-#seatpanel{width:auto;min-width:200px;max-width:460px;background:var(–panel);border-left:1px solid var(–bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#seatpanel{width:auto;min-width:200px;max-width:460px;background:var(--panel);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 #seatpanel.hidden{display:none!important}
-#spseathdr{padding:10px 14px;border-bottom:1px solid var(–bd);flex-shrink:0}
-#spseattitle{font-size:.85rem;font-weight:700;color:var(–ac);margin-bottom:4px}
+#spseathdr{padding:10px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
+#spseattitle{font-size:.85rem;font-weight:700;color:var(--ac);margin-bottom:4px}
 #spseatleg{display:flex;gap:10px;flex-wrap:wrap}
 .legit{display:flex;align-items:center;gap:5px;font-size:.75rem}
 .legdot{width:10px;height:10px;border-radius:2px;border:2px solid;flex-shrink:0}
 #sphall{overflow:auto;padding:10px;flex:1}
 
 /* Instructions strip in seating phase */
-#spinst{flex-shrink:0;border-top:1px solid var(–bd);background:#0d0d1a;padding:8px 16px;display:none}
+#spinst{flex-shrink:0;border-top:1px solid var(--bd);background:#0d0d1a;padding:8px 16px;display:none}
 #spinst.show{display:flex}
 #spinst-inner{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;width:100%}
-.spin-item{display:flex;gap:7px;align-items:flex-start;font-size:.82rem;color:var(–tx)}
-.spin-bullet{color:var(–ac2);font-weight:700;flex-shrink:0;min-width:18px}
+.spin-item{display:flex;gap:7px;align-items:flex-start;font-size:.82rem;color:var(--tx)}
+.spin-bullet{color:var(--ac2);font-weight:700;flex-shrink:0;min-width:18px}
 
 /* == EXAM PHASE == */
 #examphase{display:none;flex-direction:column;min-height:100vh;padding:16px;gap:14px}
-#tsec{text-align:center;padding:20px 20px 16px;background:var(–panel);border-radius:12px;border:1px solid var(–bd)}
-#tlbl{font-size:1rem;color:var(–mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-#tdisp{font-size:clamp(3.5rem,12vw,10rem);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:var(–gr);text-shadow:0 0 40px currentColor,0 0 80px currentColor;transition:color .5s,text-shadow .5s;line-height:1}
-#tdisp.ye{color:var(–ye);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
-#tdisp.re{color:var(–re);text-shadow:0 0 40px currentColor,0 0 70px currentColor;animation:pulse 1s ease-in-out infinite}
-#tdisp.ot{color:var(–re);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
+#tsec{text-align:center;padding:20px 20px 16px;background:var(--panel);border-radius:12px;border:1px solid var(--bd)}
+#tlbl{font-size:1rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+#tdisp{font-size:clamp(3.5rem,12vw,10rem);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:var(--gr);text-shadow:0 0 40px currentColor,0 0 80px currentColor;transition:color .5s,text-shadow .5s;line-height:1}
+#tdisp.ye{color:var(--ye);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
+#tdisp.re{color:var(--re);text-shadow:0 0 40px currentColor,0 0 70px currentColor;animation:pulse 1s ease-in-out infinite}
+#tdisp.ot{color:var(--re);text-shadow:0 0 40px currentColor,0 0 70px currentColor}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-#tmsg{margin-top:8px;font-size:1.3rem;color:var(–ac2);min-height:1.8em;font-weight:600}
+#tmsg{margin-top:8px;font-size:1.3rem;color:var(--ac2);min-height:1.8em;font-weight:600}
 #tbtns{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
 #clockbar{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
-#clockbox{font-size:clamp(1.8rem,4.5vw,3.2rem);font-weight:900;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em;background:#0d0d20;border:1px solid var(–bd);border-radius:8px;padding:6px 20px}
-#datebox{font-size:.9rem;color:var(–mu);background:#0d0d20;border:1px solid var(–bd);border-radius:8px;padding:6px 14px}
+#clockbox{font-size:clamp(1.8rem,4.5vw,3.2rem);font-weight:900;font-variant-numeric:tabular-nums;color:#a0c4ff;letter-spacing:.1em;background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 20px}
+#datebox{font-size:.9rem;color:var(--mu);background:#0d0d20;border:1px solid var(--bd);border-radius:8px;padding:6px 14px}
 #exrow{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
-#exseat{background:var(–panel);border-radius:12px;border:1px solid var(–bd);padding:16px;flex:1;min-width:0}
+#exseat{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:16px;flex:1;min-width:0}
 #exseat.hidden{display:none}
 #exseathdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-#exseattitle{font-size:1rem;font-weight:700;color:var(–ac)}
+#exseattitle{font-size:1rem;font-weight:700;color:var(--ac)}
 #exleg{display:flex;gap:12px;flex-wrap:wrap}
 #exhall{overflow:auto;padding:4px}
 
 /* Instructions panel in exam phase */
-#exinst{background:var(–panel);border-radius:12px;border:1px solid var(–bd);padding:16px;flex:0 0 auto;max-width:320px;display:none}
+#exinst{background:var(--panel);border-radius:12px;border:1px solid var(--bd);padding:16px;flex:0 0 auto;max-width:320px;display:none}
 #exinst.show{display:block}
-#exinst h3{font-size:.88rem;font-weight:700;color:var(–ac2);margin-bottom:10px;letter-spacing:.04em}
+#exinst h3{font-size:.88rem;font-weight:700;color:var(--ac2);margin-bottom:10px;letter-spacing:.04em}
 .exinst-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:.85rem;line-height:1.45}
-.exinst-bullet{color:var(–ac2);font-weight:700;flex-shrink:0;font-size:.9rem}
+.exinst-bullet{color:var(--ac2);font-weight:700;flex-shrink:0;font-size:.9rem}
 
 /* Shared seat styles */
 .hwrap{display:flex;align-items:flex-start;gap:12px;min-width:max-content}
 .hwrap.dr{flex-direction:row-reverse}
-.door{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;background:linear-gradient(135deg,#2a1a00,#4a3000);border:2px solid var(–ac2);border-radius:7px;color:var(–ac2);font-weight:700;font-size:.7rem;writing-mode:vertical-rl;min-height:70px;letter-spacing:.1em;align-self:center}
+.door{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;background:linear-gradient(135deg,#2a1a00,#4a3000);border:2px solid var(--ac2);border-radius:7px;color:var(--ac2);font-weight:700;font-size:.7rem;writing-mode:vertical-rl;min-height:70px;letter-spacing:.1em;align-self:center}
 .dico{font-size:1.2rem;writing-mode:horizontal-tb}
 .carea{display:flex;align-items:flex-start}
 .cwrap{display:flex;flex-direction:column;align-items:center}
-.clbl{font-size:.62rem;color:var(–mu);margin-bottom:4px;font-weight:600}
+.clbl{font-size:.62rem;color:var(--mu);margin-bottom:4px;font-weight:600}
 .cseats{display:flex;flex-direction:column;gap:3px;transition:margin-top .15s}
 .sgap{height:18px}
 .seat{width:52px;height:40px;border-radius:5px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.55rem;line-height:1.2;padding:2px;cursor:default;transition:transform .15s}
@@ -193,15 +192,13 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 #lbprev{left:12px}#lbnext{right:12px}
 #lbcap{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.45);font-size:.82rem;pointer-events:none}
 
-#toast{position:fixed;bottom:16px;right:16px;background:var(–ac);color:#000;padding:8px 15px;border-radius:7px;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+#toast{position:fixed;bottom:16px;right:16px;background:var(--ac);color:#000;padding:8px 15px;border-radius:7px;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
-
 </head>
 <body>
 
 <!-- ========== EDITOR ========== -->
-
 <div id="editor">
   <div class="etop"><h1>🏫 Exam Hall Display Editor</h1></div>
   <div class="tabrow">
@@ -212,7 +209,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- TIMER -->
-
   <div id="t1" class="tc on panel">
     <h2>Timer Settings</h2>
     <div class="row">
@@ -236,7 +232,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- SEATING -->
-
   <div id="t2" class="tc panel">
     <h2>Venue &amp; Classes</h2>
     <div class="row">
@@ -253,7 +248,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- COLUMNS -->
-
   <div id="t3" class="tc panel">
     <h2>Column Configuration</h2>
     <p style="color:var(--mu);font-size:.83rem;margin-bottom:12px">Seats fill top-to-bottom per column, then wrap to next column. Use the ▲▼ buttons in the live display to shift columns up/down by one seat slot.</p>
@@ -280,7 +274,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- INSTRUCTIONS -->
-
   <div id="t4" class="tc panel">
     <h2>Custom Instructions</h2>
     <p style="color:var(--mu);font-size:.83rem;margin-bottom:14px">These instructions will be displayed as a panel during the exam. Each line is a separate bullet point.</p>
@@ -312,7 +305,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- LAUNCH -->
-
   <div class="panel">
     <h2>Launch Display</h2>
     <p style="color:var(--mu);font-size:.83rem;margin-bottom:14px">Choose which view to launch. Switch between modes anytime using the floating controls.</p>
@@ -332,11 +324,9 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 </div>
 
 <!-- ========== DISPLAY ========== -->
-
 <div id="display">
 
   <!-- Floating main controls -->
-
   <div id="fctrl">
     <button class="btn bpu sm" onclick="switchToSeating()" id="modeseat">🪑 Seating View</button>
     <button class="btn bgr sm" onclick="switchToExam()" id="modeexam">⏱ Exam View</button>
@@ -346,7 +336,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- Floating column adjuster (bottom-left) -->
-
   <div id="coladj">
     <div id="coladj-inner">
       <div id="coladj-title">↕ Column Offsets</div>
@@ -355,7 +344,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- -- SEATING PHASE -- -->
-
   <div id="seatphase">
     <div id="spbar">
       <div id="spvenue">Examination Hall</div>
@@ -410,7 +398,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 
   <!-- -- EXAM PHASE -- -->
-
   <div id="examphase">
     <div id="tsec">
       <div id="tlbl">Time Remaining</div>
@@ -445,7 +432,6 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 </div><!-- /display -->
 
 <!-- Lightbox -->
-
 <div id="lightbox" onclick="lbClose()">
   <button id="lbclose" onclick="lbClose()">✕</button>
   <button id="lbprev" onclick="event.stopPropagation();lbShift(-1)">‹</button>
@@ -563,440 +549,436 @@ function renderInstList(){
     div.innerHTML=`
       <input type="text" class="inst-bullet" value="${item.bullet}" onchange="instItems[${i}].bullet=this.value;renderInstPreview()" placeholder="•" title="Bullet / number">
       <textarea onchange="instItems[${i}].text=this.value;renderInstPreview()" oninput="instItems[${i}].text=this.value;renderInstPreview()">${item.text}</textarea>
-
-```
-  <button class="inst-del" onclick="delInst(${i})" title="Remove">✕</button>`;
-list.appendChild(div);
-```
-
-});
-renderInstPreview();
+      <button class="inst-del" onclick="delInst(${i})" title="Remove">✕</button>`;
+    list.appendChild(div);
+  });
+  renderInstPreview();
 }
 function addInst(){
-instItems.push({bullet:`${instItems.length+1}.`,text:’’});
-renderInstList();
+  instItems.push({bullet:`${instItems.length+1}.`,text:''});
+  renderInstList();
 }
 function delInst(i){
-instItems.splice(i,1);
-renderInstList();
+  instItems.splice(i,1);
+  renderInstList();
 }
 function renderInstPreview(){
-const prev=document.getElementById(‘instpreview’); prev.innerHTML=’’;
-instItems.forEach(item=>{
-if(!item.text.trim())return;
-const d=document.createElement(‘div’); d.className=‘exinst-item’;
-d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
-prev.appendChild(d);
-});
-// Keep text box in sync
-const tb=document.getElementById(‘insttextbox’);
-if(tb&&tb!==document.activeElement) tb.value=serializeInst();
+  const prev=document.getElementById('instpreview'); prev.innerHTML='';
+  instItems.forEach(item=>{
+    if(!item.text.trim())return;
+    const d=document.createElement('div'); d.className='exinst-item';
+    d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    prev.appendChild(d);
+  });
+  // Keep text box in sync
+  const tb=document.getElementById('insttextbox');
+  if(tb&&tb!==document.activeElement) tb.value=serializeInst();
 }
 function serializeInst(){
-const title=document.getElementById(‘insttitle’).value||’’;
-const where=document.getElementById(‘instwhere’).value||‘both’;
-let out=`TITLE: ${title}\nSHOW: ${where}\n---\n`;
-instItems.forEach(item=>{out+=`${item.bullet}|${item.text}\n`;});
-return out.trimEnd();
+  const title=document.getElementById('insttitle').value||'';
+  const where=document.getElementById('instwhere').value||'both';
+  let out=`TITLE: ${title}\nSHOW: ${where}\n---\n`;
+  instItems.forEach(item=>{out+=`${item.bullet}|${item.text}\n`;});
+  return out.trimEnd();
 }
 function exportInstText(){
-const text=serializeInst();
-document.getElementById(‘insttextbox’).value=text;
-navigator.clipboard?.writeText(text).then(()=>toast(‘📋 Copied to clipboard!’)).catch(()=>toast(‘📋 Text ready – copy manually’));
+  const text=serializeInst();
+  document.getElementById('insttextbox').value=text;
+  navigator.clipboard?.writeText(text).then(()=>toast('📋 Copied to clipboard!')).catch(()=>toast('📋 Text ready -- copy manually'));
 }
 function importInstText(){
-const raw=document.getElementById(‘insttextbox’).value.trim();
-if(!raw){toast(‘Nothing to import’);return;}
-const lines=raw.split(’\n’);
-let title=’’, where=‘both’, items=[], inData=false;
-for(const line of lines){
-if(line.startsWith(‘TITLE:’)){title=line.slice(6).trim();}
-else if(line.startsWith(‘SHOW:’)){where=line.slice(5).trim();}
-else if(line===’—’){inData=true;}
-else if(inData&&line.includes(’|’)){
-const idx=line.indexOf(’|’);
-items.push({bullet:line.slice(0,idx),text:line.slice(idx+1)});
+  const raw=document.getElementById('insttextbox').value.trim();
+  if(!raw){toast('Nothing to import');return;}
+  const lines=raw.split('\n');
+  let title='', where='both', items=[], inData=false;
+  for(const line of lines){
+    if(line.startsWith('TITLE:')){title=line.slice(6).trim();}
+    else if(line.startsWith('SHOW:')){where=line.slice(5).trim();}
+    else if(line==='---'){inData=true;}
+    else if(inData&&line.includes('|')){
+      const idx=line.indexOf('|');
+      items.push({bullet:line.slice(0,idx),text:line.slice(idx+1)});
+    }
+  }
+  if(!items.length){toast('⚠ No instructions found -- check format');return;}
+  if(title) document.getElementById('insttitle').value=title;
+  const ws=document.getElementById('instwhere');
+  if(['both','seating','exam','none'].includes(where)) ws.value=where;
+  instItems=items;
+  renderInstList();
+  toast('✅ Instructions imported!');
 }
-}
-if(!items.length){toast(‘⚠ No instructions found – check format’);return;}
-if(title) document.getElementById(‘insttitle’).value=title;
-const ws=document.getElementById(‘instwhere’);
-if([‘both’,‘seating’,‘exam’,‘none’].includes(where)) ws.value=where;
-instItems=items;
-renderInstList();
-toast(‘✅ Instructions imported!’);
-}
-function getInstWhere(){return document.getElementById(‘instwhere’).value;}
+function getInstWhere(){return document.getElementById('instwhere').value;}
 
-// – READ CONFIG –
+// -- READ CONFIG --
 function readAll(){
-const h=+document.getElementById(‘th’).value||0, m=+document.getElementById(‘tm’).value||0;
-T.total=(h*3600)+(m*60); T.rem=T.total;
-T.wy=+document.getElementById(‘wy’).value||30;
-T.wr=+document.getElementById(‘wr’).value||10;
-T.lbl=document.getElementById(‘tlbltxt’).value||‘Time Remaining’;
-T.ot=document.getElementById(‘otmsg’).value;
-T.msgs=document.getElementById(‘cdmsgs’).value.trim().split(’\n’)
-.map(l=>{const[t,…r]=l.split(’=’);return{at:+t,msg:r.join(’=’)};}).filter(x=>!isNaN(x.at));
-T.fired=new Set();
-const nc=+document.getElementById(‘nc’).value, cls=[];
-for(let i=0;i<nc;i++){
-ccSaved[i]={name:document.getElementById(`cn${i}`)?.value||`Class ${i+1}`,stu:+document.getElementById(`cs${i}`)?.value||30,st:+document.getElementById(`ck${i}`)?.value||1};
-cls.push(ccSaved[i]);
-}
-const ncols=+document.getElementById(‘ncols’).value||4, gap=+document.getElementById(‘cgap’).value??1, cols=[];
-for(let i=0;i<ncols;i++){
-CS[i]={s:+document.getElementById(`cse${i}`)?.value||8,o:parseInt(document.getElementById(`cof${i}`)?.value)||0,sp:+document.getElementById(`csp${i}`)?.value||12};
-cols.push(CS[i]);
-}
-return{
-vname:document.getElementById(‘vname’).value,
-door:document.getElementById(‘dpos’).value,
-nc,cls,ncols,gap,cols,
-insttitle:document.getElementById(‘insttitle’).value,
-instwhere:getInstWhere(),
-instItems:[…instItems]
-};
+  const h=+document.getElementById('th').value||0, m=+document.getElementById('tm').value||0;
+  T.total=(h*3600)+(m*60); T.rem=T.total;
+  T.wy=+document.getElementById('wy').value||30;
+  T.wr=+document.getElementById('wr').value||10;
+  T.lbl=document.getElementById('tlbltxt').value||'Time Remaining';
+  T.ot=document.getElementById('otmsg').value;
+  T.msgs=document.getElementById('cdmsgs').value.trim().split('\n')
+    .map(l=>{const[t,...r]=l.split('=');return{at:+t,msg:r.join('=')};}).filter(x=>!isNaN(x.at));
+  T.fired=new Set();
+  const nc=+document.getElementById('nc').value, cls=[];
+  for(let i=0;i<nc;i++){
+    ccSaved[i]={name:document.getElementById(`cn${i}`)?.value||`Class ${i+1}`,stu:+document.getElementById(`cs${i}`)?.value||30,st:+document.getElementById(`ck${i}`)?.value||1};
+    cls.push(ccSaved[i]);
+  }
+  const ncols=+document.getElementById('ncols').value||4, gap=+document.getElementById('cgap').value??1, cols=[];
+  for(let i=0;i<ncols;i++){
+    CS[i]={s:+document.getElementById(`cse${i}`)?.value||8,o:parseInt(document.getElementById(`cof${i}`)?.value)||0,sp:+document.getElementById(`csp${i}`)?.value||12};
+    cols.push(CS[i]);
+  }
+  return{
+    vname:document.getElementById('vname').value,
+    door:document.getElementById('dpos').value,
+    nc,cls,ncols,gap,cols,
+    insttitle:document.getElementById('insttitle').value,
+    instwhere:getInstWhere(),
+    instItems:[...instItems]
+  };
 }
 
-// – LAUNCH –
+// -- LAUNCH --
 function goSeating(){cfg=readAll();showDisplay();switchToSeating();}
 function goExam(){cfg=readAll();showDisplay();switchToExam();}
 function showDisplay(){
-document.getElementById(‘editor’).style.display=‘none’;
-document.getElementById(‘display’).style.display=‘flex’;
-startClock();
+  document.getElementById('editor').style.display='none';
+  document.getElementById('display').style.display='flex';
+  startClock();
 }
 function exitD(){
-tPause();stopClock();stopGallery();
-document.getElementById(‘display’).style.display=‘none’;
-document.getElementById(‘seatphase’).style.display=‘none’;
-document.getElementById(‘examphase’).style.display=‘none’;
-document.getElementById(‘coladj’).style.display=‘none’;
-document.getElementById(‘editor’).style.display=‘flex’;
+  tPause();stopClock();stopGallery();
+  document.getElementById('display').style.display='none';
+  document.getElementById('seatphase').style.display='none';
+  document.getElementById('examphase').style.display='none';
+  document.getElementById('coladj').style.display='none';
+  document.getElementById('editor').style.display='flex';
 }
 
 function switchToSeating(){
-document.getElementById(‘examphase’).style.display=‘none’;
-document.getElementById(‘seatphase’).style.display=‘flex’;
-document.getElementById(‘modeseat’).style.opacity=’.4’;
-document.getElementById(‘modeexam’).style.opacity=‘1’;
-document.getElementById(‘tbtn’).textContent=‘🪑 Hide Seating’;
-document.getElementById(‘seatpanel’).classList.remove(‘hidden’);
-document.getElementById(‘spvenue’).textContent=cfg?.vname||‘Examination Hall’;
-document.getElementById(‘spseattitle’).textContent=cfg?.vname||‘Seating’;
-buildHall(cfg,‘sphall’,‘spseatleg’);
-renderGallery();
-buildInstStrip();
-buildColAdj();
-document.getElementById(‘coladj’).style.display=‘block’;
+  document.getElementById('examphase').style.display='none';
+  document.getElementById('seatphase').style.display='flex';
+  document.getElementById('modeseat').style.opacity='.4';
+  document.getElementById('modeexam').style.opacity='1';
+  document.getElementById('tbtn').textContent='🪑 Hide Seating';
+  document.getElementById('seatpanel').classList.remove('hidden');
+  document.getElementById('spvenue').textContent=cfg?.vname||'Examination Hall';
+  document.getElementById('spseattitle').textContent=cfg?.vname||'Seating';
+  buildHall(cfg,'sphall','spseatleg');
+  renderGallery();
+  buildInstStrip();
+  buildColAdj();
+  document.getElementById('coladj').style.display='block';
 }
 function switchToExam(){
-document.getElementById(‘seatphase’).style.display=‘none’;
-document.getElementById(‘examphase’).style.display=‘flex’;
-document.getElementById(‘modeexam’).style.opacity=’.4’;
-document.getElementById(‘modeseat’).style.opacity=‘1’;
-document.getElementById(‘tbtn’).textContent=‘🪑 Hide Seating’;
-document.getElementById(‘exseat’).classList.remove(‘hidden’);
-document.getElementById(‘tlbl’).textContent=T.lbl;
-document.getElementById(‘exseattitle’).textContent=(cfg?.vname||’’)+’ – Seating’;
-buildHall(cfg,‘exhall’,‘exleg’);
-buildInstExam();
-buildColAdj();
-document.getElementById(‘coladj’).style.display=‘block’;
-tReset();
+  document.getElementById('seatphase').style.display='none';
+  document.getElementById('examphase').style.display='flex';
+  document.getElementById('modeexam').style.opacity='.4';
+  document.getElementById('modeseat').style.opacity='1';
+  document.getElementById('tbtn').textContent='🪑 Hide Seating';
+  document.getElementById('exseat').classList.remove('hidden');
+  document.getElementById('tlbl').textContent=T.lbl;
+  document.getElementById('exseattitle').textContent=(cfg?.vname||'')+' -- Seating';
+  buildHall(cfg,'exhall','exleg');
+  buildInstExam();
+  buildColAdj();
+  document.getElementById('coladj').style.display='block';
+  tReset();
 }
 
-// – TOGGLE SEATING –
+// -- TOGGLE SEATING --
 function togSeat(){
-const phase=document.getElementById(‘seatphase’).style.display!==‘none’?‘seat’:‘exam’;
-if(phase===‘seat’){
-const p=document.getElementById(‘seatpanel’);
-const hidden=p.classList.toggle(‘hidden’);
-document.getElementById(‘tbtn’).textContent=hidden?‘🪑 Show Seating’:‘🪑 Hide Seating’;
-document.getElementById(‘coladj’).style.display=hidden?‘none’:‘block’;
-} else {
-const p=document.getElementById(‘exseat’);
-const hidden=p.classList.toggle(‘hidden’);
-document.getElementById(‘tbtn’).textContent=hidden?‘🪑 Show Seating’:‘🪑 Hide Seating’;
-document.getElementById(‘coladj’).style.display=hidden?‘none’:‘block’;
-}
+  const phase=document.getElementById('seatphase').style.display!=='none'?'seat':'exam';
+  if(phase==='seat'){
+    const p=document.getElementById('seatpanel');
+    const hidden=p.classList.toggle('hidden');
+    document.getElementById('tbtn').textContent=hidden?'🪑 Show Seating':'🪑 Hide Seating';
+    document.getElementById('coladj').style.display=hidden?'none':'block';
+  } else {
+    const p=document.getElementById('exseat');
+    const hidden=p.classList.toggle('hidden');
+    document.getElementById('tbtn').textContent=hidden?'🪑 Show Seating':'🪑 Hide Seating';
+    document.getElementById('coladj').style.display=hidden?'none':'block';
+  }
 }
 
-// – LIVE COLUMN ADJUSTER (display panel) –
+// -- LIVE COLUMN ADJUSTER (display panel) --
 function buildColAdj(){
-if(!cfg)return;
-const n=cfg.ncols, rows=document.getElementById(‘cadjrows’);
-rows.innerHTML=’’;
-for(let i=0;i<n;i++){
-const row=document.createElement(‘div’); row.className=‘cadj-row’;
-row.innerHTML=`<span class="cadj-lbl">Col ${i+1}</span> <button class="cadj-btn" onclick="liveAdjOff(${i},-1)" title="Shift up 1 seat">▲</button> <span class="cadj-val" id="lcov${i}">${CS[i]?.o||0}</span> <button class="cadj-btn" onclick="liveAdjOff(${i},1)" title="Shift down 1 seat">▼</button> <button class="cadj-rst" onclick="liveResetOff(${i})" title="Reset">⊙</button>`;
-rows.appendChild(row);
-}
+  if(!cfg)return;
+  const n=cfg.ncols, rows=document.getElementById('cadjrows');
+  rows.innerHTML='';
+  for(let i=0;i<n;i++){
+    const row=document.createElement('div'); row.className='cadj-row';
+    row.innerHTML=`<span class="cadj-lbl">Col ${i+1}</span>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},-1)" title="Shift up 1 seat">▲</button>
+      <span class="cadj-val" id="lcov${i}">${CS[i]?.o||0}</span>
+      <button class="cadj-btn" onclick="liveAdjOff(${i},1)" title="Shift down 1 seat">▼</button>
+      <button class="cadj-rst" onclick="liveResetOff(${i})" title="Reset">⊙</button>`;
+    rows.appendChild(row);
+  }
 }
 
 function liveAdjOff(i, delta){
-while(CS.length<=i) CS.push({s:8,o:0,sp:12});
-let v=Math.max(0,Math.min(20,(CS[i].o||0)+delta));
-CS[i].o=v;
-// Update display label
-const lbl=document.getElementById(`lcov${i}`);
-if(lbl) lbl.textContent=v;
-// Sync back to editor inputs
-const eh=document.getElementById(`cof${i}`), el=document.getElementById(`cov${i}`);
-if(eh) eh.value=v; if(el) el.textContent=v+’ slots’;
-// Sync cfg cols so rebuild is correct
-if(cfg&&cfg.cols[i]) cfg.cols[i].o=v;
-// Rebuild whichever hall is visible
-const inSeat=document.getElementById(‘seatphase’).style.display!==‘none’;
-if(inSeat) buildHall(cfg,‘sphall’,‘spseatleg’);
-else buildHall(cfg,‘exhall’,‘exleg’);
+  while(CS.length<=i) CS.push({s:8,o:0,sp:12});
+  let v=Math.max(0,Math.min(20,(CS[i].o||0)+delta));
+  CS[i].o=v;
+  // Update display label
+  const lbl=document.getElementById(`lcov${i}`);
+  if(lbl) lbl.textContent=v;
+  // Sync back to editor inputs
+  const eh=document.getElementById(`cof${i}`), el=document.getElementById(`cov${i}`);
+  if(eh) eh.value=v; if(el) el.textContent=v+' slots';
+  // Sync cfg cols so rebuild is correct
+  if(cfg&&cfg.cols[i]) cfg.cols[i].o=v;
+  // Rebuild whichever hall is visible
+  const inSeat=document.getElementById('seatphase').style.display!=='none';
+  if(inSeat) buildHall(cfg,'sphall','spseatleg');
+  else buildHall(cfg,'exhall','exleg');
 }
 function liveResetOff(i){ liveAdjOff(i,-(CS[i]?.o||0)); }
 
-// – INSTRUCTIONS –
+// -- INSTRUCTIONS --
 function buildInstStrip(){
-const where=cfg?.instwhere||‘both’;
-const strip=document.getElementById(‘spinst’);
-const inner=document.getElementById(‘spinst-inner’);
-inner.innerHTML=’’;
-if(where===‘exam’||where===‘none’||!cfg?.instItems?.length){strip.classList.remove(‘show’);return;}
-cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
-const d=document.createElement(‘div’); d.className=‘spin-item’;
-d.innerHTML=`<span class="spin-bullet">${item.bullet}</span><span>${item.text}</span>`;
-inner.appendChild(d);
-});
-if(inner.children.length) strip.classList.add(‘show’); else strip.classList.remove(‘show’);
+  const where=cfg?.instwhere||'both';
+  const strip=document.getElementById('spinst');
+  const inner=document.getElementById('spinst-inner');
+  inner.innerHTML='';
+  if(where==='exam'||where==='none'||!cfg?.instItems?.length){strip.classList.remove('show');return;}
+  cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
+    const d=document.createElement('div'); d.className='spin-item';
+    d.innerHTML=`<span class="spin-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    inner.appendChild(d);
+  });
+  if(inner.children.length) strip.classList.add('show'); else strip.classList.remove('show');
 }
 function buildInstExam(){
-const where=cfg?.instwhere||‘both’;
-const box=document.getElementById(‘exinst’);
-const list=document.getElementById(‘exinstlist’);
-list.innerHTML=’’;
-if(where===‘seating’||where===‘none’||!cfg?.instItems?.length){box.classList.remove(‘show’);return;}
-document.getElementById(‘exinsttitle’).textContent=cfg.insttitle||‘📋 Exam Instructions’;
-cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
-const d=document.createElement(‘div’); d.className=‘exinst-item’;
-d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
-list.appendChild(d);
-});
-if(list.children.length) box.classList.add(‘show’); else box.classList.remove(‘show’);
+  const where=cfg?.instwhere||'both';
+  const box=document.getElementById('exinst');
+  const list=document.getElementById('exinstlist');
+  list.innerHTML='';
+  if(where==='seating'||where==='none'||!cfg?.instItems?.length){box.classList.remove('show');return;}
+  document.getElementById('exinsttitle').textContent=cfg.insttitle||'📋 Exam Instructions';
+  cfg.instItems.filter(x=>x.text.trim()).forEach(item=>{
+    const d=document.createElement('div'); d.className='exinst-item';
+    d.innerHTML=`<span class="exinst-bullet">${item.bullet}</span><span>${item.text}</span>`;
+    list.appendChild(d);
+  });
+  if(list.children.length) box.classList.add('show'); else box.classList.remove('show');
 }
 
-// – CLOCK –
-function pad(n){return String(n).padStart(2,‘0’);}
+// -- CLOCK --
+function pad(n){return String(n).padStart(2,'0');}
 function startClock(){updateClock();clockIv=setInterval(updateClock,1000);}
 function stopClock(){clearInterval(clockIv);}
 function updateClock(){
-const n=new Date();
-const ts=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
-document.getElementById(‘clockbox’).textContent=ts;
-document.getElementById(‘spclock’).textContent=ts;
-const days=[‘Sun’,‘Mon’,‘Tue’,‘Wed’,‘Thu’,‘Fri’,‘Sat’];
-const months=[‘Jan’,‘Feb’,‘Mar’,‘Apr’,‘May’,‘Jun’,‘Jul’,‘Aug’,‘Sep’,‘Oct’,‘Nov’,‘Dec’];
-const ds=`${days[n.getDay()]}, ${n.getDate()} ${months[n.getMonth()]} ${n.getFullYear()}`;
-document.getElementById(‘datebox’).textContent=ds;
-document.getElementById(‘spdate’).textContent=ds;
+  const n=new Date();
+  const ts=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  document.getElementById('clockbox').textContent=ts;
+  document.getElementById('spclock').textContent=ts;
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const ds=`${days[n.getDay()]}, ${n.getDate()} ${months[n.getMonth()]} ${n.getFullYear()}`;
+  document.getElementById('datebox').textContent=ds;
+  document.getElementById('spdate').textContent=ds;
 }
 
-// – TIMER –
+// -- TIMER --
 function updTimer(){
-const el=document.getElementById(‘tdisp’);
-const r=T.rem, ot=r<0, abs=Math.abs(r);
-const h=Math.floor(abs/3600), mm=Math.floor((abs%3600)/60), s=abs%60;
-const str=(h>0?h+’:’:’’)+pad(mm)+’:’+pad(s);
-el.textContent=ot?’+’+str:str; el.className=’’;
-const rm=r/60;
-if(ot){el.classList.add(‘ot’);document.getElementById(‘tmsg’).textContent=T.ot;}
-else if(rm<=T.wr)el.classList.add(‘re’);
-else if(rm<=T.wy)el.classList.add(‘ye’);
+  const el=document.getElementById('tdisp');
+  const r=T.rem, ot=r<0, abs=Math.abs(r);
+  const h=Math.floor(abs/3600), mm=Math.floor((abs%3600)/60), s=abs%60;
+  const str=(h>0?h+':':'')+pad(mm)+':'+pad(s);
+  el.textContent=ot?'+'+str:str; el.className='';
+  const rm=r/60;
+  if(ot){el.classList.add('ot');document.getElementById('tmsg').textContent=T.ot;}
+  else if(rm<=T.wr)el.classList.add('re');
+  else if(rm<=T.wy)el.classList.add('ye');
 }
 function chkMsgs(){
-const rm=Math.floor(T.rem/60);
-for(const m of T.msgs){if(rm<=m.at&&!T.fired.has(m.at)){T.fired.add(m.at);document.getElementById(‘tmsg’).textContent=m.msg;}}
+  const rm=Math.floor(T.rem/60);
+  for(const m of T.msgs){if(rm<=m.at&&!T.fired.has(m.at)){T.fired.add(m.at);document.getElementById('tmsg').textContent=m.msg;}}
 }
 function showBtns(run){
-document.getElementById(‘sb2’).style.display=run?‘none’:’’;
-document.getElementById(‘pb2’).style.display=run?’’:‘none’;
+  document.getElementById('sb2').style.display=run?'none':'';
+  document.getElementById('pb2').style.display=run?'':'none';
 }
-function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem–;chkMsgs();updTimer();},1000);}
+function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=>{T.rem--;chkMsgs();updTimer();},1000);}
 function tPause(){T.run=false;clearInterval(T.iv);showBtns(false);}
-function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById(‘tmsg’).textContent=’’;updTimer();}
+function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById('tmsg').textContent='';updTimer();}
 
-// – BUILD HALL –
+// -- BUILD HALL --
 function buildHall(cfg,hallId,legId){
-if(!cfg)return;
-const{door,nc,cls,ncols,gap,cols}=cfg;
-const hall=document.getElementById(hallId); hall.innerHTML=’’;
+  if(!cfg)return;
+  const{door,nc,cls,ncols,gap,cols}=cfg;
+  const hall=document.getElementById(hallId); hall.innerHTML='';
 
-// Build flat seat list with 1-seat gaps between classes
-let flat=[];
-for(let ci=0;ci<nc;ci++){
-if(ci>0) for(let g=0;g<Math.max(1,gap);g++) flat.push({t:‘g’,ci});
-const c=cls[ci];
-for(let s=0;s<c.stu;s++) flat.push({t:‘s’,ci,n:c.st+s});
+  // Build flat seat list with 1-seat gaps between classes
+  let flat=[];
+  for(let ci=0;ci<nc;ci++){
+    if(ci>0) for(let g=0;g<Math.max(1,gap);g++) flat.push({t:'g',ci});
+    const c=cls[ci];
+    for(let s=0;s<c.stu;s++) flat.push({t:'s',ci,n:c.st+s});
+  }
+
+  // Distribute into columns, respecting slot offset (empty seats at top)
+  const colData=[]; let si=0;
+  for(let c=0;c<ncols;c++){
+    const colcfg=cols[c]||{s:8,o:0,sp:12};
+    const slotOffset=Math.max(0,colcfg.o||0);
+    const capacity=Math.max(1,colcfg.s);
+
+    // Collect the actual seat/gap slots for this column first
+    const seatSlots=[];
+    for(let r=0;r<capacity;r++) seatSlots.push(si<flat.length?flat[si++]:{t:'e'});
+
+    // Reverse so highest seat number is at top (back of room, near door = bottom)
+    seatSlots.reverse();
+
+    const col=[];
+    // Prepend offset empty slots (shift column down)
+    for(let r=0;r<slotOffset;r++) col.push({t:'e'});
+    // Then the reversed seat slots
+    for(const s of seatSlots) col.push(s);
+    colData.push(col);
+  }
+
+  const wrap=document.createElement('div');
+  wrap.className='hwrap'+(door==='right'?' dr':'');
+  const doorEl=document.createElement('div');
+  doorEl.className='door'; doorEl.innerHTML='<span class="dico">🚪</span><span>DOOR</span>';
+  wrap.appendChild(doorEl);
+  const ca=document.createElement('div'); ca.className='carea';
+  for(let c=0;c<ncols;c++){
+    const cfg2=cols[c]||{s:8,o:0,sp:12};
+    if(c>0){const sp=document.createElement('div');sp.style.width=Math.max(4,(cols[c-1]||{sp:12}).sp)+'px';sp.style.flexShrink='0';ca.appendChild(sp);}
+    const cw=document.createElement('div'); cw.className='cwrap';
+    const lb=document.createElement('div'); lb.className='clbl'; lb.textContent=`Col ${c+1}`; cw.appendChild(lb);
+    const cs=document.createElement('div'); cs.className='cseats';
+    // No margin-top -- offset is handled by prepended empty slots above
+    for(const slot of colData[c]){
+      if(slot.t==='g'){
+        const g=document.createElement('div'); g.className='sgap'; cs.appendChild(g);
+      } else if(slot.t==='e'){
+        const s=document.createElement('div'); s.className='seat emp';
+        s.style.background='rgba(20,35,50,.4)'; s.style.borderColor='rgba(40,70,100,.5)';
+        cs.appendChild(s);
+      } else {
+        const clr=CLR[slot.ci%CLR.length], c2=cls[slot.ci];
+        const s=document.createElement('div'); s.className='seat';
+        s.style.background=clr.bg; s.style.borderColor=clr.bd;
+        s.title=`${c2.name} -- Seat ${slot.n}`;
+        s.innerHTML=`<span class="snum">${slot.n}</span><span class="sbadge" style="background:${clr.bbl};color:${clr.tx}">${c2.name}</span>`;
+        cs.appendChild(s);
+      }
+    }
+    cw.appendChild(cs); ca.appendChild(cw);
+  }
+  wrap.appendChild(ca); hall.appendChild(wrap);
+  const leg=document.getElementById(legId); leg.innerHTML='';
+  for(let ci=0;ci<nc;ci++){
+    const c2=cls[ci], clr=CLR[ci%CLR.length];
+    const li=document.createElement('div'); li.className='legit';
+    li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span><span>${c2.name}</span><span style="color:var(--mu);font-size:.7rem;margin-left:2px">${c2.st}-${c2.st+c2.stu-1}</span>`;
+    leg.appendChild(li);
+  }
 }
 
-// Distribute into columns, respecting slot offset (empty seats at top)
-const colData=[]; let si=0;
-for(let c=0;c<ncols;c++){
-const colcfg=cols[c]||{s:8,o:0,sp:12};
-const slotOffset=Math.max(0,colcfg.o||0);
-const capacity=Math.max(1,colcfg.s);
-
-```
-// Collect the actual seat/gap slots for this column first
-const seatSlots=[];
-for(let r=0;r<capacity;r++) seatSlots.push(si<flat.length?flat[si++]:{t:'e'});
-
-// Reverse so highest seat number is at top (back of room, near door = bottom)
-seatSlots.reverse();
-
-const col=[];
-// Prepend offset empty slots (shift column down)
-for(let r=0;r<slotOffset;r++) col.push({t:'e'});
-// Then the reversed seat slots
-for(const s of seatSlots) col.push(s);
-colData.push(col);
-```
-
-}
-
-const wrap=document.createElement(‘div’);
-wrap.className=‘hwrap’+(door===‘right’?’ dr’:’’);
-const doorEl=document.createElement(‘div’);
-doorEl.className=‘door’; doorEl.innerHTML=’<span class="dico">🚪</span><span>DOOR</span>’;
-wrap.appendChild(doorEl);
-const ca=document.createElement(‘div’); ca.className=‘carea’;
-for(let c=0;c<ncols;c++){
-const cfg2=cols[c]||{s:8,o:0,sp:12};
-if(c>0){const sp=document.createElement(‘div’);sp.style.width=Math.max(4,(cols[c-1]||{sp:12}).sp)+‘px’;sp.style.flexShrink=‘0’;ca.appendChild(sp);}
-const cw=document.createElement(‘div’); cw.className=‘cwrap’;
-const lb=document.createElement(‘div’); lb.className=‘clbl’; lb.textContent=`Col ${c+1}`; cw.appendChild(lb);
-const cs=document.createElement(‘div’); cs.className=‘cseats’;
-// No margin-top – offset is handled by prepended empty slots above
-for(const slot of colData[c]){
-if(slot.t===‘g’){
-const g=document.createElement(‘div’); g.className=‘sgap’; cs.appendChild(g);
-} else if(slot.t===‘e’){
-const s=document.createElement(‘div’); s.className=‘seat emp’;
-s.style.background=‘rgba(20,35,50,.4)’; s.style.borderColor=‘rgba(40,70,100,.5)’;
-cs.appendChild(s);
-} else {
-const clr=CLR[slot.ci%CLR.length], c2=cls[slot.ci];
-const s=document.createElement(‘div’); s.className=‘seat’;
-s.style.background=clr.bg; s.style.borderColor=clr.bd;
-s.title=`${c2.name} -- Seat ${slot.n}`;
-s.innerHTML=`<span class="snum">${slot.n}</span><span class="sbadge" style="background:${clr.bbl};color:${clr.tx}">${c2.name}</span>`;
-cs.appendChild(s);
-}
-}
-cw.appendChild(cs); ca.appendChild(cw);
-}
-wrap.appendChild(ca); hall.appendChild(wrap);
-const leg=document.getElementById(legId); leg.innerHTML=’’;
-for(let ci=0;ci<nc;ci++){
-const c2=cls[ci], clr=CLR[ci%CLR.length];
-const li=document.createElement(‘div’); li.className=‘legit’;
-li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span><span>${c2.name}</span><span style="color:var(--mu);font-size:.7rem;margin-left:2px">${c2.st}-${c2.st+c2.stu-1}</span>`;
-leg.appendChild(li);
-}
-}
-
-// – GALLERY –
+// -- GALLERY --
 function galGo(idx){
-if(!attImages.length){galIdx=0;return;}
-galIdx=(idx+attImages.length)%attImages.length;
-document.querySelectorAll(’.spslide’).forEach((s,i)=>s.classList.toggle(‘active’,i===galIdx));
-renderImgDots();
-document.getElementById(‘imgcount’).textContent=`${galIdx+1} / ${attImages.length}`;
+  if(!attImages.length){galIdx=0;return;}
+  galIdx=(idx+attImages.length)%attImages.length;
+  document.querySelectorAll('.spslide').forEach((s,i)=>s.classList.toggle('active',i===galIdx));
+  renderImgDots();
+  document.getElementById('imgcount').textContent=`${galIdx+1} / ${attImages.length}`;
 }
 function galNext(){galGo(galIdx+1);}
 function galPrev(){galGo(galIdx-1);}
 function galTogglePlay(){
-galPlaying=!galPlaying;
-document.getElementById(‘galplaybtn’).textContent=galPlaying?‘⏸’:‘▶’;
-if(galPlaying)startGallery(); else stopGallery();
+  galPlaying=!galPlaying;
+  document.getElementById('galplaybtn').textContent=galPlaying?'⏸':'▶';
+  if(galPlaying)startGallery(); else stopGallery();
 }
 function startGallery(){
-stopGallery();
-const spd=+document.getElementById(‘imgspeed’).value;
-if(spd===0||!galPlaying||attImages.length<2)return;
-galIv=setInterval(galNext,spd);
+  stopGallery();
+  const spd=+document.getElementById('imgspeed').value;
+  if(spd===0||!galPlaying||attImages.length<2)return;
+  galIv=setInterval(galNext,spd);
 }
 function stopGallery(){clearInterval(galIv);galIv=null;}
 
 function renderGallery(){
-const panel=document.getElementById(‘imgpanel’);
-panel.querySelectorAll(’.spslide’).forEach(s=>s.remove());
-const empty=document.getElementById(‘imgdrop’);
-if(!attImages.length){empty.style.display=‘flex’;document.getElementById(‘imgcount’).textContent=’’;renderImgDots();stopGallery();return;}
-empty.style.display=‘none’;
-attImages.forEach((img,i)=>{
-const div=document.createElement(‘div’);
-div.className=‘spslide’+(i===galIdx?’ active’:’’);
-const im=document.createElement(‘img’); im.src=img.src; im.alt=img.name;
-im.onclick=e=>{e.stopPropagation();lbOpen(i);};
-div.appendChild(im); panel.appendChild(div);
-});
-document.getElementById(‘imgcount’).textContent=`${galIdx+1} / ${attImages.length}`;
-renderImgDots();
-if(galPlaying)startGallery();
+  const panel=document.getElementById('imgpanel');
+  panel.querySelectorAll('.spslide').forEach(s=>s.remove());
+  const empty=document.getElementById('imgdrop');
+  if(!attImages.length){empty.style.display='flex';document.getElementById('imgcount').textContent='';renderImgDots();stopGallery();return;}
+  empty.style.display='none';
+  attImages.forEach((img,i)=>{
+    const div=document.createElement('div');
+    div.className='spslide'+(i===galIdx?' active':'');
+    const im=document.createElement('img'); im.src=img.src; im.alt=img.name;
+    im.onclick=e=>{e.stopPropagation();lbOpen(i);};
+    div.appendChild(im); panel.appendChild(div);
+  });
+  document.getElementById('imgcount').textContent=`${galIdx+1} / ${attImages.length}`;
+  renderImgDots();
+  if(galPlaying)startGallery();
 }
 function renderImgDots(){
-const d=document.getElementById(‘imgdots’); d.innerHTML=’’;
-attImages.forEach((_,i)=>{
-const b=document.createElement(‘button’); b.className=‘idot’+(i===galIdx?’ on’:’’);
-b.onclick=e=>{e.stopPropagation();galGo(i);}; d.appendChild(b);
-});
+  const d=document.getElementById('imgdots'); d.innerHTML='';
+  attImages.forEach((_,i)=>{
+    const b=document.createElement('button'); b.className='idot'+(i===galIdx?' on':'');
+    b.onclick=e=>{e.stopPropagation();galGo(i);}; d.appendChild(b);
+  });
 }
 
-// – IMAGE UPLOAD –
-function imgPanelClick(e){if(!attImages.length) document.getElementById(‘attfile’).click();}
-function imgDragOver(e){e.preventDefault();document.getElementById(‘imgdrop’).classList.add(‘over’);document.getElementById(‘imgpanel’).style.outline=‘2px dashed var(–ac)’;}
-function imgDragLeave(){document.getElementById(‘imgdrop’).classList.remove(‘over’);document.getElementById(‘imgpanel’).style.outline=’’;}
+// -- IMAGE UPLOAD --
+function imgPanelClick(e){if(!attImages.length) document.getElementById('attfile').click();}
+function imgDragOver(e){e.preventDefault();document.getElementById('imgdrop').classList.add('over');document.getElementById('imgpanel').style.outline='2px dashed var(--ac)';}
+function imgDragLeave(){document.getElementById('imgdrop').classList.remove('over');document.getElementById('imgpanel').style.outline='';}
 function imgDrop(e){e.preventDefault();imgDragLeave();attFiles(e.dataTransfer.files);}
 function attFiles(files){
-if(!files||!files.length)return;
-const oldLen=attImages.length; let loaded=0;
-Array.from(files).forEach(f=>{
-if(!f.type.startsWith(‘image/’))return;
-const reader=new FileReader();
-reader.onload=e=>{
-attImages.push({src:e.target.result,name:f.name});
-loaded++;
-if(loaded===1&&oldLen===0)galIdx=0;
-renderGallery();
-toast(‘📷 ‘+f.name);
-};
-reader.readAsDataURL(f);
-});
-document.getElementById(‘attfile’).value=’’;
+  if(!files||!files.length)return;
+  const oldLen=attImages.length; let loaded=0;
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      attImages.push({src:e.target.result,name:f.name});
+      loaded++;
+      if(loaded===1&&oldLen===0)galIdx=0;
+      renderGallery();
+      toast('📷 '+f.name);
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('attfile').value='';
 }
 
-// – LIGHTBOX –
+// -- LIGHTBOX --
 function lbOpen(idx){
-if(!attImages.length)return;
-galIdx=idx;
-document.getElementById(‘lbimg’).src=attImages[idx].src;
-document.getElementById(‘lbcap’).textContent=`${attImages[idx].name}  (${idx+1} / ${attImages.length})`;
-document.getElementById(‘lightbox’).classList.add(‘open’);
-document.addEventListener(‘keydown’,lbKey);
+  if(!attImages.length)return;
+  galIdx=idx;
+  document.getElementById('lbimg').src=attImages[idx].src;
+  document.getElementById('lbcap').textContent=`${attImages[idx].name}  (${idx+1} / ${attImages.length})`;
+  document.getElementById('lightbox').classList.add('open');
+  document.addEventListener('keydown',lbKey);
 }
-function lbClose(){document.getElementById(‘lightbox’).classList.remove(‘open’);document.removeEventListener(‘keydown’,lbKey);}
+function lbClose(){document.getElementById('lightbox').classList.remove('open');document.removeEventListener('keydown',lbKey);}
 function lbShift(d){
-galIdx=(galIdx+d+attImages.length)%attImages.length;
-document.getElementById(‘lbimg’).src=attImages[galIdx].src;
-document.getElementById(‘lbcap’).textContent=`${attImages[galIdx].name}  (${galIdx+1} / ${attImages.length})`;
-galGo(galIdx);
+  galIdx=(galIdx+d+attImages.length)%attImages.length;
+  document.getElementById('lbimg').src=attImages[galIdx].src;
+  document.getElementById('lbcap').textContent=`${attImages[galIdx].name}  (${galIdx+1} / ${attImages.length})`;
+  galGo(galIdx);
 }
-function lbKey(e){if(e.key===‘ArrowLeft’)lbShift(-1);if(e.key===‘ArrowRight’)lbShift(1);if(e.key===‘Escape’)lbClose();}
+function lbKey(e){if(e.key==='ArrowLeft')lbShift(-1);if(e.key==='ArrowRight')lbShift(1);if(e.key==='Escape')lbClose();}
 
-// – TOAST –
-function toast(msg){const t=document.getElementById(‘toast’);t.textContent=msg;t.classList.add(‘show’);setTimeout(()=>t.classList.remove(‘show’),2200);}
+// -- TOAST --
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
 window.onload=()=>{renderCC();renderCT();renderInstList();};
 </script>
-
 </body>
 </html>
