@@ -10,7 +10,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
 
-/* ══ EDITOR ══ */
+/* == EDITOR == */
 #editor{display:flex;flex-direction:column;min-height:100vh;padding:20px;gap:14px;max-width:1100px;margin:0 auto}
 .etop{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 h1{font-size:1.5rem;font-weight:800;color:var(–ac)}
@@ -66,14 +66,14 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .lcard .ltitle{font-size:1rem;font-weight:700;margin-bottom:6px;display:block}
 .lcard .ldesc{font-size:.78rem;color:var(–mu);line-height:1.45;display:block}
 
-/* ══ DISPLAY ══ */
+/* == DISPLAY == */
 #display{display:none;flex-direction:column;min-height:100vh}
 
 /* Floating controls */
 #fctrl{position:fixed;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:300;opacity:.1;transition:opacity .3s}
 #fctrl:hover{opacity:1}
 
-/* ══ COLUMN ADJUST PANEL (live, in display) ══ */
+/* == COLUMN ADJUST PANEL (live, in display) == */
 #coladj{position:fixed;left:12px;bottom:12px;z-index:300;opacity:.1;transition:opacity .3s;display:none}
 #coladj:hover{opacity:1}
 #coladj-inner{background:rgba(10,10,26,.92);border:1px solid var(–bd);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);max-height:80vh;overflow-y:auto}
@@ -87,7 +87,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .cadj-rst{width:20px;height:20px;border-radius:4px;border:1px solid var(–bd);background:#1a1a30;color:var(–mu);cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .cadj-rst:hover{background:#333;color:var(–tx)}
 
-/* ══ SEATING PHASE ══ */
+/* == SEATING PHASE == */
 #seatphase{display:none;flex-direction:column;height:100vh;overflow:hidden}
 #spbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(–panel);border-bottom:1px solid var(–bd);gap:12px;flex-shrink:0}
 #spvenue{font-size:1rem;font-weight:700;color:var(–ac);letter-spacing:.04em}
@@ -137,7 +137,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 .spin-item{display:flex;gap:7px;align-items:flex-start;font-size:.82rem;color:var(–tx)}
 .spin-bullet{color:var(–ac2);font-weight:700;flex-shrink:0;min-width:18px}
 
-/* ══ EXAM PHASE ══ */
+/* == EXAM PHASE == */
 #examphase{display:none;flex-direction:column;min-height:100vh;padding:16px;gap:14px}
 #tsec{text-align:center;padding:20px 20px 16px;background:var(–panel);border-radius:12px;border:1px solid var(–bd)}
 #tlbl{font-size:1rem;color:var(–mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
@@ -200,7 +200,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
 </head>
 <body>
 
-<!-- ══════════ EDITOR ══════════ -->
+<!-- ========== EDITOR ========== -->
 
 <div id="editor">
   <div class="etop"><h1>🏫 Exam Hall Display Editor</h1></div>
@@ -223,14 +223,14 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
     <div class="row">
       <div class="fg"><label>Timer Label</label><input type="text" id="tlbltxt" value="Time Remaining"></div>
-      <div class="fg"><label>Overtime Message</label><input type="text" id="otmsg" value="⏰ TIME IS UP — Please stop writing!"></div>
+      <div class="fg"><label>Overtime Message</label><input type="text" id="otmsg" value="⏰ TIME IS UP -- Please stop writing!"></div>
     </div>
     <div class="row">
       <div class="fg"><label>Timed Messages (minutes=message, one per line)</label>
         <textarea id="cdmsgs">30=⚠ 30 minutes remaining
-15=⚠ 15 minutes — check your work!
+15=⚠ 15 minutes -- check your work!
 10=⚠ 10 minutes left!
-5=⚠ 5 minutes — finish up!</textarea>
+5=⚠ 5 minutes -- finish up!</textarea>
       </div>
     </div>
   </div>
@@ -264,7 +264,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
     <div class="row" style="margin-bottom:14px;align-items:flex-end">
       <div class="fg">
-        <label>Quick seat count — e.g. <span style="color:var(--ac)">5,3,5,4,3</span></label>
+        <label>Quick seat count -- e.g. <span style="color:var(--ac)">5,3,5,4,3</span></label>
         <div style="display:flex;gap:8px">
           <input type="text" id="quickseats" placeholder="e.g. 5,3,5,4,3" style="max-width:220px">
           <button class="btn bp sm" onclick="applyQuickSeats()">Apply</button>
@@ -302,7 +302,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
       <div id="instpreview"></div>
     </div>
     <div class="dvd"></div>
-    <h3 style="color:var(--ac2);margin-bottom:8px">⚡ Crash Failsafe — Plain Text Copy</h3>
+    <h3 style="color:var(--ac2);margin-bottom:8px">⚡ Crash Failsafe -- Plain Text Copy</h3>
     <p style="color:var(--mu);font-size:.82rem;margin-bottom:10px">Keep this text somewhere safe (notes app, printed). If the page crashes, you can re-paste it here and your instructions will be restored instantly.</p>
     <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
       <button class="btn bp sm" onclick="exportInstText()">📋 Copy to Clipboard</button>
@@ -331,7 +331,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
   </div>
 </div>
 
-<!-- ══════════ DISPLAY ══════════ -->
+<!-- ========== DISPLAY ========== -->
 
 <div id="display">
 
@@ -354,7 +354,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
   </div>
 
-  <!-- ── SEATING PHASE ── -->
+  <!-- -- SEATING PHASE -- -->
 
   <div id="seatphase">
     <div id="spbar">
@@ -371,7 +371,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
         <div id="imgdrop">
           <div class="dico">📋</div>
           <p>Click or drag &amp; drop attendance images here</p>
-          <small>JPG / PNG — multiple files supported</small>
+          <small>JPG / PNG -- multiple files supported</small>
         </div>
         <div id="imgoverlay">
           <button class="imgnavbtn" onclick="event.stopPropagation();galPrev()">‹</button>
@@ -409,7 +409,7 @@ textarea{resize:vertical;min-height:80px;font-size:.82rem}
     </div>
   </div>
 
-  <!-- ── EXAM PHASE ── -->
+  <!-- -- EXAM PHASE -- -->
 
   <div id="examphase">
     <div id="tsec">
@@ -472,14 +472,14 @@ let clockIv=null, cfg=null;
 // Which halls are currently rendered (for live offset updates)
 let activeHalls={}; // hallId -> colElements array
 
-// ── TABS ──
+// -- TABS --
 function tab(id){
   document.querySelectorAll('.tabx').forEach((b,i)=>b.classList.toggle('on',['t1','t2','t3','t4'][i]===id));
   document.querySelectorAll('.tc').forEach(c=>c.classList.toggle('on',c.id===id));
   if(id==='t4')renderInstPreview();
 }
 
-// ── CLASS CONFIG ──
+// -- CLASS CONFIG --
 let ccSaved=[{name:'Class 3A',stu:30,st:1},{name:'Class 3B',stu:30,st:1},{name:'Class 3C',stu:30,st:1}];
 function renderCC(){
   const n=+document.getElementById('nc').value, c=document.getElementById('cclist');
@@ -498,7 +498,7 @@ function renderCC(){
   }
 }
 
-// ── COLUMN CONFIG ──
+// -- COLUMN CONFIG --
 // CS[i].o = slot offset (integer: number of empty seats prepended at top)
 function renderCT(){
   const n=+document.getElementById('ncols').value||4;
@@ -550,7 +550,7 @@ function applyQuickSeats(){
   toast(`✅ Applied ${vals.length} columns: ${vals.join(', ')}`);
 }
 
-// ── INSTRUCTIONS ──
+// -- INSTRUCTIONS --
 let instItems=[
   {bullet:'1.',text:'Place your student ID on the top-right corner of your desk.'},
   {bullet:'2.',text:'No electronic devices are permitted during the examination.'},
@@ -602,7 +602,7 @@ return out.trimEnd();
 function exportInstText(){
 const text=serializeInst();
 document.getElementById(‘insttextbox’).value=text;
-navigator.clipboard?.writeText(text).then(()=>toast(‘📋 Copied to clipboard!’)).catch(()=>toast(‘📋 Text ready — copy manually’));
+navigator.clipboard?.writeText(text).then(()=>toast(‘📋 Copied to clipboard!’)).catch(()=>toast(‘📋 Text ready – copy manually’));
 }
 function importInstText(){
 const raw=document.getElementById(‘insttextbox’).value.trim();
@@ -618,7 +618,7 @@ const idx=line.indexOf(’|’);
 items.push({bullet:line.slice(0,idx),text:line.slice(idx+1)});
 }
 }
-if(!items.length){toast(‘⚠ No instructions found — check format’);return;}
+if(!items.length){toast(‘⚠ No instructions found – check format’);return;}
 if(title) document.getElementById(‘insttitle’).value=title;
 const ws=document.getElementById(‘instwhere’);
 if([‘both’,‘seating’,‘exam’,‘none’].includes(where)) ws.value=where;
@@ -628,7 +628,7 @@ toast(‘✅ Instructions imported!’);
 }
 function getInstWhere(){return document.getElementById(‘instwhere’).value;}
 
-// ── READ CONFIG ──
+// – READ CONFIG –
 function readAll(){
 const h=+document.getElementById(‘th’).value||0, m=+document.getElementById(‘tm’).value||0;
 T.total=(h*3600)+(m*60); T.rem=T.total;
@@ -659,7 +659,7 @@ instItems:[…instItems]
 };
 }
 
-// ── LAUNCH ──
+// – LAUNCH –
 function goSeating(){cfg=readAll();showDisplay();switchToSeating();}
 function goExam(){cfg=readAll();showDisplay();switchToExam();}
 function showDisplay(){
@@ -699,7 +699,7 @@ document.getElementById(‘modeseat’).style.opacity=‘1’;
 document.getElementById(‘tbtn’).textContent=‘🪑 Hide Seating’;
 document.getElementById(‘exseat’).classList.remove(‘hidden’);
 document.getElementById(‘tlbl’).textContent=T.lbl;
-document.getElementById(‘exseattitle’).textContent=(cfg?.vname||’’)+’ — Seating’;
+document.getElementById(‘exseattitle’).textContent=(cfg?.vname||’’)+’ – Seating’;
 buildHall(cfg,‘exhall’,‘exleg’);
 buildInstExam();
 buildColAdj();
@@ -707,7 +707,7 @@ document.getElementById(‘coladj’).style.display=‘block’;
 tReset();
 }
 
-// ── TOGGLE SEATING ──
+// – TOGGLE SEATING –
 function togSeat(){
 const phase=document.getElementById(‘seatphase’).style.display!==‘none’?‘seat’:‘exam’;
 if(phase===‘seat’){
@@ -723,7 +723,7 @@ document.getElementById(‘coladj’).style.display=hidden?‘none’:‘block�
 }
 }
 
-// ── LIVE COLUMN ADJUSTER (display panel) ──
+// – LIVE COLUMN ADJUSTER (display panel) –
 function buildColAdj(){
 if(!cfg)return;
 const n=cfg.ncols, rows=document.getElementById(‘cadjrows’);
@@ -754,7 +754,7 @@ else buildHall(cfg,‘exhall’,‘exleg’);
 }
 function liveResetOff(i){ liveAdjOff(i,-(CS[i]?.o||0)); }
 
-// ── INSTRUCTIONS ──
+// – INSTRUCTIONS –
 function buildInstStrip(){
 const where=cfg?.instwhere||‘both’;
 const strip=document.getElementById(‘spinst’);
@@ -783,7 +783,7 @@ list.appendChild(d);
 if(list.children.length) box.classList.add(‘show’); else box.classList.remove(‘show’);
 }
 
-// ── CLOCK ──
+// – CLOCK –
 function pad(n){return String(n).padStart(2,‘0’);}
 function startClock(){updateClock();clockIv=setInterval(updateClock,1000);}
 function stopClock(){clearInterval(clockIv);}
@@ -799,7 +799,7 @@ document.getElementById(‘datebox’).textContent=ds;
 document.getElementById(‘spdate’).textContent=ds;
 }
 
-// ── TIMER ──
+// – TIMER –
 function updTimer(){
 const el=document.getElementById(‘tdisp’);
 const r=T.rem, ot=r<0, abs=Math.abs(r);
@@ -823,7 +823,7 @@ function tStart(){if(T.run)return;T.run=true;showBtns(true);T.iv=setInterval(()=
 function tPause(){T.run=false;clearInterval(T.iv);showBtns(false);}
 function tReset(){tPause();T.rem=T.total;T.fired=new Set();document.getElementById(‘tmsg’).textContent=’’;updTimer();}
 
-// ── BUILD HALL ──
+// – BUILD HALL –
 function buildHall(cfg,hallId,legId){
 if(!cfg)return;
 const{door,nc,cls,ncols,gap,cols}=cfg;
@@ -874,7 +874,7 @@ if(c>0){const sp=document.createElement(‘div’);sp.style.width=Math.max(4,(co
 const cw=document.createElement(‘div’); cw.className=‘cwrap’;
 const lb=document.createElement(‘div’); lb.className=‘clbl’; lb.textContent=`Col ${c+1}`; cw.appendChild(lb);
 const cs=document.createElement(‘div’); cs.className=‘cseats’;
-// No margin-top — offset is handled by prepended empty slots above
+// No margin-top – offset is handled by prepended empty slots above
 for(const slot of colData[c]){
 if(slot.t===‘g’){
 const g=document.createElement(‘div’); g.className=‘sgap’; cs.appendChild(g);
@@ -886,7 +886,7 @@ cs.appendChild(s);
 const clr=CLR[slot.ci%CLR.length], c2=cls[slot.ci];
 const s=document.createElement(‘div’); s.className=‘seat’;
 s.style.background=clr.bg; s.style.borderColor=clr.bd;
-s.title=`${c2.name} — Seat ${slot.n}`;
+s.title=`${c2.name} -- Seat ${slot.n}`;
 s.innerHTML=`<span class="snum">${slot.n}</span><span class="sbadge" style="background:${clr.bbl};color:${clr.tx}">${c2.name}</span>`;
 cs.appendChild(s);
 }
@@ -898,12 +898,12 @@ const leg=document.getElementById(legId); leg.innerHTML=’’;
 for(let ci=0;ci<nc;ci++){
 const c2=cls[ci], clr=CLR[ci%CLR.length];
 const li=document.createElement(‘div’); li.className=‘legit’;
-li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span><span>${c2.name}</span><span style="color:var(--mu);font-size:.7rem;margin-left:2px">${c2.st}–${c2.st+c2.stu-1}</span>`;
+li.innerHTML=`<span class="legdot" style="background:${clr.bg};border-color:${clr.dot}"></span><span>${c2.name}</span><span style="color:var(--mu);font-size:.7rem;margin-left:2px">${c2.st}-${c2.st+c2.stu-1}</span>`;
 leg.appendChild(li);
 }
 }
 
-// ── GALLERY ──
+// – GALLERY –
 function galGo(idx){
 if(!attImages.length){galIdx=0;return;}
 galIdx=(idx+attImages.length)%attImages.length;
@@ -951,7 +951,7 @@ b.onclick=e=>{e.stopPropagation();galGo(i);}; d.appendChild(b);
 });
 }
 
-// ── IMAGE UPLOAD ──
+// – IMAGE UPLOAD –
 function imgPanelClick(e){if(!attImages.length) document.getElementById(‘attfile’).click();}
 function imgDragOver(e){e.preventDefault();document.getElementById(‘imgdrop’).classList.add(‘over’);document.getElementById(‘imgpanel’).style.outline=‘2px dashed var(–ac)’;}
 function imgDragLeave(){document.getElementById(‘imgdrop’).classList.remove(‘over’);document.getElementById(‘imgpanel’).style.outline=’’;}
@@ -974,7 +974,7 @@ reader.readAsDataURL(f);
 document.getElementById(‘attfile’).value=’’;
 }
 
-// ── LIGHTBOX ──
+// – LIGHTBOX –
 function lbOpen(idx){
 if(!attImages.length)return;
 galIdx=idx;
@@ -992,7 +992,7 @@ galGo(galIdx);
 }
 function lbKey(e){if(e.key===‘ArrowLeft’)lbShift(-1);if(e.key===‘ArrowRight’)lbShift(1);if(e.key===‘Escape’)lbClose();}
 
-// ── TOAST ──
+// – TOAST –
 function toast(msg){const t=document.getElementById(‘toast’);t.textContent=msg;t.classList.add(‘show’);setTimeout(()=>t.classList.remove(‘show’),2200);}
 
 window.onload=()=>{renderCC();renderCT();renderInstList();};
