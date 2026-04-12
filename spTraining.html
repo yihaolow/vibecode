@@ -1,630 +1,1047 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CSV Attendance Report Generator</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Transformation Visualizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Inter", "sans-serif"],
-            },
-          },
-        },
-      };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
     </script>
-    <style>
-      body {
-        background-color: #f7f9fb;
-        font-family: "Inter", sans-serif;
-      }
-      .container-box {
-        background-color: #ffffff;
-        box-shadow:
-          0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -2px rgba(0, 0, 0, 0.1);
-      }
-      .csv-output {
-        white-space: pre;
-        overflow-x: auto;
-        min-height: 200px;
-        font-family: monospace;
-      }
-      .date-checkbox:checked + div {
-        background-color: #e0e7ff;
-        border-color: #4f46e5;
-        color: #4f46e5;
-      }
-      .division-checkbox:checked + div {
-        background-color: #dcfce7;
-        border-color: #16a34a;
-        color: #16a34a;
-      }
-    </style>
-  </head>
-  <body class="p-4 sm:p-8">
-    <div class="max-w-5xl mx-auto space-y-6">
-      <!-- Header -->
-      <div class="border-b pb-4">
-        <h1 class="text-3xl font-bold text-gray-800">
-          Chinese Chess Attendance Report Generator
-        </h1>
-        <p class="text-gray-600 mt-2">
-          Upload CSV, select dates and divisions, then generate your report
-        </p>
-      </div>
+</head>
+<body class="font-sans overflow-hidden" style="background: #f8faf8; height: 100vh;">
+    <div class="flex h-full">
+        <!-- Left Sidebar -->
+        <div class="w-80 bg-white border-r border-emerald-200 overflow-y-auto">
+            <div class="p-4">
+                <!-- Matrix Panel -->
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold text-emerald-900 mb-3">Transformation Matrix</h2>
+                    <div class="font-mono text-lg flex items-center justify-center">
+                        <span class="text-3xl text-emerald-800">[</span>
+                        <div class="grid grid-cols-3 gap-2 mx-2">
+                            <input type="number" id="m00" value="1" step="0.1" class="w-16 h-10 text-center border border-emerald-300 rounded bg-emerald-50 text-emerald-900">
+                            <input type="number" id="m01" value="0" step="0.1" class="w-16 h-10 text-center border border-emerald-300 rounded bg-emerald-50 text-emerald-900">
+                            <input type="number" id="m02" value="0" step="0.1" class="w-16 h-10 text-center border border-amber-300 rounded bg-amber-50 text-emerald-900">
+                            <input type="number" id="m10" value="0" step="0.1" class="w-16 h-10 text-center border border-emerald-300 rounded bg-emerald-50 text-emerald-900">
+                            <input type="number" id="m11" value="1" step="0.1" class="w-16 h-10 text-center border border-emerald-300 rounded bg-emerald-50 text-emerald-900">
+                            <input type="number" id="m12" value="0" step="0.1" class="w-16 h-10 text-center border border-amber-300 rounded bg-amber-50 text-emerald-900">
+                            <div class="w-16 h-10 flex items-center justify-center bg-slate-100 text-slate-500 rounded font-mono">0</div>
+                            <div class="w-16 h-10 flex items-center justify-center bg-slate-100 text-slate-500 rounded font-mono">0</div>
+                            <div class="w-16 h-10 flex items-center justify-center bg-slate-100 text-slate-500 rounded font-mono">1</div>
+                        </div>
+                        <span class="text-3xl text-emerald-800">]</span>
+                    </div>
+                </div>
 
-      <!-- Step 1: File Upload -->
-      <div class="container-box p-6 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
-          <span
-            class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3"
-            >1</span
-          >
-          Upload CSV File
-        </h2>
-        <div class="flex flex-col sm:flex-row gap-4 items-start">
-          <input
-            type="file"
-            id="csvFile"
-            accept=".csv"
-            class="flex-grow text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-gray-300 rounded-lg p-2"
-          />
-          <button
-            onclick="analyzeCSV()"
-            id="analyzeButton"
-            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition duration-150 shadow-md whitespace-nowrap"
-          >
-            Analyze File
-          </button>
-        </div>
-        <p id="uploadMessage" class="mt-3 text-sm hidden"></p>
-      </div>
+                <!-- Presets -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-emerald-900 mb-2">Presets</h3>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="setPreset('identity')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Identity</button>
+                        <button onclick="setPreset('rotation')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Rotation</button>
+                        <button onclick="setPreset('scale')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Scale</button>
+                        <button onclick="setPreset('shearX')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Shear X</button>
+                        <button onclick="setPreset('shearY')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Shear Y</button>
+                        <button onclick="setPreset('translation')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Translation</button>
+                        <button onclick="setPreset('reflectX')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Reflect X</button>
+                        <button onclick="setPreset('reflectY')" class="preset-btn px-3 py-2 text-sm border border-emerald-300 rounded hover:bg-emerald-50 transition-colors">Reflect Y</button>
+                    </div>
+                    
+                    <!-- Parameter sliders -->
+                    <div id="params" class="mt-3 space-y-2 hidden">
+                        <div id="param-angle" class="hidden">
+                            <label class="text-sm text-emerald-700">Angle (°)</label>
+                            <input type="range" id="angle-slider" min="0" max="360" value="45" class="w-full">
+                            <span id="angle-value" class="text-sm font-mono text-emerald-800">45°</span>
+                        </div>
+                        <div id="param-scale" class="hidden">
+                            <label class="text-sm text-emerald-700">Scale X</label>
+                            <input type="range" id="scaleX-slider" min="0.1" max="3" step="0.1" value="2" class="w-full">
+                            <span id="scaleX-value" class="text-sm font-mono text-emerald-800">2.0</span>
+                            <label class="text-sm text-emerald-700">Scale Y</label>
+                            <input type="range" id="scaleY-slider" min="0.1" max="3" step="0.1" value="1" class="w-full">
+                            <span id="scaleY-value" class="text-sm font-mono text-emerald-800">1.0</span>
+                        </div>
+                        <div id="param-shear" class="hidden">
+                            <label class="text-sm text-emerald-700">Shear Factor</label>
+                            <input type="range" id="shear-slider" min="-2" max="2" step="0.1" value="0.5" class="w-full">
+                            <span id="shear-value" class="text-sm font-mono text-emerald-800">0.5</span>
+                        </div>
+                        <div id="param-translation" class="hidden">
+                            <label class="text-sm text-emerald-700">X Translation</label>
+                            <input type="range" id="transX-slider" min="-5" max="5" step="0.1" value="2" class="w-full">
+                            <span id="transX-value" class="text-sm font-mono text-emerald-800">2.0</span>
+                            <label class="text-sm text-emerald-700">Y Translation</label>
+                            <input type="range" id="transY-slider" min="-5" max="5" step="0.1" value="-1" class="w-full">
+                            <span id="transY-value" class="text-sm font-mono text-emerald-800">-1.0</span>
+                        </div>
+                    </div>
+                </div>
 
-      <!-- Step 2: Date & Division Selection (Hidden initially) -->
-      <div id="selectionPanel" class="hidden container-box p-6 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
-          <span
-            class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3"
-            >2</span
-          >
-          Select Dates & Divisions
-        </h2>
+                <!-- Properties -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-emerald-900 mb-2">Properties</h3>
+                    <div class="bg-emerald-50 p-3 rounded text-sm space-y-1">
+                        <div>Det: <span id="det-value" class="font-mono text-emerald-800">1.00</span></div>
+                        <div>Type: <span id="type-value" class="text-emerald-700">Identity</span></div>
+                        <div>Invertible: <span id="invertible-value" class="text-emerald-700">Yes</span></div>
+                        <div>Area Scale: <span id="area-scale-value" class="font-mono text-emerald-800">1.00</span></div>
+                    </div>
+                </div>
 
-        <!-- Division Filter -->
-        <div class="mb-6">
-          <h3
-            class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3"
-          >
-            Divisions Found
-          </h3>
-          <div id="divisionContainer" class="flex flex-wrap gap-2">
-            <!-- Checkboxes injected here -->
-          </div>
-          <p class="text-xs text-gray-500 mt-2">
-            Select which divisions to include in the report
-          </p>
-        </div>
+                <!-- Transformation Description -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-emerald-900 mb-2">Transformation</h3>
+                    <div id="transform-description" class="text-sm text-emerald-700 bg-emerald-50 p-3 rounded">
+                        T : Identity transformation
+                    </div>
+                </div>
 
-        <!-- Date Filter -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-3">
-            <h3
-              class="text-sm font-semibold text-gray-600 uppercase tracking-wide"
-            >
-              Available Dates
-            </h3>
-            <div class="space-x-2">
-              <button
-                onclick="selectAllDates(true)"
-                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-              >
-                Select All
-              </button>
-              <button
-                onclick="selectAllDates(false)"
-                class="text-xs text-gray-500 hover:text-gray-700 font-medium"
-              >
-                Clear
-              </button>
+                <!-- Points Table -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-emerald-900 mb-2">Points</h3>
+                    <div id="points-table" class="text-sm space-y-1">
+                        <div class="text-slate-500 italic">Click canvas to add points</div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="mb-6 space-y-2">
+                    <button onclick="animateTransform()" class="w-full px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors">
+                        Animate
+                    </button>
+                    <button onclick="commitTransform()" class="w-full px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors">
+                        Commit & Start Next Transform
+                    </button>
+                    <div class="flex space-x-2">
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="show-original" checked class="mr-1">
+                            Original Grid
+                        </label>
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="show-transformed" checked class="mr-1">
+                            Transformed Grid
+                        </label>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-emerald-900 mb-2">History</h3>
+                    <div id="replay-banner" class="hidden mb-2 p-2 bg-blue-100 text-blue-800 rounded text-sm">
+                        Viewing Step <span id="replay-step"></span> - <button onclick="exitReplay()" class="underline">Return to Live</button>
+                    </div>
+                    <div id="history-list" class="space-y-2">
+                        <div class="text-slate-500 italic text-sm">No transformations yet</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div id="dateContainer" class="space-y-4">
-            <!-- Date checkboxes grouped by month -->
-          </div>
         </div>
 
-        <div class="flex justify-end pt-4 border-t">
-          <button
-            onclick="generateReport()"
-            id="generateButton"
-            class="px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition duration-150 shadow-md flex items-center gap-2"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              ></path>
-            </svg>
-            Generate Report
-          </button>
+        <!-- Canvas Area -->
+        <div class="flex-1 relative">
+            <canvas id="canvas" class="w-full h-full cursor-crosshair"></canvas>
+            <div id="mouse-coords" class="absolute top-4 left-4 bg-white bg-opacity-90 px-2 py-1 rounded text-sm font-mono text-emerald-800">
+                (0.00, 0.00)
+            </div>
         </div>
-      </div>
-
-      <!-- Step 3: Output -->
-      <div id="outputPanel" class="hidden container-box p-6 rounded-lg">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-700">Generated Report</h2>
-          <div class="text-sm text-gray-600" id="reportSummary"></div>
-        </div>
-
-        <textarea
-          id="csvOutput"
-          readonly
-          placeholder="Report will appear here..."
-          class="csv-output w-full p-4 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-4"
-          rows="10"
-        ></textarea>
-
-        <div class="flex justify-end">
-          <button
-            onclick="downloadCSV()"
-            id="downloadButton"
-            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition duration-150 shadow-md flex items-center gap-2"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              ></path>
-            </svg>
-            Download CSV
-          </button>
-        </div>
-      </div>
     </div>
 
     <script>
-      // Global storage for parsed data
-      let parsedData = [];
-      let availableDates = new Map(); // Map<dateString, {sortKey, display, month, count}>
-      let availableDivisions = new Map();
-
-      // --- Utility Functions ---
-
-      function parseCSV(text) {
-        const rows = text.trim().split("\n");
-        if (rows.length === 0) return [];
-
-        const data = [];
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (row.trim() === "") continue;
-
-          const values = [];
-          let inQuote = false;
-          let current = "";
-
-          for (let j = 0; j < row.length; j++) {
-            const char = row[j];
-
-            if (char === '"') {
-              if (inQuote && j + 1 < row.length && row[j + 1] === '"') {
-                current += '"';
-                j++;
-              } else {
-                inQuote = !inQuote;
-              }
-            } else if (char === "," && !inQuote) {
-              values.push(current.trim());
-              current = "";
-            } else {
-              current += char;
-            }
-          }
-          values.push(current.trim());
-
-          const cleanedValues = values.map((v) =>
-            v.replace(/^"|"$/g, "").trim(),
-          );
-          data.push(cleanedValues);
-        }
-        return data;
-      }
-
-      function parseDate(dateStr) {
-        const parts = dateStr.split("/");
-        if (parts.length !== 3) return null;
-
-        const [day, month, year] = parts;
-        const date = new Date(year, month - 1, day);
-
-        if (isNaN(date)) return null;
-
-        return {
-          sortKey: `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
-          display: `${date.toLocaleString("en-US", { month: "short" })}-${day.padStart(2, "0")}`,
-          fullDate: date,
-          original: dateStr,
-        };
-      }
-
-      function showMessage(elementId, message, isError = false) {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        el.className = `mt-3 text-sm ${isError ? "text-red-600 font-medium" : "text-green-600 font-medium"}`;
-        el.classList.remove("hidden");
-      }
-
-      // --- Step 1: Analyze CSV ---
-
-      function analyzeCSV() {
-        const fileInput = document.getElementById("csvFile");
-        const file = fileInput.files[0];
-
-        if (!file) {
-          showMessage("uploadMessage", "Please select a CSV file first.", true);
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          try {
-            const rawData = e.target.result;
-            parsedData = parseCSV(rawData);
-
-            if (parsedData.length === 0) {
-              showMessage(
-                "uploadMessage",
-                "CSV file is empty or unreadable.",
-                true,
-              );
-              return;
-            }
-
-            extractMetadata();
-
-            if (availableDates.size === 0) {
-              showMessage(
-                "uploadMessage",
-                "No valid dates found in CSV.",
-                true,
-              );
-              return;
-            }
-
-            renderDivisionSelectors();
-            renderDateSelectors();
-            document
-              .getElementById("selectionPanel")
-              .classList.remove("hidden");
-            document.getElementById("outputPanel").classList.add("hidden");
-
-            showMessage(
-              "uploadMessage",
-              `Found ${parsedData.length} records across ${availableDates.size} dates and ${availableDivisions.size} divisions.`,
-            );
-          } catch (error) {
-            console.error(error);
-            showMessage(
-              "uploadMessage",
-              "Error parsing CSV: " + error.message,
-              true,
-            );
-          }
-        };
-
-        reader.readAsText(file);
-      }
-
-      function extractMetadata() {
-        availableDates.clear();
-        availableDivisions.clear();
-
-        const DATE_INDEX = 6;
-        const DIVISION_INDEX = 11;
-
-        parsedData.forEach((row) => {
-          if (row.length > DATE_INDEX && row[DATE_INDEX]) {
-            const dateStr = row[DATE_INDEX];
-            const parsed = parseDate(dateStr);
-
-            if (parsed) {
-              if (!availableDates.has(dateStr)) {
-                availableDates.set(dateStr, {
-                  ...parsed,
-                  count: 0,
-                  divisions: new Set(),
-                });
-              }
-              availableDates.get(dateStr).count++;
-            }
-          }
-
-          if (row.length > DIVISION_INDEX && row[DIVISION_INDEX]) {
-            const div = row[DIVISION_INDEX].trim();
-            if (div) {
-              if (!availableDivisions.has(div)) {
-                availableDivisions.set(div, 0);
-              }
-              availableDivisions.set(div, availableDivisions.get(div) + 1);
-            }
-          }
-        });
-
-        availableDates = new Map(
-          [...availableDates].sort((a, b) =>
-            a[1].sortKey.localeCompare(b[1].sortKey),
-          ),
-        );
-      }
-
-      // --- Step 2: Render Selectors ---
-
-      function renderDivisionSelectors() {
-        const container = document.getElementById("divisionContainer");
-        container.innerHTML = "";
-
-        const sortedDivisions = [...availableDivisions.keys()].sort((a, b) =>
-          a.localeCompare(b),
-        );
-
-        sortedDivisions.forEach((division) => {
-          const count = availableDivisions.get(division);
-          const isChecked = division === "Chinese Chess" ? "checked" : "";
-
-          const label = document.createElement("label");
-          label.className = "cursor-pointer";
-          label.innerHTML = `
-            <input type="checkbox" class="division-checkbox hidden" value="${division}" ${isChecked}>
-            <div class="px-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-sm font-medium transition-all hover:bg-gray-100 flex items-center gap-2">
-              <span>${division}</span>
-              <span class="text-xs opacity-60 bg-white px-2 py-0.5 rounded-full">${count}</span>
-            </div>
-          `;
-          container.appendChild(label);
-        });
-      }
-
-      function renderDateSelectors() {
-        const container = document.getElementById("dateContainer");
-        container.innerHTML = "";
-
-        const monthGroups = new Map();
-        availableDates.forEach((data, dateStr) => {
-          const monthKey = data.sortKey.substring(0, 7); // YYYY-MM
-          if (!monthGroups.has(monthKey)) {
-            monthGroups.set(monthKey, {
-              month: data.fullDate.toLocaleString("en-US", {
-                month: "long",
-                year: "numeric",
-              }),
-              dates: [],
-            });
-          }
-          monthGroups.get(monthKey).dates.push({ dateStr, ...data });
-        });
-
-        const sortedMonths = [...monthGroups.keys()].sort();
-
-        sortedMonths.forEach((monthKey) => {
-          const group = monthGroups.get(monthKey);
-
-          const monthDiv = document.createElement("div");
-          monthDiv.className =
-            "border border-gray-200 rounded-lg p-4 bg-gray-50";
-
-          const header = document.createElement("div");
-          header.className = "flex justify-between items-center mb-3";
-          header.innerHTML = `
-            <h4 class="font-semibold text-gray-700">${group.month}</h4>
-            <span class="text-xs text-gray-500">${group.dates.length} date(s)</span>
-          `;
-          monthDiv.appendChild(header);
-
-          const datesGrid = document.createElement("div");
-          datesGrid.className = "flex flex-wrap gap-2";
-
-          group.dates.forEach(({ dateStr, display, count }) => {
-            const label = document.createElement("label");
-            label.className = "cursor-pointer";
-            label.title = `${count} records on ${display}`;
-            label.innerHTML = `
-              <input type="checkbox" class="date-checkbox hidden" value="${dateStr}" checked>
-              <div class="px-3 py-1.5 rounded border border-gray-300 bg-white text-sm transition-all hover:bg-gray-50 flex flex-col items-center min-w-[4.5rem]">
-                <span class="font-semibold">${display}</span>
-                <span class="text-xs opacity-60">${count} rec</span>
-              </div>
-            `;
-            datesGrid.appendChild(label);
-          });
-
-          monthDiv.appendChild(datesGrid);
-          container.appendChild(monthDiv);
-        });
-      }
-
-      function selectAllDates(select) {
-        document.querySelectorAll(".date-checkbox").forEach((cb) => {
-          cb.checked = select;
-        });
-      }
-
-      // --- Step 3: Generate Report ---
-
-      function generateReport() {
-        const selectedDivisions = new Set();
-        document
-          .querySelectorAll(".division-checkbox:checked")
-          .forEach((cb) => {
-            selectedDivisions.add(cb.value.toLowerCase());
-          });
-
-        if (selectedDivisions.size === 0) {
-          alert("Please select at least one division.");
-          return;
-        }
-
-        const selectedDates = new Set();
-        document.querySelectorAll(".date-checkbox:checked").forEach((cb) => {
-          selectedDates.add(cb.value);
-        });
-
-        if (selectedDates.size === 0) {
-          alert("Please select at least one date.");
-          return;
-        }
-
-        const ADMIN_INDEX = 4;
-        const NAME_INDEX = 3;
-        const ACTIVITY_TYPE_INDEX = 5;
-        const DATE_INDEX = 6;
-        const DIVISION_INDEX = 11;
-
-        const filteredRecords = parsedData.filter((row) => {
-          if (row.length <= DIVISION_INDEX) return false;
-
-          const isTraining =
-            row[ACTIVITY_TYPE_INDEX] &&
-            row[ACTIVITY_TYPE_INDEX].toLowerCase() === "training/workshop";
-          const division = row[DIVISION_INDEX]
-            ? row[DIVISION_INDEX].toLowerCase()
-            : "";
-          const isSelectedDivision = selectedDivisions.has(division);
-          const date = row[DATE_INDEX];
-          const isSelectedDate = selectedDates.has(date);
-
-          return isTraining && isSelectedDivision && isSelectedDate;
-        });
-
-        if (filteredRecords.length === 0) {
-          alert("No records found matching the selected criteria.");
-          return;
-        }
-
-        // Build attendance map - FIX: Store display info with sortKey
-        const studentMap = new Map();
-        const dateMap = new Map(); // sortKey -> display
-
-        filteredRecords.forEach((row) => {
-          const adminNo = row[ADMIN_INDEX];
-          const name = row[NAME_INDEX];
-          const dateStr = row[DATE_INDEX];
-
-          if (!adminNo || !name || !dateStr) return;
-
-          const parsed = parseDate(dateStr);
-          if (!parsed) return;
-
-          // Store the display for this sortKey
-          dateMap.set(parsed.sortKey, parsed.display);
-
-          if (!studentMap.has(adminNo)) {
-            studentMap.set(adminNo, {
-              name: name.replace(/^"|"$/g, ""),
-              attendance: new Map(),
-            });
-          }
-
-          studentMap.get(adminNo).attendance.set(parsed.sortKey, 1);
-        });
-
-        const sortedDates = Array.from(dateMap.keys()).sort();
-
-        const outputRows = [];
-        const sortedAdmins = Array.from(studentMap.keys()).sort();
-
-        sortedAdmins.forEach((adminNo) => {
-          const student = studentMap.get(adminNo);
-          let attendedCount = 0;
-          const dateColumns = [];
-
-          sortedDates.forEach((dateKey) => {
-            const attended = student.attendance.has(dateKey) ? 1 : 0;
-            dateColumns.push(attended);
-            attendedCount += attended;
-          });
-
-          const percentage =
-            sortedDates.length > 0
-              ? Math.round((attendedCount / sortedDates.length) * 100)
-              : 0;
-
-          outputRows.push([
-            adminNo,
-            student.name,
-            attendedCount,
-            percentage + "%",
-            ...dateColumns,
-          ]);
-        });
-
-        // FIX: Use the stored display names instead of reparsing
-        const dateHeaders = sortedDates.map((sortKey) => dateMap.get(sortKey));
-
-        const header1 = [
-          "Admin Number",
-          "Name",
-          "Total",
-          "Percentage",
-          "Attended",
-          ...Array(dateHeaders.length - 1).fill(""),
+        // Global state
+        let canvas, ctx;
+        let matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+        let points = [];
+        let history = [];
+        let currentPreset = null;
+        let isAnimating = false;
+        let replayMode = false;
+        let replayStep = -1;
+        
+        // Canvas state
+        let scale = 30;
+        let offsetX = 0;
+        let offsetY = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let dragPoint = null;
+
+        // Point colors
+        const pointColors = [
+            '#ef4444', '#f97316', '#eab308', '#22c55e',
+            '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'
         ];
-        const header2 = ["", "", "", "", ...dateHeaders];
 
-        const csvContent = [
-          header1.join(","),
-          header2.join(","),
-          ...outputRows.map((row) => row.join(",")),
-        ].join("\n");
-
-        document.getElementById("csvOutput").value = csvContent;
-        document.getElementById("outputPanel").classList.remove("hidden");
-        document.getElementById("reportSummary").textContent =
-          `${outputRows.length} students | ${sortedDates.length} dates | ${filteredRecords.length} total records`;
-
-        document
-          .getElementById("outputPanel")
-          .scrollIntoView({ behavior: "smooth" });
-      }
-
-      function downloadCSV() {
-        const csvText = document.getElementById("csvOutput").value;
-        if (!csvText) {
-          alert("No data to download.");
-          return;
+        function init() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            
+            setupCanvas();
+            setupEventListeners();
+            updateMatrix();
+            draw();
         }
 
-        const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
+        function setupCanvas() {
+            function resize() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * devicePixelRatio;
+                canvas.height = rect.height * devicePixelRatio;
+                ctx.scale(devicePixelRatio, devicePixelRatio);
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                
+                offsetX = rect.width / 2;
+                offsetY = rect.height / 2;
+                draw();
+            }
+            
+            resize();
+            new ResizeObserver(resize).observe(canvas);
+        }
 
-        const date = new Date().toISOString().split("T")[0];
-        link.setAttribute("href", url);
-        link.setAttribute("download", `attendance_report_${date}.csv`);
-        link.style.visibility = "hidden";
+        function setupEventListeners() {
+            // Matrix inputs
+            ['m00', 'm01', 'm02', 'm10', 'm11', 'm12'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateMatrix);
+            });
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+            // Canvas mouse events
+            canvas.addEventListener('mousedown', onMouseDown);
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('mouseup', onMouseUp);
+            canvas.addEventListener('wheel', onWheel);
+            canvas.addEventListener('contextmenu', onContextMenu);
+
+            // Toggles
+            document.getElementById('show-original').addEventListener('change', draw);
+            document.getElementById('show-transformed').addEventListener('change', draw);
+
+            // Parameter sliders
+            setupSliderListeners();
+        }
+
+        function setupSliderListeners() {
+            const sliders = [
+                'angle-slider', 'scaleX-slider', 'scaleY-slider', 
+                'shear-slider', 'transX-slider', 'transY-slider'
+            ];
+            
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', updatePresetParameters);
+                }
+            });
+        }
+
+        function updatePresetParameters() {
+            if (!currentPreset) return;
+            
+            const angle = parseFloat(document.getElementById('angle-slider')?.value || 0);
+            const scaleX = parseFloat(document.getElementById('scaleX-slider')?.value || 1);
+            const scaleY = parseFloat(document.getElementById('scaleY-slider')?.value || 1);
+            const shear = parseFloat(document.getElementById('shear-slider')?.value || 0);
+            const transX = parseFloat(document.getElementById('transX-slider')?.value || 0);
+            const transY = parseFloat(document.getElementById('transY-slider')?.value || 0);
+
+            // Update value displays
+            if (document.getElementById('angle-value')) {
+                document.getElementById('angle-value').textContent = angle + '°';
+            }
+            if (document.getElementById('scaleX-value')) {
+                document.getElementById('scaleX-value').textContent = scaleX.toFixed(1);
+            }
+            if (document.getElementById('scaleY-value')) {
+                document.getElementById('scaleY-value').textContent = scaleY.toFixed(1);
+            }
+            if (document.getElementById('shear-value')) {
+                document.getElementById('shear-value').textContent = shear.toFixed(1);
+            }
+            if (document.getElementById('transX-value')) {
+                document.getElementById('transX-value').textContent = transX.toFixed(1);
+            }
+            if (document.getElementById('transY-value')) {
+                document.getElementById('transY-value').textContent = transY.toFixed(1);
+            }
+
+            // Apply preset with current parameters
+            setPreset(currentPreset, false);
+        }
+
+        function setPreset(preset, showParams = true) {
+            currentPreset = preset;
+            
+            // Reset all preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-100', 'border-emerald-500');
+            });
+            
+            // Highlight active button
+            event.target?.classList.add('bg-emerald-100', 'border-emerald-500');
+            
+            // Hide all parameter panels
+            document.getElementById('params').classList.add('hidden');
+            document.querySelectorAll('[id^="param-"]').forEach(el => el.classList.add('hidden'));
+            
+            let m = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+            
+            switch (preset) {
+                case 'identity':
+                    m = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+                    break;
+                case 'rotation':
+                    if (showParams) {
+                        document.getElementById('params').classList.remove('hidden');
+                        document.getElementById('param-angle').classList.remove('hidden');
+                    }
+                    const angle = parseFloat(document.getElementById('angle-slider')?.value || 45) * Math.PI / 180;
+                    const cos = Math.cos(angle);
+                    const sin = Math.sin(angle);
+                    m = [cos, -sin, 0, sin, cos, 0, 0, 0, 1];
+                    break;
+                case 'scale':
+                    if (showParams) {
+                        document.getElementById('params').classList.remove('hidden');
+                        document.getElementById('param-scale').classList.remove('hidden');
+                    }
+                    const sx = parseFloat(document.getElementById('scaleX-slider')?.value || 2);
+                    const sy = parseFloat(document.getElementById('scaleY-slider')?.value || 1);
+                    m = [sx, 0, 0, 0, sy, 0, 0, 0, 1];
+                    break;
+                case 'shearX':
+                    if (showParams) {
+                        document.getElementById('params').classList.remove('hidden');
+                        document.getElementById('param-shear').classList.remove('hidden');
+                    }
+                    const shx = parseFloat(document.getElementById('shear-slider')?.value || 0.5);
+                    m = [1, shx, 0, 0, 1, 0, 0, 0, 1];
+                    break;
+                case 'shearY':
+                    if (showParams) {
+                        document.getElementById('params').classList.remove('hidden');
+                        document.getElementById('param-shear').classList.remove('hidden');
+                    }
+                    const shy = parseFloat(document.getElementById('shear-slider')?.value || 0.5);
+                    m = [1, 0, 0, shy, 1, 0, 0, 0, 1];
+                    break;
+                case 'translation':
+                    if (showParams) {
+                        document.getElementById('params').classList.remove('hidden');
+                        document.getElementById('param-translation').classList.remove('hidden');
+                    }
+                    const tx = parseFloat(document.getElementById('transX-slider')?.value || 2);
+                    const ty = parseFloat(document.getElementById('transY-slider')?.value || -1);
+                    m = [1, 0, tx, 0, 1, ty, 0, 0, 1];
+                    break;
+                case 'reflectX':
+                    m = [1, 0, 0, 0, -1, 0, 0, 0, 1];
+                    break;
+                case 'reflectY':
+                    m = [-1, 0, 0, 0, 1, 0, 0, 0, 1];
+                    break;
+            }
+            
+            matrix = m;
+            updateMatrixInputs();
+            updateProperties();
+            draw();
+        }
+
+        function updateMatrixInputs() {
+            document.getElementById('m00').value = matrix[0].toFixed(2);
+            document.getElementById('m01').value = matrix[1].toFixed(2);
+            document.getElementById('m02').value = matrix[2].toFixed(2);
+            document.getElementById('m10').value = matrix[3].toFixed(2);
+            document.getElementById('m11').value = matrix[4].toFixed(2);
+            document.getElementById('m12').value = matrix[5].toFixed(2);
+        }
+
+        function updateMatrix() {
+            matrix[0] = parseFloat(document.getElementById('m00').value) || 0;
+            matrix[1] = parseFloat(document.getElementById('m01').value) || 0;
+            matrix[2] = parseFloat(document.getElementById('m02').value) || 0;
+            matrix[3] = parseFloat(document.getElementById('m10').value) || 0;
+            matrix[4] = parseFloat(document.getElementById('m11').value) || 0;
+            matrix[5] = parseFloat(document.getElementById('m12').value) || 0;
+            matrix[6] = 0;
+            matrix[7] = 0;
+            matrix[8] = 1;
+            
+            updateProperties();
+            draw();
+        }
+
+        function updateProperties() {
+            const det = matrix[0] * matrix[4] - matrix[1] * matrix[3];
+            const isInvertible = Math.abs(det) > 1e-10;
+            
+            document.getElementById('det-value').textContent = det.toFixed(2);
+            document.getElementById('invertible-value').textContent = isInvertible ? 'Yes' : 'No';
+            document.getElementById('area-scale-value').textContent = Math.abs(det).toFixed(2);
+            
+            // Detect transformation type
+            const type = detectTransformationType();
+            document.getElementById('type-value').textContent = type.short;
+            document.getElementById('transform-description').textContent = 'T : ' + type.full;
+        }
+
+        function detectTransformationType() {
+            const [a, b, c, d, e, f] = matrix;
+            const det = a * d - b * c;
+            
+            // Check for identity
+            if (Math.abs(a - 1) < 1e-10 && Math.abs(d - 1) < 1e-10 && 
+                Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10 && 
+                Math.abs(e) < 1e-10 && Math.abs(f) < 1e-10) {
+                return { short: 'Identity', full: 'Identity transformation' };
+            }
+            
+            // Check for translation only
+            if (Math.abs(a - 1) < 1e-10 && Math.abs(d - 1) < 1e-10 && 
+                Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10) {
+                return { 
+                    short: 'Translation', 
+                    full: `Translation by (${e.toFixed(2)}, ${f.toFixed(2)})` 
+                };
+            }
+            
+            // Check for pure scaling (no translation)
+            if (Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10 && 
+                Math.abs(e) < 1e-10 && Math.abs(f) < 1e-10) {
+                if (Math.abs(a - d) < 1e-10) {
+                    return { 
+                        short: 'Uniform Scaling', 
+                        full: `Uniform scaling by factor ${a.toFixed(2)}` 
+                    };
+                } else {
+                    return { 
+                        short: 'Scaling', 
+                        full: `Scaling by ${a.toFixed(2)} in x, ${d.toFixed(2)} in y` 
+                    };
+                }
+            }
+            
+            // Check for reflection
+            if (det < 0) {
+                if (Math.abs(a + 1) < 1e-10 && Math.abs(d - 1) < 1e-10 && 
+                    Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10) {
+                    return { short: 'Reflect Y', full: 'Reflection about the y-axis' };
+                }
+                if (Math.abs(a - 1) < 1e-10 && Math.abs(d + 1) < 1e-10 && 
+                    Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10) {
+                    return { short: 'Reflect X', full: 'Reflection about the x-axis' };
+                }
+            }
+            
+            // Check for rotation
+            if (Math.abs(det - 1) < 1e-10 && Math.abs(a - d) < 1e-10 && 
+                Math.abs(b + c) < 1e-10 && Math.abs(e) < 1e-10 && Math.abs(f) < 1e-10) {
+                const angle = Math.atan2(c, a) * 180 / Math.PI;
+                const dir = angle >= 0 ? 'Anticlockwise' : 'Clockwise';
+                return { 
+                    short: 'Rotation', 
+                    full: `${dir} rotation ${Math.abs(angle).toFixed(0)}° about the origin` 
+                };
+            }
+            
+            // Check for shearing
+            if (Math.abs(a - 1) < 1e-10 && Math.abs(d - 1) < 1e-10 && 
+                Math.abs(e) < 1e-10 && Math.abs(f) < 1e-10) {
+                if (Math.abs(c) < 1e-10) {
+                    return { 
+                        short: 'Shear X', 
+                        full: `Shearing in the x-direction by factor of ${b.toFixed(2)}` 
+                    };
+                }
+                if (Math.abs(b) < 1e-10) {
+                    return { 
+                        short: 'Shear Y', 
+                        full: `Shearing in the y-direction by factor of ${c.toFixed(2)}` 
+                    };
+                }
+            }
+            
+            return { short: 'Composite', full: 'Composite transformation' };
+        }
+
+        function transformPoint(x, y) {
+            return [
+                matrix[0] * x + matrix[1] * y + matrix[2],
+                matrix[3] * x + matrix[4] * y + matrix[5]
+            ];
+        }
+
+        function screenToGrid(screenX, screenY) {
+            return [
+                (screenX - offsetX) / scale,
+                -(screenY - offsetY) / scale
+            ];
+        }
+
+        function gridToScreen(gridX, gridY) {
+            return [
+                gridX * scale + offsetX,
+                -gridY * scale + offsetY
+            ];
+        }
+
+        function onMouseDown(e) {
+            if (replayMode) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const [gridX, gridY] = screenToGrid(x, y);
+            
+            // Check if clicking on existing point
+            dragPoint = null;
+            for (let i = 0; i < points.length; i++) {
+                const [px, py] = points[i];
+                const [screenPx, screenPy] = gridToScreen(px, py);
+                const dist = Math.sqrt((x - screenPx) ** 2 + (y - screenPy) ** 2);
+                if (dist < 15) {
+                    dragPoint = i;
+                    return;
+                }
+            }
+            
+            if (e.button === 0) { // Left click
+                if (points.length < 8) {
+                    points.push([gridX, gridY]);
+                    updatePointsTable();
+                    draw();
+                } else {
+                    isDragging = true;
+                    lastMouseX = x;
+                    lastMouseY = y;
+                }
+            }
+        }
+
+        function onMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const [gridX, gridY] = screenToGrid(x, y);
+            
+            // Update mouse coordinates display
+            document.getElementById('mouse-coords').textContent = 
+                `(${gridX.toFixed(2)}, ${gridY.toFixed(2)})`;
+            
+            if (replayMode) return;
+            
+            if (dragPoint !== null) {
+                points[dragPoint] = [gridX, gridY];
+                updatePointsTable();
+                draw();
+            } else if (isDragging) {
+                offsetX += x - lastMouseX;
+                offsetY += y - lastMouseY;
+                lastMouseX = x;
+                lastMouseY = y;
+                draw();
+            }
+        }
+
+        function onMouseUp(e) {
+            isDragging = false;
+            dragPoint = null;
+        }
+
+        function onWheel(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            const newScale = Math.max(5, Math.min(100, scale * scaleFactor));
+            
+            // Zoom towards mouse position
+            offsetX = x - (x - offsetX) * (newScale / scale);
+            offsetY = y - (y - offsetY) * (newScale / scale);
+            scale = newScale;
+            
+            draw();
+        }
+
+        function onContextMenu(e) {
+            e.preventDefault();
+            if (replayMode) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if right-clicking on a point
+            for (let i = 0; i < points.length; i++) {
+                const [px, py] = points[i];
+                const [screenPx, screenPy] = gridToScreen(px, py);
+                const dist = Math.sqrt((x - screenPx) ** 2 + (y - screenPy) ** 2);
+                if (dist < 15) {
+                    points.splice(i, 1);
+                    updatePointsTable();
+                    draw();
+                    break;
+                }
+            }
+        }
+
+        function updatePointsTable() {
+            const table = document.getElementById('points-table');
+            if (points.length === 0) {
+                table.innerHTML = '<div class="text-slate-500 italic">Click canvas to add points</div>';
+                return;
+            }
+            
+            let html = '';
+            points.forEach((point, i) => {
+                const [x, y] = point;
+                const [tx, ty] = transformPoint(x, y);
+                const color = pointColors[i];
+                html += `
+                    <div class="flex items-center text-xs font-mono">
+                        <div class="w-3 h-3 rounded-full mr-2" style="background: ${color}"></div>
+                        P${i + 1}: (${x.toFixed(2)}, ${y.toFixed(2)}) → (${tx.toFixed(2)}, ${ty.toFixed(2)})
+                    </div>
+                `;
+            });
+            table.innerHTML = html;
+        }
+
+        function draw() {
+            const width = canvas.width / devicePixelRatio;
+            const height = canvas.height / devicePixelRatio;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const showOriginal = document.getElementById('show-original').checked;
+            const showTransformed = document.getElementById('show-transformed').checked;
+            
+            // Draw original grid
+            if (showOriginal) {
+                drawGrid(false);
+            }
+            
+            // Draw transformed grid
+            if (showTransformed) {
+                drawGrid(true);
+            }
+            
+            // Draw basis vectors
+            drawBasisVectors();
+            
+            // Draw points and connections
+            drawPointsAndShape();
+            
+            // Draw axes
+            drawAxes();
+        }
+
+        function drawGrid(transformed) {
+            const width = canvas.width / devicePixelRatio;
+            const height = canvas.height / devicePixelRatio;
+            
+            ctx.strokeStyle = transformed ? '#16a34a' : '#22c55e';
+            ctx.lineWidth = transformed ? 1.5 : 0.5;
+            ctx.globalAlpha = transformed ? 0.8 : 0.3;
+            
+            const gridSize = 1;
+            const [minX, minY] = screenToGrid(0, height);
+            const [maxX, maxY] = screenToGrid(width, 0);
+            
+            // Vertical lines
+            for (let x = Math.floor(minX / gridSize) * gridSize; x <= maxX; x += gridSize) {
+                if (transformed) {
+                    drawTransformedLine(x, minY - 1, x, maxY + 1);
+                } else {
+                    const [sx1, sy1] = gridToScreen(x, minY - 1);
+                    const [sx2, sy2] = gridToScreen(x, maxY + 1);
+                    ctx.beginPath();
+                    ctx.moveTo(sx1, sy1);
+                    ctx.lineTo(sx2, sy2);
+                    ctx.stroke();
+                }
+            }
+            
+            // Horizontal lines
+            for (let y = Math.floor(minY / gridSize) * gridSize; y <= maxY; y += gridSize) {
+                if (transformed) {
+                    drawTransformedLine(minX - 1, y, maxX + 1, y);
+                } else {
+                    const [sx1, sy1] = gridToScreen(minX - 1, y);
+                    const [sx2, sy2] = gridToScreen(maxX + 1, y);
+                    ctx.beginPath();
+                    ctx.moveTo(sx1, sy1);
+                    ctx.lineTo(sx2, sy2);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        function drawTransformedLine(x1, y1, x2, y2) {
+            const samples = 50;
+            ctx.beginPath();
+            
+            for (let i = 0; i <= samples; i++) {
+                const t = i / samples;
+                const x = x1 + t * (x2 - x1);
+                const y = y1 + t * (y2 - y1);
+                const [tx, ty] = transformPoint(x, y);
+                const [sx, sy] = gridToScreen(tx, ty);
+                
+                if (i === 0) {
+                    ctx.moveTo(sx, sy);
+                } else {
+                    ctx.lineTo(sx, sy);
+                }
+            }
+            
+            ctx.stroke();
+        }
+
+        function drawBasisVectors() {
+            const [i1, i2] = transformPoint(1, 0);
+            const [j1, j2] = transformPoint(0, 1);
+            const [ox, oy] = gridToScreen(0, 0);
+            const [ix, iy] = gridToScreen(i1, i2);
+            const [jx, jy] = gridToScreen(j1, j2);
+            
+            // i vector (red)
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            drawArrow(ox, oy, ix, iy);
+            
+            // j vector (blue)
+            ctx.strokeStyle = '#3b82f6';
+            drawArrow(ox, oy, jx, jy);
+        }
+
+        function drawArrow(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+            // Arrow head
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const headLen = 10;
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(
+                x2 - headLen * Math.cos(angle - Math.PI / 6),
+                y2 - headLen * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(
+                x2 - headLen * Math.cos(angle + Math.PI / 6),
+                y2 - headLen * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.stroke();
+        }
+
+        function drawPointsAndShape() {
+            if (points.length === 0) return;
+            
+            // Draw filled shape if we have 3 or more points
+            if (points.length >= 3) {
+                // Original shape (semi-transparent)
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.1)';
+                ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)';
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                for (let i = 0; i < points.length; i++) {
+                    const [x, y] = points[i];
+                    const [sx, sy] = gridToScreen(x, y);
+                    if (i === 0) ctx.moveTo(sx, sy);
+                    else ctx.lineTo(sx, sy);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                // Transformed shape (more opaque)
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
+                ctx.strokeStyle = 'rgba(22, 163, 74, 0.6)';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                for (let i = 0; i < points.length; i++) {
+                    const [x, y] = points[i];
+                    const [tx, ty] = transformPoint(x, y);
+                    const [sx, sy] = gridToScreen(tx, ty);
+                    if (i === 0) ctx.moveTo(sx, sy);
+                    else ctx.lineTo(sx, sy);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            // Draw points and connections
+            points.forEach((point, i) => {
+                const [x, y] = point;
+                const [tx, ty] = transformPoint(x, y);
+                const [sx, sy] = gridToScreen(x, y);
+                const [tsx, tsy] = gridToScreen(tx, ty);
+                const color = pointColors[i];
+                
+                // Connection line
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(tsx, tsy);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Original point (hollow)
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(sx, sy, 6, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Transformed point (filled with glow)
+                ctx.fillStyle = color;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(tsx, tsy, 6, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                // Point labels
+                ctx.fillStyle = '#14532d';
+                ctx.font = '12px Inter';
+                ctx.fillText(`P${i + 1}`, sx + 10, sy - 10);
+                ctx.fillText(`P${i + 1}'`, tsx + 10, tsy - 10);
+            });
+        }
+
+        function drawAxes() {
+            const width = canvas.width / devicePixelRatio;
+            const height = canvas.height / devicePixelRatio;
+            
+            ctx.strokeStyle = '#14532d';
+            ctx.lineWidth = 1.5;
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(0, offsetY);
+            ctx.lineTo(width, offsetY);
+            ctx.stroke();
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(offsetX, 0);
+            ctx.lineTo(offsetX, height);
+            ctx.stroke();
+            
+            // Tick marks and labels
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#14532d';
+            ctx.textAlign = 'center';
+            
+            const [minX, minY] = screenToGrid(0, height);
+            const [maxX, maxY] = screenToGrid(width, 0);
+            
+            // X-axis ticks
+            for (let x = Math.floor(minX); x <= maxX; x++) {
+                if (x === 0) continue;
+                const [sx, sy] = gridToScreen(x, 0);
+                ctx.beginPath();
+                ctx.moveTo(sx, sy - 5);
+                ctx.lineTo(sx, sy + 5);
+                ctx.stroke();
+                ctx.fillText(x.toString(), sx, sy + 18);
+            }
+            
+            // Y-axis ticks
+            ctx.textAlign = 'right';
+            for (let y = Math.floor(minY); y <= maxY; y++) {
+                if (y === 0) continue;
+                const [sx, sy] = gridToScreen(0, y);
+                ctx.beginPath();
+                ctx.moveTo(sx - 5, sy);
+                ctx.lineTo(sx + 5, sy);
+                ctx.stroke();
+                ctx.fillText(y.toString(), sx - 10, sy + 4);
+            }
+        }
+
+        function animateTransform() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            const originalMatrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+            const targetMatrix = [...matrix];
+            const duration = 2000;
+            const startTime = Date.now();
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ping-pong animation
+                let t = progress * 2;
+                if (t > 1) t = 2 - t;
+                
+                // Interpolate matrix
+                for (let i = 0; i < 6; i++) {
+                    matrix[i] = originalMatrix[i] + t * (targetMatrix[i] - originalMatrix[i]);
+                }
+                
+                updateMatrixInputs();
+                updateProperties();
+                draw();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    matrix = [...targetMatrix];
+                    updateMatrixInputs();
+                    updateProperties();
+                    draw();
+                    isAnimating = false;
+                }
+            }
+            
+            animate();
+        }
+
+        function commitTransform() {
+            if (replayMode) return;
+            
+            // Apply current transformation to all points
+            const transformedPoints = points.map(point => transformPoint(point[0], point[1]));
+            
+            // Create history entry
+            const step = {
+                matrix: [...matrix],
+                points: points.map((point, i) => ({
+                    original: [...point],
+                    transformed: [...transformedPoints[i]],
+                    color: pointColors[i]
+                })),
+                description: document.getElementById('transform-description').textContent
+            };
+            
+            history.push(step);
+            
+            // Update points to transformed positions
+            points = transformedPoints;
+            
+            // Reset matrix to identity
+            matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+            updateMatrixInputs();
+            updateProperties();
+            updatePointsTable();
+            updateHistoryDisplay();
+            draw();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('history-list');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="text-slate-500 italic text-sm">No transformations yet</div>';
+                return;
+            }
+            
+            let html = '';
+            history.forEach((step, index) => {
+                html += `
+                    <div class="border border-emerald-200 rounded p-2 cursor-pointer hover:bg-emerald-50 transition-colors"
+                         onclick="viewHistoryStep(${index})">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="font-semibold text-sm text-emerald-900">Step ${index + 1}</div>
+                            <button onclick="deleteHistoryStep(${index}); event.stopPropagation();" 
+                                    class="text-red-500 hover:text-red-700 text-sm">✕</button>
+                        </div>
+                        <div class="text-xs text-emerald-700 mb-1">${step.description.replace('T : ', '')}</div>
+                        <div class="font-mono text-xs text-slate-600">
+                            [${step.matrix[0].toFixed(1)} ${step.matrix[1].toFixed(1)} ${step.matrix[2].toFixed(1)}]<br>
+                            [${step.matrix[3].toFixed(1)} ${step.matrix[4].toFixed(1)} ${step.matrix[5].toFixed(1)}]
+                        </div>
+                        <div class="text-xs mt-1 space-y-0.5">
+                            ${step.points.map((point, i) => 
+                                `<div style="color: ${point.color}">P${i+1}: (${point.original[0].toFixed(2)}, ${point.original[1].toFixed(2)}) → (${point.transformed[0].toFixed(2)}, ${point.transformed[1].toFixed(2)})</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function viewHistoryStep(index) {
+            replayMode = true;
+            replayStep = index;
+            
+            document.getElementById('replay-banner').classList.remove('hidden');
+            document.getElementById('replay-step').textContent = index + 1;
+            
+            // Set matrix to the step's matrix
+            const step = history[index];
+            matrix = [...step.matrix];
+            updateMatrixInputs();
+            updateProperties();
+            draw();
+        }
+
+        function exitReplay() {
+            replayMode = false;
+            replayStep = -1;
+            
+            document.getElementById('replay-banner').classList.add('hidden');
+            
+            // Reset to identity matrix
+            matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+            updateMatrixInputs();
+            updateProperties();
+            draw();
+        }
+
+        function deleteHistoryStep(index) {
+            // Remove the step and all subsequent steps
+            history.splice(index);
+            
+            // Reset points to state before deleted step
+            if (index === 0) {
+                points = [];
+            } else {
+                const previousStep = history[index - 1];
+                points = previousStep.points.map(p => [...p.transformed]);
+            }
+            
+            updatePointsTable();
+            updateHistoryDisplay();
+            exitReplay();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
     </script>
-  </body>
+</body>
 </html>
